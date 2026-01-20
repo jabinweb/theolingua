@@ -1,19 +1,29 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
 
 :root {
-  --scio-blue: #2d5296;
+  /* TheoLingua Brand Colors - Yellow & Blue Combination */
+  --brand-primary: #f99f1b; /* TheoLingua brand orange */
+  --brand-primary-light: #fbbf24; /* Lighter variant */
+  --brand-primary-dark: #d97706; /* Darker variant */
+  --brand-secondary: #2563eb; /* blue-600 - Secondary blue */
+  --brand-secondary-light: #3b82f6; /* blue-500 */
+  --brand-accent: #fef3c7; /* amber-100 - Light yellow for backgrounds */
+  --brand-accent-dark: #fde68a; /* amber-200 */
+  
+  /* Legacy support - map to yellow & blue theme */
+  --scio-blue: #2563eb;
   --scio-orange: #f99f1b;
-  --scio-blue-light: #4a6bb3;
-  --scio-blue-dark: #1e3a6f;
-  --scio-orange-light: #fbb040;
-  --scio-orange-dark: #e8890a;
+  --scio-blue-light: #3b82f6;
+  --scio-blue-dark: #1e40af;
+  --scio-orange-light: #fbbf24;
+  --scio-orange-dark: #d97706;
   --scio-green: #10b981;
   --scio-green-light: #34d399;
-  --scio-purple: #8b5cf6;
-  --scio-purple-light: #a78bfa;
+  --scio-purple: #c084fc;
+  --scio-purple-light: #d8b4fe;
+  
   --font-inter: 'Inter', sans-serif;
   --font-poppins: 'Poppins', sans-serif;
   --radius: 0.625rem;
@@ -90,10 +100,6 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @layer base {
   html {
     font-family: var(--font-inter);
@@ -150,6 +156,23 @@
 }
 
 @layer utilities {
+  /* TheoLingua Brand Utilities - Yellow & Blue Theme */
+  .bg-brand-primary { background-color: var(--brand-primary); }
+  .bg-brand-primary-light { background-color: var(--brand-primary-light); }
+  .bg-brand-primary-dark { background-color: var(--brand-primary-dark); }
+  .bg-brand-secondary { background-color: var(--brand-secondary); }
+  .bg-brand-accent { background-color: var(--brand-accent); }
+  
+  .text-brand-primary { color: var(--brand-primary); }
+  .text-brand-primary-light { color: var(--brand-primary-light); }
+  .text-brand-primary-dark { color: var(--brand-primary-dark); }
+  .text-brand-secondary { color: var(--brand-secondary); }
+  
+  .border-brand-primary { border-color: var(--brand-primary); }
+  .border-brand-secondary { border-color: var(--brand-secondary); }
+  .border-brand-accent { border-color: var(--brand-accent); }
+  
+  /* Legacy support */
   .bg-scio-blue { background-color: var(--scio-blue); }
   .bg-scio-orange { background-color: var(--scio-orange); }
   .bg-scio-green { background-color: var(--scio-green); }
@@ -160,6 +183,22 @@
   .text-scio-purple { color: var(--scio-purple); }
   .border-scio-blue { border-color: var(--scio-blue); }
   .border-scio-orange { border-color: var(--scio-orange); }
+  
+  /* Brand gradients - Yellow to Blue */
+  .bg-gradient-brand {
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
+  }
+  
+  .bg-gradient-brand-light {
+    background: linear-gradient(135deg, var(--brand-primary-light) 0%, var(--brand-secondary-light) 100%);
+  }
+  
+  .text-gradient-brand {
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 
   .font-heading { font-family: var(--font-poppins); }
   .font-body { font-family: var(--font-inter); }
@@ -281,11 +320,6 @@
   body {
     @apply bg-background text-foreground;
   }
-}
-
-/* Custom font classes */
-.font-heading {
-  font-family: var(--font-poppins);
 }
 
 .font-body {
@@ -449,4 +483,69 @@ html {
 
 .animate-cloud-left-to-right {
   animation: cloudDriftLeftToRight infinite linear;
+}
+
+/* Brand Color Utility Classes */
+.bg-brand {
+  background-color: #f99f1b;
+}
+
+.bg-brand-light {
+  background-color: #fbbf24;
+}
+
+.bg-brand-dark {
+  background-color: #d97706;
+}
+
+.bg-brand-50 {
+  background-color: #fffbeb;
+}
+
+.bg-brand-100 {
+  background-color: #fef3c7;
+}
+
+.text-brand {
+  color: #f99f1b;
+}
+
+.text-brand-light {
+  color: #fbbf24;
+}
+
+.text-brand-dark {
+  color: #d97706;
+}
+
+.text-brand-600 {
+  color: #d97706;
+}
+
+.text-brand-700 {
+  color: #b45309;
+}
+
+.text-brand-800 {
+  color: #92400e;
+}
+
+.border-brand {
+  border-color: #f99f1b;
+}
+
+.border-brand-200 {
+  border-color: #fde68a;
+}
+
+.border-brand-300 {
+  border-color: #fcd34d;
+}
+
+.hover\:bg-brand-200:hover {
+  background-color: #fde68a;
+}
+
+.hover\:border-brand-300:hover {
+  border-color: #fcd34d;
 }

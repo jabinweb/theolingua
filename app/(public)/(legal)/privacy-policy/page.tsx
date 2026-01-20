@@ -5,7 +5,7 @@ import ContactSection from '@/components/legal/ContactSection';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
-  description: 'Privacy Policy for ScioCare Healthcare Education',
+  description: 'Privacy Policy for TheoLingua Bible-Based English Learning',
 };
 
 export default function PrivacyPolicyPage() {
@@ -13,7 +13,7 @@ export default function PrivacyPolicyPage() {
     <>
       <LegalPageHero
         title="Privacy Policy"
-        description="Your privacy and data security are our top priorities at ScioCare"
+        description="Your privacy and data security are our top priorities at TheoLingua"
         icon={Shield}
         lastUpdated={new Date().toLocaleDateString()}
       />

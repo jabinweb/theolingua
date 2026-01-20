@@ -13,31 +13,31 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "ScioCare - Healthcare Education Excellence",
-    template: "%s | ScioCare"
+    default: "TheoLingua - Bible-Based English Learning",
+    template: "%s | TheoLingua"
   },
-  description: "Equipping healthcare professionals with essential communication and professional skills through specialized training programs including CareBridge English, CareSteps, and Pathways360°.",
-  keywords: ["healthcare training", "medical education", "nursing training", "clinical communication", "healthcare English", "professional development"],
-  authors: [{ name: "ScioCare" }],
-  creator: "ScioCare",
+  description: "A Bible-based and theology-focused English curriculum for theological students in India. Integrating biblical texts and Christian literature to enhance language skills while deepening understanding of the Bible.",
+  keywords: ["theological education", "Bible-based English", "Christian education", "seminary training", "theological English", "ministry communication", "biblical literature", "English for theology students"],
+  authors: [{ name: "TheoLingua" }],
+  creator: "TheoLingua",
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://sciocare.com",
-    title: "ScioCare - Healthcare Education Excellence",
-    description: "Specialized training programs for healthcare professionals focusing on communication skills and professional development.",
-    siteName: "ScioCare",
+    url: "https://theolingua.com",
+    title: "TheoLingua - Bible-Based English Learning",
+    description: "Bible-based and theology-focused English curriculum for theological students in India.",
+    siteName: "TheoLingua",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ScioCare - Healthcare Education Excellence",
-    description: "Specialized training programs for healthcare professionals focusing on communication skills and professional development.",
+    title: "TheoLingua - Bible-Based English Learning",
+    description: "Bible-based and theology-focused English curriculum for theological students in India.",
   },
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "ScioCare"
+    title: "TheoLingua"
   },
   icons: {
     icon: "/favicon.png",

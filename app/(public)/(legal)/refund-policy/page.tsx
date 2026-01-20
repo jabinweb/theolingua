@@ -5,7 +5,7 @@ import ContactSection from '@/components/legal/ContactSection';
 
 export const metadata: Metadata = {
   title: 'Refund Policy',
-  description: 'Refund Policy for ScioCare Healthcare Education',
+  description: 'Refund Policy for TheoLingua Bible-Based English Learning',
 };
 
 export default function RefundPolicyPage() {

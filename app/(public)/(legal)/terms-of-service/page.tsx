@@ -4,7 +4,7 @@ import LegalPageHero from '@/components/legal/LegalPageHero';
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
-  description: 'Terms of Service for ScioCare Healthcare Education',
+  description: 'Terms of Service for TheoLingua Bible-Based English Learning',
 };
 
 export default function TermsOfServicePage() {
@@ -22,7 +22,7 @@ export default function TermsOfServicePage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Acceptance of Terms</h2>
             <p className="text-gray-700 mb-4">
-              By accessing and using ScioCare&apos;s services, you accept and agree to be bound by the
+              By accessing and using TheoLingua&apos;s services, you accept and agree to be bound by the
               terms and provision of this agreement.
             </p>
           </section>
@@ -50,14 +50,14 @@ export default function TermsOfServicePage() {
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Intellectual Property</h2>
             <p className="text-gray-700 mb-4">
               All course materials, including but not limited to text, graphics, logos, and software,
-              are the property of ScioCare and are protected by copyright laws.
+              are the property of TheoLingua and are protected by copyright laws.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Limitation of Liability</h2>
             <p className="text-gray-700 mb-4">
-              ScioCare shall not be liable for any damages arising from the use or inability to use
+              TheoLingua shall not be liable for any damages arising from the use or inability to use
               our services, even if we have been advised of the possibility of such damages.
             </p>
           </section>

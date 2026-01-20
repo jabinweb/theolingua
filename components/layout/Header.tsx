@@ -34,10 +34,10 @@ export default function Header() {
   }, []);
 
   const navigation = [
-    { name: 'Discover ScioCare', href: '#discover', icon: Globe },
-    { name: 'Programs', href: '#programs', icon: BookOpen },
-    { name: 'Why ScioCare', href: '#why-choose', icon: Users },
-    { name: 'Contact', href: '#brochures', icon: Phone },
+    { name: 'About', href: '#hero', icon: Globe },
+    { name: 'Features', href: '#features', icon: BookOpen },
+    // { name: 'Games', href: '#games', icon: Users },
+    { name: 'Testimonials', href: '#testimonials', icon: Phone },
   ];
 
   return (
@@ -54,10 +54,10 @@ export default function Header() {
           <Link href="/" className="flex items-center space-x-3">
             <div className="w-28 md:w-32 h-8 relative">
               <Image
-                src={isScrolled || !isHomePage ? "/logo.png" : "/sciocare_light.png"}
-                alt="ScioCare Logo"
+                src={isScrolled || !isHomePage ? "/logo.png" : "/logo.png"}
+                alt="TheoLingua Logo"
                 fill
-                className="object-contain"
+                className="object-contain object-left"
               />
             </div>
           </Link>

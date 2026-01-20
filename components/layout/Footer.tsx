@@ -13,9 +13,10 @@ export default function Footer() {
   ];
 
   const quickLinks = [
-    { name: 'Our Programs', href: '#programs' },
-    { name: 'Why Choose Us', href: '#why-choose' },
-    // { name: 'Success Stories', href: '#testimonials' },
+    { name: 'What is TheoLingua', href: '#hero' },
+    { name: 'Features', href: '#features' },
+    { name: 'Games', href: '#games' },
+    { name: 'Testimonials', href: '#testimonials' },
   ];
 
   // const socialLinks = [
@@ -34,15 +35,15 @@ export default function Footer() {
             <div className="flex items-center space-x-3">
               <div className="w-32 h-8 relative">
                 <Image
-                  src="/sciocare_light.png"
-                  alt="ScioCare Logo"
+                  src="/logo.png"
+                  alt="TheoLingua Logo"
                   fill
-                  className="object-contain"
+                  className="object-contain object-left"
                 />
               </div>
             </div>
             <p className="text-gray-300 text-sm leading-relaxed">
-              Healthcare Communication Training That Actually Works. Empowering healthcare professionals with industry-specific English and soft skills.
+              Bible-based English Learning for Theological Students. Integrating biblical texts and theological literature to enhance language skills and deepen understanding of the Bible.
             </p>
             
             {/* CTA Button */}
@@ -127,7 +128,7 @@ export default function Footer() {
         <div className="border-t border-gray-700 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 text-center md:text-left">
             <div className="text-gray-400 text-xs md:text-sm">
-              © {currentYear} ScioCare. All rights reserved. | Healthcare Education Excellence
+              © {currentYear} TheoLingua. All rights reserved. | Bible-Based English Learning
             </div>
             <div className="flex space-x-4 text-xs md:text-sm">
               <span className="text-gray-500">Powered by <Link href="https://sciolabs.in" target='_blank' className="text-gray-400 hover:text-white transition-colors">ScioLabs</Link> | Made with ❤️ by <Link href="https://web.jabin.org" target='_blank' className="text-gray-400 hover:text-white transition-colors">Jabin Web</Link></span>

@@ -39,13 +39,13 @@ function LoginForm() {
           <div className="flex justify-center mb-4">
             <Image
               src="/logo.png"
-              alt="Scio Labs"
+              alt="TheoLingua"
               width={60}
               height={60}
               className="rounded-lg"
             />
           </div>
-          <h1 className="text-2xl font-bold">Welcome to ScioCare</h1>
+          <h1 className="text-2xl font-bold">Welcome to TheoLingua</h1>
           <p className="text-muted-foreground">
             Sign in or create a new account
           </p>

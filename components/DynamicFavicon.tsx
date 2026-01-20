@@ -10,11 +10,11 @@ export default function DynamicFavicon() {
       const appleTouchIcon = document.querySelector('link[rel="apple-touch-icon"]') as HTMLLinkElement;
       
       if (favicon) {
-        favicon.href = isDarkMode ? '/favicon_light.png' : '/favicon.png';
+        favicon.href = '/logo.png';
       }
       
       if (appleTouchIcon) {
-        appleTouchIcon.href = isDarkMode ? '/favicon_light.png' : '/favicon.png';
+        appleTouchIcon.href = '/logo.png';
       }
     };
 

@@ -66,7 +66,7 @@ export default function BookDemo({ children }: BookDemoProps) {
         email: formData.email,
         phone: formData.phone,
         status: 'new',
-        source: 'ScioCare Website',
+        source: 'TheoLingua Website',
         tags: 'demo-request'
       };
             
@@ -139,7 +139,7 @@ export default function BookDemo({ children }: BookDemoProps) {
             Book a Demo Session
           </DialogTitle>
           <DialogDescription className="text-sm sm:text-base">
-            Schedule a personalized demo to see how ScioCare can transform your healthcare education programs.
+            Schedule a personalized demo to see how TheoLingua can transform your theological education programs.
           </DialogDescription>
         </DialogHeader>
 
@@ -232,9 +232,9 @@ export default function BookDemo({ children }: BookDemoProps) {
                   <SelectValue placeholder="Select a program" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="carebridge">CareBridge English</SelectItem>
-                  <SelectItem value="caresteps">CareSteps</SelectItem>
-                  <SelectItem value="pathways360">Pathways360°</SelectItem>
+                  <SelectItem value="theolingua">TheoLingua</SelectItem>
+                  <SelectItem value="theolingua-basics">TheoLingua Basics</SelectItem>
+                  <SelectItem value="theolingua-advanced">TheoLingua Advanced</SelectItem>
                   <SelectItem value="all">All Programs</SelectItem>
                   <SelectItem value="custom">Custom Solution</SelectItem>
                 </SelectContent>
