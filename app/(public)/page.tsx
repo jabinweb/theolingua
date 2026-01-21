@@ -178,26 +178,26 @@ interface ProblemItem {
 const problemItems: ProblemItem[] = [
   {
     id: 'general',
-    description: 'Traditional English courses don\'t connect with the spiritual and theological context that matters most to theology students.',
+    description: 'General English courses don\'t prepare theology students for academic reading and study.',
     emoji: '📚',
     bgColor: 'bg-brand-100',
   },
   {
     id: 'speaking',
-    description: 'Students struggle to articulate theological concepts and communicate biblical truths effectively in English.',
+    description: 'Students struggle to read, understand, and discuss theological texts in English.',
     emoji: '😕',
     bgColor: 'bg-brand-100',
   },
   {
     id: 'writing',
-    description: 'Writing sermons, theological papers, and ministry communications requires specialized English skills.',
+    description: 'Many find it difficult to write sermons, assignments, and research papers clearly.',
     emoji: '✍️',
     bgColor: 'bg-yellow-100',
   },
   {
     id: 'opportunities',
-    description: 'Many capable students miss ministry opportunities globally—not because of calling, but because of English barriers.',
-    emoji: '🌍',
+    description: 'Limited English makes it hard to use commentaries, journals, and global resources.',
+    emoji: '📖',
     bgColor: 'bg-yellow-100',
   },
 ];
