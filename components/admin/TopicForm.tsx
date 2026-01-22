@@ -294,7 +294,7 @@ export function TopicForm({ isOpen, onClose, onSubmit, initialData, mode, chapte
                 <div>
                   <Label className="text-sm font-medium">Or Upload Video File</Label>
                   <FileUpload
-                    folder="sciocare"
+                    folder="theolingua"
                     onUploadComplete={(file) => {
                       updateContentData('videoUrl', file.url);
                       toast.success('Video uploaded successfully');
@@ -321,7 +321,7 @@ export function TopicForm({ isOpen, onClose, onSubmit, initialData, mode, chapte
                 <div>
                   <Label className="text-sm font-medium">Or Upload PDF File</Label>
                   <FileUpload
-                    folder="sciocare"
+                    folder="theolingua"
                     onUploadComplete={(file) => {
                       updateContentData('pdfUrl', file.url);
                       toast.success('PDF uploaded successfully');

@@ -219,7 +219,7 @@ export default function BookDemo({ children }: BookDemoProps) {
                 name="organization"
                 value={formData.organization}
                 onChange={handleInputChange}
-                placeholder="Your nursing college or healthcare institution"
+                placeholder="Your seminary or theological institution"
                 className="mt-1"
                 required
               />

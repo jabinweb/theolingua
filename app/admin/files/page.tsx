@@ -41,7 +41,7 @@ export default function FileManagerPage() {
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFolder] = useState('sciocare'); // Fixed to sciocare folder
+  const [selectedFolder] = useState('theolingua'); // Fixed to theolingua folder
   const [deleting, setDeleting] = useState<string | null>(null);
   const [showUpload, setShowUpload] = useState(false);
 

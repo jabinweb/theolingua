@@ -27,31 +27,31 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "ScioCare - Healthcare Education Excellence",
-    template: "%s | ScioCare"
+    default: "TheoLingua - Theological English Education Excellence",
+    template: "%s | TheoLingua"
   },
-  description: "Equipping healthcare professionals with essential communication and professional skills through specialized training programs including CareBridge English, CareSteps, and Pathways360°.",
-  keywords: ["healthcare training", "medical education", "nursing training", "clinical communication", "healthcare English", "professional development"],
-  authors: [{ name: "ScioCare" }],
-  creator: "ScioCare",
+  description: "Equipping theology students and ministers with essential English skills for reading, understanding, and discussing theological texts. Specialized training for academic excellence and ministry effectiveness.",
+  keywords: ["theological education", "theological English", "seminary training", "biblical communication", "ministry English", "theological writing"],
+  authors: [{ name: "TheoLingua" }],
+  creator: "TheoLingua",
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://sciocare.com",
-    title: "ScioCare - Healthcare Education Excellence",
-    description: "Specialized training programs for healthcare professionals focusing on communication skills and professional development.",
-    siteName: "ScioCare",
+    url: "https://theolingua.com",
+    title: "TheoLingua - Theological English Education Excellence",
+    description: "Specialized training programs for theology students focusing on English communication skills and academic development.",
+    siteName: "TheoLingua",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ScioCare - Healthcare Education Excellence",
-    description: "Specialized training programs for healthcare professionals focusing on communication skills and professional development.",
+    title: "TheoLingua - Theological English Education Excellence",
+    description: "Specialized training programs for theology students focusing on English communication skills and academic development.",
   },
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "ScioCare"
+    title: "TheoLingua"
   },
   icons: {
     icon: "/logo.png",

@@ -129,7 +129,7 @@ export default function ComboSubscriptionDialog({
         key: order.keyId,
         amount: order.amount,
         currency: order.currency,
-        name: 'ScioCare',
+        name: 'TheoLingua',
         description: `${basicsProgram.name} + ${advancedProgram.name} - ${duration} Months`,
         order_id: order.id,
         handler: async function (response: any) {

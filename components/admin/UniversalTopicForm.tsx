@@ -478,7 +478,7 @@ export function UniversalTopicForm({ isOpen, onClose, onSubmit }: UniversalTopic
                   <div>
                     <Label className="text-sm font-medium">Or Upload PDF File</Label>
                     <FileUpload
-                      folder="sciocare"
+                      folder="theolingua"
                       onUploadComplete={(file) => {
                         handleContentChange('url', file.url);
                         toast.success('PDF uploaded successfully');
@@ -504,7 +504,7 @@ export function UniversalTopicForm({ isOpen, onClose, onSubmit }: UniversalTopic
                 <div>
                   <Label className="text-sm font-medium">Or Upload Video File</Label>
                   <FileUpload
-                    folder="sciocare"
+                    folder="theolingua"
                     onUploadComplete={(file) => {
                       handleContentChange('videoUrl', file.url);
                       toast.success('Video uploaded successfully');

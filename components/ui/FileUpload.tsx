@@ -26,7 +26,7 @@ export function FileUpload({
   accept = 'image/*,.pdf,.doc,.docx,.xls,.xlsx',
   maxSizeMB = 10,
   label = 'Upload File',
-  folder = 'sciocare' // Default folder
+  folder = 'theolingua' // Default folder
 }: FileUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null);
