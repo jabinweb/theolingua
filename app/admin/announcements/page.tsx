@@ -130,14 +130,14 @@ export default function AdminAnnouncementsPage() {
 
   const getTypeBadge = (type: string) => {
     const typeConfig = {
-      INFO: { label: 'Info', className: 'bg-blue-100 text-blue-800' },
-      UPDATE: { label: 'Update', className: 'bg-green-100 text-green-800' },
-      MAINTENANCE: { label: 'Maintenance', className: 'bg-orange-100 text-orange-800' },
-      PROMOTION: { label: 'Promotion', className: 'bg-purple-100 text-purple-800' },
-      WARNING: { label: 'Warning', className: 'bg-red-100 text-red-800' },
+      INFO: { label: 'Info', className: 'bg-white border-theo-black/10 text-theo-black' },
+      UPDATE: { label: 'Update', className: 'bg-theo-yellow text-theo-black font-bold' },
+      MAINTENANCE: { label: 'Maintenance', className: 'bg-theo-black text-theo-yellow font-bold' },
+      PROMOTION: { label: 'Promotion', className: 'bg-theo-yellow text-theo-black font-bold border-2 border-theo-black' },
+      WARNING: { label: 'Warning', className: 'bg-red-600 text-white font-bold' },
     };
     const config = typeConfig[type as keyof typeof typeConfig] || typeConfig.INFO;
-    return <Badge className={config.className}>{config.label}</Badge>;
+    return <Badge className={`rounded-full px-4 py-1 uppercase tracking-tighter text-[10px] ${config.className}`} variant="outline">{config.label}</Badge>;
   };
 
   const getStatusBadge = (announcement: Announcement) => {
@@ -146,18 +146,18 @@ export default function AdminAnnouncementsPage() {
     const endDate = announcement.endDate ? new Date(announcement.endDate) : null;
 
     if (!announcement.isActive) {
-      return <Badge className="bg-gray-100 text-gray-800">Inactive</Badge>;
+      return <Badge variant="outline" className="bg-gray-50 text-gray-400 border-gray-200 uppercase tracking-tighter text-[10px] font-bold">Inactive</Badge>;
     }
 
     if (startDate && startDate > now) {
-      return <Badge className="bg-yellow-100 text-yellow-800">Scheduled</Badge>;
+      return <Badge className="bg-theo-yellow/20 text-theo-black border-theo-black/10 uppercase tracking-tighter text-[10px] font-bold">Scheduled</Badge>;
     }
 
     if (endDate && endDate < now) {
-      return <Badge className="bg-red-100 text-red-800">Expired</Badge>;
+      return <Badge className="bg-red-50 text-red-600 border-red-100 uppercase tracking-tighter text-[10px] font-bold">Expired</Badge>;
     }
 
-    return <Badge className="bg-green-100 text-green-800">Active</Badge>;
+    return <Badge className="bg-theo-yellow text-theo-black border-theo-black/10 uppercase tracking-tighter text-[10px] font-bold">Active</Badge>;
   };
 
   const createAnnouncement = async () => {
@@ -301,55 +301,76 @@ export default function AdminAnnouncementsPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Announcements Management</h1>
-        <p className="text-gray-600">Create and manage system announcements</p>
-      </div>
+    <div className="p-8 bg-theo-white/30 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+              <h1 className="text-5xl font-bold text-theo-black tracking-tight mb-2">
+                Announcements
+              </h1>
+              <p className="text-gray-500 font-medium text-lg">Broadcast information and updates to your users</p>
+            </div>
+            <div className="flex gap-4">
+              <Button onClick={() => setShowCreateForm(true)} variant="theo" className="rounded-2xl h-11 px-6 shadow-lg shadow-theo-yellow/20">
+                <Plus className="h-5 w-5 mr-2" />
+                New Announcement
+              </Button>
+            </div>
+          </div>
+        </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group bg-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Announcements</CardTitle>
-            <Megaphone className="h-4 w-4 text-blue-600" />
+            <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total Created</CardTitle>
+            <div className="h-12 w-12 rounded-2xl bg-theo-yellow/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Megaphone className="h-6 w-6 text-theo-black" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalAnnouncements}</div>
-            <p className="text-xs text-gray-500">All announcements created</p>
+            <div className="text-4xl font-bold text-theo-black tracking-tighter">{stats.totalAnnouncements}</div>
+            <p className="text-xs text-gray-500 font-medium mt-1">All announcements sent</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group bg-theo-black">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Announcements</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-600" />
+            <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-theo-yellow/50">Live Now</CardTitle>
+            <div className="h-12 w-12 rounded-2xl bg-theo-yellow/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <CheckCircle className="h-6 w-6 text-theo-yellow" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.activeAnnouncements}</div>
-            <p className="text-xs text-gray-500">Currently visible to users</p>
+            <div className="text-4xl font-bold text-theo-yellow tracking-tighter">{stats.activeAnnouncements}</div>
+            <p className="text-xs text-theo-yellow/50 font-medium mt-1">Currently visible to users</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group bg-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Scheduled</CardTitle>
-            <Calendar className="h-4 w-4 text-yellow-600" />
+            <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Scheduled</CardTitle>
+            <div className="h-12 w-12 rounded-2xl bg-theo-black/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Calendar className="h-6 w-6 text-theo-black" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{stats.scheduledAnnouncements}</div>
-            <p className="text-xs text-gray-500">Scheduled for future</p>
+            <div className="text-4xl font-bold text-theo-black tracking-tighter">{stats.scheduledAnnouncements}</div>
+            <p className="text-xs text-gray-500 font-medium mt-1">Scheduled for future release</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group bg-white text-gray-400 opacity-80">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Expired</CardTitle>
-            <AlertCircle className="h-4 w-4 text-red-600" />
+            <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Archived/Expired</CardTitle>
+            <div className="h-12 w-12 rounded-2xl bg-gray-100 flex items-center justify-center">
+              <AlertCircle className="h-6 w-6" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{stats.expiredAnnouncements}</div>
-            <p className="text-xs text-gray-500">Past end date</p>
+            <div className="text-4xl font-bold tracking-tighter">{stats.expiredAnnouncements}</div>
+            <p className="text-xs font-medium mt-1">Past end date</p>
           </CardContent>
         </Card>
       </div>
@@ -674,6 +695,7 @@ export default function AdminAnnouncementsPage() {
           )}
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

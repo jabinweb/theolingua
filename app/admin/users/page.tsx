@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Trash2, RefreshCw, AlertCircle, UserCheck, Plus, Edit, UserX, Search, Upload, CheckSquare, ArrowUp, ArrowDown } from 'lucide-react';
+import { Trash2, RefreshCw, AlertCircle, UserCheck, Plus, Edit, UserX, Search, Upload, CheckSquare, ArrowUp, ArrowDown, Users, DollarSign } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { BulkStudentUpload } from '@/components/admin/BulkStudentUpload';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -498,76 +498,69 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">User Management</h1>
-            <p className="text-muted-foreground">Manage registered users and their subscriptions</p>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={refreshData} variant="outline" disabled={dataLoading}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
-            </Button>
-            <Button onClick={() => setBulkUploadOpen(true)} variant="secondary">
-              <Upload className="h-4 w-4 mr-2" />
-              Bulk Upload
-            </Button>
-            <Button onClick={() => setFormOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add User
-            </Button>
+    <div className="p-8 bg-theo-white/30 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+              <h1 className="text-5xl font-bold text-theo-black tracking-tight mb-2">
+                User Directory
+              </h1>
+              <p className="text-gray-500 font-medium text-lg">Manage registered students, faculty and administrative roles</p>
+            </div>
+            <div className="flex gap-4">
+              <Button onClick={refreshData} variant="outline" disabled={dataLoading} className="rounded-2xl h-11 px-6">
+                <RefreshCw className={`h-4 w-4 mr-2 ${dataLoading ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+              <Button onClick={() => setBulkUploadOpen(true)} variant="theo-black" className="rounded-2xl h-11 px-6">
+                <Upload className="h-4 w-4 mr-2" />
+                Bulk Actions
+              </Button>
+              <Button onClick={() => setFormOpen(true)} variant="theo" className="rounded-2xl h-11 px-6 shadow-lg shadow-theo-yellow/20">
+                <Plus className="h-5 w-5 mr-2" />
+                Add User
+              </Button>
+            </div>
           </div>
         </div>
 
         {/* Search Bar & Filters */}
-        <Card className="mb-6">
-          <CardContent className="p-4">
+        <Card className="mb-8 border-0 shadow-sm rounded-[32px] overflow-hidden bg-white">
+          <CardContent className="p-6">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <Input
-                  placeholder="Search by name, email, college, phone, or role..."
+                  placeholder="Query students, faculty or institutions..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-12 h-12 rounded-2xl border-theo-black/5 bg-gray-50/50 focus:bg-white transition-all"
                 />
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <Select value={filterRole} onValueChange={setFilterRole}>
-                  <SelectTrigger className="w-[140px]">
+                  <SelectTrigger className="w-[160px] h-12 rounded-2xl border-theo-black/5 bg-gray-50/50">
                     <SelectValue placeholder="All Roles" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Roles</SelectItem>
-                    <SelectItem value="USER">User</SelectItem>
-                    <SelectItem value="TEACHER">Teacher</SelectItem>
-                    <SelectItem value="MODERATOR">Moderator</SelectItem>
-                    <SelectItem value="ADMIN">Admin</SelectItem>
+                  <SelectContent className="rounded-2xl border-theo-black/5">
+                    <SelectItem value="all">Every Role</SelectItem>
+                    <SelectItem value="USER">Students</SelectItem>
+                    <SelectItem value="TEACHER">Staff</SelectItem>
+                    <SelectItem value="MODERATOR">Mentors</SelectItem>
+                    <SelectItem value="ADMIN">Admins</SelectItem>
                   </SelectContent>
                 </Select>
                 <Select value={filterStatus} onValueChange={setFilterStatus}>
-                  <SelectTrigger className="w-[160px]">
+                  <SelectTrigger className="w-[180px] h-12 rounded-2xl border-theo-black/5 bg-gray-50/50">
                     <SelectValue placeholder="All Status" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="active">Subscribers</SelectItem>
-                    <SelectItem value="inactive">Free Users</SelectItem>
-                    <SelectItem value="enabled">Enabled</SelectItem>
-                    <SelectItem value="disabled">Disabled</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={itemsPerPage.toString()} onValueChange={(val) => setItemsPerPage(Number(val))}>
-                  <SelectTrigger className="w-[100px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="10">10 / page</SelectItem>
-                    <SelectItem value="25">25 / page</SelectItem>
-                    <SelectItem value="50">50 / page</SelectItem>
-                    <SelectItem value="100">100 / page</SelectItem>
+                  <SelectContent className="rounded-2xl border-theo-black/5">
+                    <SelectItem value="all">Universal Status</SelectItem>
+                    <SelectItem value="active">Subscribed</SelectItem>
+                    <SelectItem value="inactive">Free Tier</SelectItem>
+                    <SelectItem value="enabled">Active Access</SelectItem>
+                    <SelectItem value="disabled">Restricted</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -577,12 +570,12 @@ export default function UsersPage() {
 
         {/* Bulk Actions Bar */}
         {selectedUsers.size > 0 && (
-          <Card className="mb-6 bg-blue-50 border-blue-200">
+          <Card className="mb-6 bg-theo-yellow/10 border-theo-yellow/20">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <CheckSquare className="h-5 w-5 text-blue-600" />
-                  <span className="font-medium text-blue-900">
+                  <CheckSquare className="h-5 w-5 text-theo-black" />
+                  <span className="font-bold text-theo-black">
                     {selectedUsers.size} user(s) selected
                   </span>
                 </div>
@@ -628,54 +621,62 @@ export default function UsersPage() {
         )}
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-          <Card>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+          <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+              <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total Users</CardTitle>
+              <Users className="h-5 w-5 text-theo-black/20" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{registeredUsers.length}</div>
+              <div className="text-4xl font-bold text-theo-black tracking-tighter">{registeredUsers.length}</div>
               {(searchTerm || filterRole !== 'all' || filterStatus !== 'all') && (
-                <p className="text-xs text-muted-foreground">
-                  {filteredUsers.length} filtered
+                <p className="text-xs text-theo-yellow font-bold mt-1">
+                  {filteredUsers.length} matches
                 </p>
               )}
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group bg-theo-black">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Subscribers</CardTitle>
+              <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-theo-yellow/50">Pulse Rate</CardTitle>
+              <UserCheck className="h-5 w-5 text-theo-yellow/20" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-4xl font-bold text-theo-yellow tracking-tighter">
                 {registeredUsers.filter(u => u.hasActiveSubscription).length}
               </div>
+              <p className="text-xs text-theo-yellow/30 font-bold mt-1">Active Subscribers</p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Payments</CardTitle>
+              <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Transactions</CardTitle>
+              <CheckSquare className="h-5 w-5 text-theo-black/20" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-4xl font-bold text-theo-black tracking-tighter">
                 {registeredUsers.reduce((sum, u) => sum + u.totalPayments, 0)}
               </div>
+              <p className="text-xs text-gray-400 font-bold mt-1">Total Lifetime</p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+              <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Net Value</CardTitle>
+              <DollarSign className="h-5 w-5 text-theo-black/20" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-4xl font-bold text-theo-black tracking-tighter">
                 ₹{Math.round(registeredUsers.reduce((sum, u) => sum + u.totalAmountPaid, 0) / 100).toLocaleString()}
               </div>
+              <p className="text-xs text-gray-400 font-bold mt-1">Gross Revenue</p>
             </CardContent>
           </Card>
         </div>
+
 
         {/* Users List */}
         <Card>
@@ -776,7 +777,7 @@ export default function UsersPage() {
                                 {registeredUser.photoUrl && (
                                   <AvatarImage src={registeredUser.photoUrl} alt={registeredUser.displayName || 'User'} />
                                 )}
-                                <AvatarFallback className="bg-gradient-to-br from-blue-400 to-blue-600 text-white text-xs font-semibold">
+                                <AvatarFallback className="bg-theo-black text-theo-yellow text-xs font-bold">
                                   {registeredUser.displayName?.[0] || registeredUser.email?.[0]?.toUpperCase() || 'U'}
                                 </AvatarFallback>
                               </Avatar>

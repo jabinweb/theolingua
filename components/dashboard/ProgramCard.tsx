@@ -67,10 +67,7 @@ interface ProgramCardProps {
 const AccessBadge: React.FC<{ programData: DashboardProgramData }> = ({ programData }) => {
   if ('schoolAccess' in programData && programData.schoolAccess) {
     return (
-      <div className="bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg flex items-center gap-1">
-        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-        </svg>
+      <div className="bg-green-500 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm flex items-center gap-1">
         School Access
       </div>
     );
@@ -78,10 +75,7 @@ const AccessBadge: React.FC<{ programData: DashboardProgramData }> = ({ programD
   
   if ('subscriptionAccess' in programData && programData.subscriptionAccess) {
     return (
-      <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg flex items-center gap-1">
-        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-        </svg>
+      <div className="bg-theo-yellow text-theo-black px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm flex items-center gap-1">
         Full Access
       </div>
     );
@@ -89,10 +83,7 @@ const AccessBadge: React.FC<{ programData: DashboardProgramData }> = ({ programD
   
   if ('hasPartialAccess' in programData && programData.hasPartialAccess) {
     return (
-      <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg flex items-center gap-1">
-        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-        </svg>
+      <div className="bg-theo-black text-theo-yellow px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm flex items-center gap-1">
         Partial Access
       </div>
     );
@@ -100,14 +91,14 @@ const AccessBadge: React.FC<{ programData: DashboardProgramData }> = ({ programD
   
   if (programData.price && programData.price > 0) {
     return (
-      <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
+      <div className="bg-white text-theo-black border border-gray-100 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm">
         ₹{Math.round(programData.price / 100)}
       </div>
     );
   }
   
   return (
-    <div className="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
+    <div className="bg-gray-100 text-gray-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm">
       Free
     </div>
   );
@@ -118,30 +109,30 @@ const DashboardActionButton: React.FC<{ programData: DashboardProgramData }> = (
     if (('schoolAccess' in programData && programData.schoolAccess) || 
         ('subscriptionAccess' in programData && programData.subscriptionAccess)) {
       return {
-        container: 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 group-hover:from-green-100 group-hover:to-emerald-100',
-        icon: 'bg-green-100 group-hover:bg-green-200',
-        iconColor: 'text-green-600',
-        text: 'text-green-700 group-hover:text-green-800',
-        chevron: 'text-green-400 group-hover:text-green-600'
+        container: 'bg-green-50 border-green-100 group-hover:bg-green-100',
+        icon: 'bg-green-200',
+        iconColor: 'text-green-700',
+        text: 'text-green-800',
+        chevron: 'text-green-400'
       };
     }
     
     if ('hasPartialAccess' in programData && programData.hasPartialAccess) {
       return {
-        container: 'bg-gradient-to-r from-purple-50 to-violet-50 border-purple-200 group-hover:from-purple-100 group-hover:to-violet-100',
-        icon: 'bg-purple-100 group-hover:bg-purple-200',
-        iconColor: 'text-purple-600',
-        text: 'text-purple-700 group-hover:text-purple-800',
-        chevron: 'text-purple-400 group-hover:text-purple-600'
+        container: 'bg-theo-yellow/10 border-theo-yellow/20 group-hover:bg-theo-yellow/20',
+        icon: 'bg-theo-yellow/30',
+        iconColor: 'text-theo-black',
+        text: 'text-theo-black',
+        chevron: 'text-theo-black/40'
       };
     }
     
     return {
-      container: 'bg-gradient-to-r from-gray-50 to-blue-50 border-gray-100 group-hover:from-blue-50 group-hover:to-indigo-50 group-hover:border-blue-200',
-      icon: 'bg-blue-100 group-hover:bg-blue-200',
-      iconColor: 'text-blue-600',
-      text: 'text-gray-700 group-hover:text-blue-700',
-      chevron: 'text-gray-400 group-hover:text-blue-600'
+      container: 'bg-theo-black text-theo-yellow border-theo-black group-hover:bg-theo-black/90',
+      icon: 'bg-theo-yellow',
+      iconColor: 'text-theo-black',
+      text: 'text-theo-yellow',
+      chevron: 'text-theo-yellow/50'
     };
   };
 
@@ -298,34 +289,34 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
   `;
 
   const iconSectionProgrames = isDashboard 
-    ? "w-full h-32 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 rounded-xl"
-    : "w-full h-32 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 rounded-xl";
+    ? "w-full h-32 bg-theo-black rounded-[20px] shadow-inner"
+    : "w-full h-32 bg-theo-black rounded-[20px] shadow-inner";
 
   const iconProgrames = isDashboard 
-    ? "text-5xl z-10" 
-    : "text-5xl z-10";
+    ? "text-5xl z-10 filter drop-shadow-[0_0_15px_rgba(200,216,50,0.4)]" 
+    : "text-5xl z-10 filter drop-shadow-[0_0_15px_rgba(200,216,50,0.4)]";
 
   const headerPadding = isDashboard ? "relative z-1 pb-4" : "relative z-1 pb-4";
   
   const contentPadding = isDashboard 
-    ? "relative z-10 space-y-4" 
-    : "relative z-10 space-y-4";
+    ? "relative z-10 space-y-4 pt-4" 
+    : "relative z-10 space-y-4 pt-4";
 
   const titleProgrames = isDashboard 
-    ? "text-xl font-bold text-gray-900 group-hover:text-blue-700 transition-colors line-clamp-1"
-    : "text-xl font-bold text-gray-900 group-hover:text-blue-700 transition-colors line-clamp-1";
+    ? "text-xl font-bold text-theo-black group-hover:text-theo-black transition-colors line-clamp-1"
+    : "text-xl font-bold text-theo-black group-hover:text-theo-black transition-colors line-clamp-1";
 
   const descriptionProgrames = isDashboard
-    ? "text-sm text-gray-600 leading-relaxed line-clamp-2 group-hover:text-gray-700 transition-colors"
-    : "text-sm text-gray-600 leading-relaxed line-clamp-2 group-hover:text-gray-700 transition-colors";
+    ? "text-sm text-gray-500 leading-relaxed line-clamp-2 group-hover:text-gray-600 transition-colors"
+    : "text-sm text-gray-500 leading-relaxed line-clamp-2 group-hover:text-gray-600 transition-colors";
 
   const statCardProgrames = isDashboard
-    ? "flex items-center gap-2 p-3 bg-white/60 rounded-lg border border-gray-100 group-hover:bg-white/80 transition-colors"
-    : "flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100 group-hover:bg-gray-100 transition-colors";
+    ? "flex items-center gap-2 p-3 bg-theo-white/50 rounded-2xl border border-gray-100 group-hover:bg-theo-white transition-colors"
+    : "flex items-center gap-2 p-3 bg-theo-white/50 rounded-2xl border border-gray-100 group-hover:bg-theo-white transition-colors";
 
   const statIconProgrames = isDashboard
-    ? "p-1.5 bg-blue-100 rounded-lg"
-    : "p-1.5 bg-blue-100 rounded-lg";
+    ? "p-1.5 bg-theo-yellow/20 rounded-xl"
+    : "p-1.5 bg-theo-yellow/20 rounded-xl";
 
   const iconSize = isDashboard ? "h-3.5 w-3.5" : "h-3.5 w-3.5";
 
@@ -407,9 +398,9 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
             <span className="text-xs font-medium text-gray-600">{progressLabel}</span>
             <span className="text-xs font-bold text-gray-900">{progress}%</span>
           </div>
-          <div className={`w-full bg-gray-200 rounded-full ${progressBarHeight} overflow-hidden`}>
+          <div className={`w-full bg-gray-100 rounded-full ${progressBarHeight} overflow-hidden`}>
             <div 
-              className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full transition-all duration-1000 ease-out shadow-sm"
+              className="h-full bg-theo-yellow rounded-full transition-all duration-1000 ease-out shadow-sm"
               style={{ width: `${progress}%` }}
             />
           </div>

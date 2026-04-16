@@ -107,13 +107,13 @@ export default function AdminErrorLogsPage() {
 
   const getLevelBadge = (level: string) => {
     const levelConfig = {
-      INFO: { label: 'Info', className: 'bg-blue-100 text-blue-800 border-blue-200' },
-      WARN: { label: 'Warning', className: 'bg-yellow-100 text-yellow-800 border-yellow-200' },
-      ERROR: { label: 'Error', className: 'bg-red-100 text-red-800 border-red-200' },
-      CRITICAL: { label: 'Critical', className: 'bg-red-200 text-red-900 border-red-300 font-semibold' },
+      INFO: { label: 'Info', className: 'bg-theo-black/5 text-theo-black/70 border-theo-black/10 font-bold' },
+      WARN: { label: 'Warning', className: 'bg-theo-yellow/20 text-theo-black border-theo-yellow/30 font-bold' },
+      ERROR: { label: 'Error', className: 'bg-red-50 text-red-700 border-red-100 font-bold' },
+      CRITICAL: { label: 'Critical', className: 'bg-theo-black text-theo-yellow border-theo-black font-bold' },
     };
     const config = levelConfig[level as keyof typeof levelConfig] || levelConfig.INFO;
-    return <Badge className={config.className}>{config.label}</Badge>;
+    return <Badge variant="outline" className={config.className}>{config.label}</Badge>;
   };
 
   const filteredErrorLogs = errorLogs.filter(log => {
@@ -185,12 +185,12 @@ export default function AdminErrorLogsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Errors</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-yellow-600" />
+            <CardTitle className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Total Errors</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-theo-yellow" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalErrors}</div>
-            <p className="text-xs text-gray-500">All time errors logged</p>
+            <div className="text-2xl font-bold text-theo-black">{stats.totalErrors}</div>
+            <p className="text-xs text-muted-foreground">All time errors logged</p>
           </CardContent>
         </Card>
 
@@ -337,9 +337,9 @@ export default function AdminErrorLogsPage() {
                   {paginatedErrorLogs.map((log) => (
                     <tr 
                       key={log.id} 
-                      className={`border-b hover:bg-gray-50 cursor-pointer ${
-                        log.level === 'CRITICAL' ? 'bg-red-50' : 
-                        log.level === 'ERROR' ? 'bg-orange-50' : ''
+                      className={`border-b hover:bg-theo-black/5 cursor-pointer transition-colors ${
+                        log.level === 'CRITICAL' ? 'bg-theo-black/5' : 
+                        log.level === 'ERROR' ? 'bg-red-50/50' : ''
                       }`}
                       onClick={() => setSelectedError(log)}
                     >
@@ -442,11 +442,10 @@ export default function AdminErrorLogsPage() {
       {selectedError && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-4xl max-h-[90vh] overflow-hidden">
-            <div className="p-6 border-b">
+            <div className="p-6 bg-theo-black text-theo-yellow border-b border-theo-black">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  {getLevelIcon(selectedError.level)}
-                  <h2 className="text-xl font-semibold">Error Details</h2>
+                  <h2 className="text-xl font-bold uppercase tracking-tight">Error Details</h2>
                   {getLevelBadge(selectedError.level)}
                 </div>
                 <Button

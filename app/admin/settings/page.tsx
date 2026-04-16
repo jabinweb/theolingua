@@ -283,38 +283,40 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="p-8 bg-theo-white/30 min-h-screen">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="mb-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
-                System Settings
+              <h1 className="text-5xl font-bold text-theo-black tracking-tight mb-2">
+                System Control
               </h1>
-              <p className="text-gray-600 text-lg">Configure your application settings and preferences</p>
+              <p className="text-gray-500 font-medium text-lg">Infrastructure, gateways and enterprise parameters</p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-4">
               <Button 
+                variant="theo"
                 onClick={handleSave} 
                 disabled={loading}
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg"
+                className="font-bold shadow-lg shadow-theo-yellow/20 rounded-2xl h-11 px-8"
               >
                 {loading ? (
                   <>
                     <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                    Saving...
+                    Synchronizing...
                   </>
                 ) : (
                   <>
                     <Save className="h-4 w-4 mr-2" />
-                    Save Settings
+                    Commmit Changes
                   </>
                 )}
               </Button>
             </div>
           </div>
-          
+        </div>
+  
           {/* Save Status */}
           {saveStatus && (
             <div className={`mt-4 p-3 rounded-lg flex items-center gap-2 ${
@@ -330,107 +332,106 @@ export default function SettingsPage() {
               {saveStatus}
             </div>
           )}
-        </div>
 
         {/* Settings Tabs */}
-        <Tabs defaultValue="general" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-white/70 backdrop-blur-sm border shadow-lg">
-            <TabsTrigger value="general" className="flex items-center gap-2">
+        <Tabs defaultValue="general" className="space-y-8">
+          <TabsList className="grid w-full grid-cols-4 bg-white/50 backdrop-blur-md border-theo-black/5 p-1.5 h-16 rounded-[24px] shadow-sm">
+            <TabsTrigger value="general" className="rounded-2xl flex items-center gap-2 data-[state=active]:bg-theo-yellow data-[state=active]:text-theo-black font-bold text-gray-500 transition-all">
               <Globe className="h-4 w-4" />
-              General
+              Environment
             </TabsTrigger>
-            <TabsTrigger value="payment" className="flex items-center gap-2">
+            <TabsTrigger value="payment" className="rounded-2xl flex items-center gap-2 data-[state=active]:bg-theo-yellow data-[state=active]:text-theo-black font-bold text-gray-500 transition-all">
               <CreditCard className="h-4 w-4" />
-              Payment
+              Financials
             </TabsTrigger>
-            <TabsTrigger value="email" className="flex items-center gap-2">
+            <TabsTrigger value="email" className="rounded-2xl flex items-center gap-2 data-[state=active]:bg-theo-yellow data-[state=active]:text-theo-black font-bold text-gray-500 transition-all">
               <Mail className="h-4 w-4" />
-              Email
+              Messaging
             </TabsTrigger>
-            <TabsTrigger value="system" className="flex items-center gap-2">
+            <TabsTrigger value="system" className="rounded-2xl flex items-center gap-2 data-[state=active]:bg-theo-yellow data-[state=active]:text-theo-black font-bold text-gray-500 transition-all">
               <Server className="h-4 w-4" />
-              System
+              Infrastructure
             </TabsTrigger>
           </TabsList>
 
           {/* General Settings */}
           <TabsContent value="general" className="space-y-6">
-            <Card className="shadow-xl border-0 bg-white/70 backdrop-blur-sm">
-              <CardHeader className="bg-gradient-to-r from-green-600 to-emerald-700 text-white rounded-t-lg">
-                <CardTitle className="flex items-center gap-3 text-xl">
-                  <Globe className="h-6 w-6" />
+            <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden bg-white">
+              <CardHeader className="bg-theo-black text-theo-yellow p-10 pb-6">
+                <CardTitle className="flex items-center gap-3 text-3xl font-bold">
+                  <Globe className="h-8 w-8" />
                   General Configuration
-                  <Badge className="bg-white/20 text-white border-white/20">Core</Badge>
+                  <Badge variant="outline" className="bg-theo-yellow border-theo-yellow text-theo-black font-bold uppercase tracking-[0.2em] text-[10px] px-3">Primary</Badge>
                 </CardTitle>
-                <p className="text-green-100 mt-2">Basic site information and branding settings</p>
+                <p className="text-theo-yellow/50 font-medium text-lg mt-2">Basic site information and global branding settings</p>
               </CardHeader>
-              <CardContent className="p-8 space-y-8">
+              <CardContent className="p-10 space-y-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-2">
-                    <Label htmlFor="siteName" className="text-gray-700 font-medium">Site Name</Label>
+                  <div className="space-y-3">
+                    <Label htmlFor="siteName" className="text-theo-black font-bold text-sm uppercase tracking-widest">Site Name</Label>
                     <Input
                       id="siteName"
                       value={settings.siteName}
                       onChange={(e) => handleInputChange('siteName', e.target.value)}
-                      className="border-gray-200 focus:border-green-500 focus:ring-green-500 bg-white shadow-sm"
+                      className="h-12 rounded-2xl border-theo-black/5 bg-gray-50/50 focus:bg-white transition-all font-medium"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="subscriptionPrice" className="text-gray-700 font-medium">Subscription Price (₹)</Label>
+                  <div className="space-y-3">
+                    <Label htmlFor="subscriptionPrice" className="text-theo-black font-bold text-sm uppercase tracking-widest">Pricing (₹ / Month)</Label>
                     <Input
                       id="subscriptionPrice"
                       type="number"
                       value={settings.subscriptionPrice}
                       onChange={(e) => handleInputChange('subscriptionPrice', e.target.value)}
-                      className="border-gray-200 focus:border-green-500 focus:ring-green-500 bg-white shadow-sm"
+                      className="h-12 rounded-2xl border-theo-black/5 bg-gray-50/50 focus:bg-white transition-all font-medium font-mono"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="siteUrl" className="text-gray-700 font-medium">Site URL</Label>
+                <div className="space-y-4">
+                  <Label htmlFor="siteUrl" className="text-theo-black font-bold text-sm uppercase tracking-widest">Environment URL</Label>
                   <Input
                     id="siteUrl"
                     value={settings.siteUrl}
                     onChange={(e) => handleInputChange('siteUrl', e.target.value)}
                     placeholder="https://your-domain.com"
-                    className="border-gray-200 focus:border-green-500 focus:ring-green-500 bg-white shadow-sm"
+                    className="h-12 rounded-2xl border-theo-black/5 bg-gray-50/50 focus:bg-white transition-all font-medium"
                   />
-                  <p className="text-sm text-gray-500">
-                    This URL is used for payment callbacks and email links. Must include protocol (http/https).
+                  <p className="text-sm text-gray-400 font-medium">
+                    Critical for payment orchestration and identity resolution routines.
                   </p>
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="siteDescription" className="text-gray-700 font-medium">Site Description</Label>
+                <div className="space-y-4">
+                  <Label htmlFor="siteDescription" className="text-theo-black font-bold text-sm uppercase tracking-widest">Meta Descriptor</Label>
                   <Textarea
                     id="siteDescription"
                     value={settings.siteDescription}
                     onChange={(e) => handleInputChange('siteDescription', e.target.value)}
-                    className="border-gray-200 focus:border-green-500 focus:ring-green-500 bg-white shadow-sm"
+                    className="rounded-2xl border-theo-black/5 bg-gray-50/50 focus:bg-white transition-all font-medium min-h-[120px]"
                     rows={3}
                   />
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-2">
-                    <Label htmlFor="contactEmail" className="text-gray-700 font-medium">Contact Email</Label>
+                  <div className="space-y-4">
+                    <Label htmlFor="contactEmail" className="text-theo-black font-bold text-sm uppercase tracking-widest">Public Gateway</Label>
                     <Input
                       id="contactEmail"
                       type="email"
                       value={settings.contactEmail}
                       onChange={(e) => handleInputChange('contactEmail', e.target.value)}
-                      className="border-gray-200 focus:border-green-500 focus:ring-green-500 bg-white shadow-sm"
+                      className="h-12 rounded-2xl border-theo-black/5 bg-gray-50/50 focus:bg-white transition-all font-medium"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="supportEmail" className="text-gray-700 font-medium">Support Email</Label>
+                  <div className="space-y-4">
+                    <Label htmlFor="supportEmail" className="text-theo-black font-bold text-sm uppercase tracking-widest">Internal Helpdesk</Label>
                     <Input
                       id="supportEmail"
                       type="email"
                       value={settings.supportEmail}
                       onChange={(e) => handleInputChange('supportEmail', e.target.value)}
-                      className="border-gray-200 focus:border-green-500 focus:ring-green-500 bg-white shadow-sm"
+                      className="h-12 rounded-2xl border-theo-black/5 bg-gray-50/50 focus:bg-white transition-all font-medium"
                     />
                   </div>
                 </div>
@@ -441,13 +442,13 @@ export default function SettingsPage() {
           {/* Payment Settings */}
           <TabsContent value="payment" className="space-y-6">
             {/* Payment Gateway Selection */}
-            <Card className="shadow-xl border-0 bg-white/70 backdrop-blur-sm">
-              <CardHeader className="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-t-lg">
+            <Card className="shadow-xl border border-gray-100 bg-white overflow-hidden">
+              <CardHeader className="bg-theo-black text-theo-yellow">
                 <CardTitle className="flex items-center gap-3 text-xl">
                   <CreditCard className="h-6 w-6" />
                   Payment Gateway Configuration
                 </CardTitle>
-                <p className="text-purple-100 mt-2">Choose and configure your payment gateway</p>
+                <p className="text-theo-yellow/70 mt-2">Choose and configure your payment gateway</p>
               </CardHeader>
               <CardContent className="p-8 space-y-6">
                 {/* Default Gateway Selection */}
@@ -517,7 +518,7 @@ export default function SettingsPage() {
                           </div>
                         </Label>
                         {settings.payment_default_gateway === 'RAZORPAY' && (
-                          <Badge className="bg-green-100 text-green-800 border-green-200">Active</Badge>
+                          <Badge variant="theo" className="font-bold">Active</Badge>
                         )}
                       </div>
                       <div className="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
@@ -529,7 +530,7 @@ export default function SettingsPage() {
                           </div>
                         </Label>
                         {settings.payment_default_gateway === 'CASHFREE' && (
-                          <Badge className="bg-green-100 text-green-800 border-green-200">Active</Badge>
+                          <Badge variant="theo" className="font-bold">Active</Badge>
                         )}
                       </div>
                     </RadioGroup>
@@ -540,14 +541,14 @@ export default function SettingsPage() {
 
             {/* Razorpay Configuration */}
             {settings.payment_default_gateway === 'RAZORPAY' && (
-              <Card className="shadow-xl border-0 bg-white/70 backdrop-blur-sm">
-                <CardHeader className="bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-t-lg">
+              <Card className="shadow-xl border border-gray-100 bg-white overflow-hidden">
+                <CardHeader className="bg-theo-black text-theo-yellow">
                   <CardTitle className="flex items-center gap-3 text-xl">
                     <CreditCard className="h-6 w-6" />
                     Razorpay Configuration
-                    <Badge className="bg-white/20 text-white border-white/20">Razorpay</Badge>
+                    <Badge variant="outline" className="bg-theo-yellow/20 text-theo-yellow border-theo-yellow/30 font-bold uppercase tracking-wider text-[10px]">Razorpay</Badge>
                   </CardTitle>
-                  <p className="text-orange-100 mt-2">Configure Razorpay payment gateway settings</p>
+                  <p className="text-theo-yellow/70 mt-2">Configure Razorpay payment gateway settings</p>
                 </CardHeader>
                 <CardContent className="p-8 space-y-8">
                   {/* Payment Mode Selection */}
@@ -701,11 +702,11 @@ export default function SettingsPage() {
                       <Shield className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
                       <div>
                         <h4 className="font-medium text-blue-800 mb-2">Configuration Guide</h4>
-                        <ul className="text-sm text-blue-700 space-y-1">
+                        <ul className="text-sm text-theo-black/70 space-y-1">
                           <li>• Always use test mode during development</li>
                           <li>• Keep your API keys secure and never share them</li>
                           <li>• Switch to live mode only when ready for production</li>
-                          <li>• Configure webhook URL: <code className="bg-blue-100 px-1 rounded text-xs">{window?.location?.origin || 'https://your-domain.com'}/api/payment/webhook/razorpay</code></li>
+                          <li>• Configure webhook URL: <code className="bg-theo-yellow/20 px-1 rounded text-xs">{window?.location?.origin || 'https://your-domain.com'}/api/payment/webhook/razorpay</code></li>
                           <li>• Enable webhook events: <strong>payment.captured</strong> and <strong>payment.failed</strong></li>
                         </ul>
                       </div>
@@ -717,14 +718,14 @@ export default function SettingsPage() {
 
             {/* Cashfree Configuration */}
             {settings.payment_default_gateway === 'CASHFREE' && (
-              <Card className="shadow-xl border-0 bg-white/70 backdrop-blur-sm">
-                <CardHeader className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-t-lg">
+              <Card className="shadow-xl border border-gray-100 bg-white overflow-hidden">
+                <CardHeader className="bg-theo-black text-theo-yellow">
                   <CardTitle className="flex items-center gap-3 text-xl">
                     <CreditCard className="h-6 w-6" />
                     Cashfree Configuration
-                    <Badge className="bg-white/20 text-white border-white/20">Cashfree</Badge>
+                    <Badge variant="outline" className="bg-theo-yellow/20 text-theo-yellow border-theo-yellow/30 font-bold uppercase tracking-wider text-[10px]">Cashfree</Badge>
                   </CardTitle>
-                  <p className="text-blue-100 mt-2">Configure Cashfree payment gateway settings</p>
+                  <p className="text-theo-yellow/70 mt-2">Configure Cashfree payment gateway settings</p>
                 </CardHeader>
                 <CardContent className="p-8 space-y-8">
                   {/* Environment Selection */}
@@ -857,14 +858,14 @@ export default function SettingsPage() {
 
           {/* Email Settings */}
           <TabsContent value="email" className="space-y-6">
-            <Card className="shadow-xl border-0 bg-white/70 backdrop-blur-sm">
-              <CardHeader className="bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-t-lg">
+            <Card className="shadow-xl border border-gray-100 bg-white overflow-hidden">
+              <CardHeader className="bg-theo-black text-theo-yellow">
                 <CardTitle className="flex items-center gap-3 text-xl">
                   <Mail className="h-6 w-6" />
                   Email Configuration
-                  <Badge className="bg-white/20 text-white border-white/20">SMTP</Badge>
+                  <Badge variant="outline" className="bg-theo-yellow/20 text-theo-yellow border-theo-yellow/30 font-bold uppercase tracking-wider text-[10px]">SMTP</Badge>
                 </CardTitle>
-                <p className="text-purple-100 mt-2">Configure email notifications and SMTP settings</p>
+                <p className="text-theo-yellow/70 mt-2">Configure email notifications and SMTP settings</p>
               </CardHeader>
               <CardContent className="p-8 space-y-8">
                 {/* Email Toggle */}
@@ -879,7 +880,7 @@ export default function SettingsPage() {
                     <Switch
                       checked={settings.emailNotifications}
                       onCheckedChange={(checked) => handleInputChange('emailNotifications', checked)}
-                      className="data-[state=checked]:bg-purple-600"
+                      className="data-[state=checked]:bg-theo-yellow"
                     />
                   </div>
                 </div>
@@ -994,14 +995,14 @@ export default function SettingsPage() {
 
           {/* System Settings */}
           <TabsContent value="system" className="space-y-6">
-            <Card className="shadow-xl border-0 bg-white/70 backdrop-blur-sm">
-              <CardHeader className="bg-gradient-to-r from-gray-700 to-gray-900 text-white rounded-t-lg">
+            <Card className="shadow-xl border border-gray-100 bg-white overflow-hidden">
+              <CardHeader className="bg-theo-black text-theo-yellow">
                 <CardTitle className="flex items-center gap-3 text-xl">
                   <Server className="h-6 w-6" />
                   System Settings
-                  <Badge className="bg-white/20 text-white border-white/20">Advanced</Badge>
+                  <Badge variant="outline" className="bg-theo-yellow/20 text-theo-yellow border-theo-yellow/30 font-bold uppercase tracking-wider text-[10px]">Advanced</Badge>
                 </CardTitle>
-                <p className="text-gray-200 mt-2">System-wide configuration and maintenance options</p>
+                <p className="text-theo-yellow/70 mt-2">System-wide configuration and maintenance options</p>
               </CardHeader>
               <CardContent className="p-8 space-y-8">
                 {/* Maintenance Mode */}

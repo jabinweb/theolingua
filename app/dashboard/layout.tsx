@@ -36,12 +36,12 @@ export default function DashboardLayout({
   return (
     <>
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-40">
-        <div className="container px-4 py-3">
+        <div className="container px-4 py-3 mx-auto">
           <div className="flex items-center justify-between">
             {/* Left side - Back button */}
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               className="flex items-center gap-2"
               onClick={() => router.push('/')}
             >
@@ -54,7 +54,7 @@ export default function DashboardLayout({
           </div>
         </div>
       </header>
-      
+
       <main className="min-h-screen bg-gray-50">
         {children}
       </main>

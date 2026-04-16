@@ -194,22 +194,26 @@ export default function CollegesPage() {
   }
 
   return (
-    <div className="p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">College Management</h1>
-            <p className="text-muted-foreground">Manage colleges and their information</p>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={fetchColleges} variant="outline" disabled={loading}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
-            </Button>
-            <Button onClick={() => setFormOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add College
-            </Button>
+    <div className="p-8 bg-theo-white/30 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+              <h1 className="text-5xl font-bold text-theo-black tracking-tight mb-2">
+                College Management
+              </h1>
+              <p className="text-gray-500 font-medium text-lg">Manage partner institutions and student distribution</p>
+            </div>
+            <div className="flex gap-4">
+              <Button onClick={fetchColleges} variant="outline" disabled={loading} className="rounded-2xl h-11 px-6">
+                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+              <Button onClick={() => setFormOpen(true)} variant="theo" className="rounded-2xl h-11 px-6 shadow-lg shadow-theo-yellow/20">
+                <Plus className="h-5 w-5 mr-2" />
+                Add College
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -220,68 +224,78 @@ export default function CollegesPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {colleges.map((school) => (
-              <Card key={school.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
+              <Card key={school.id} className="border-0 shadow-sm rounded-[32px] overflow-hidden group hover:shadow-xl transition-all duration-300">
+                <CardHeader className="p-8">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-xl flex items-center gap-2">
-                      <School className="h-5 w-5" />
+                    <CardTitle className="text-2xl font-bold text-theo-black flex items-center gap-3">
+                      <div className="h-12 w-12 rounded-2xl bg-theo-yellow/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <School className="h-6 w-6 text-theo-black" />
+                      </div>
                       {school.name}
                     </CardTitle>
-                    <Badge variant={school.is_active ? 'default' : 'secondary'}>
+                    <Badge variant={school.is_active ? 'theo' : 'outline'} className="rounded-full shadow-sm px-4 font-bold uppercase tracking-tighter text-[10px]">
                       {school.is_active ? 'Active' : 'Inactive'}
                     </Badge>
                   </div>
                 </CardHeader>
                 
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center gap-2">
-                        <Mail className="h-4 w-4" />
+                <CardContent className="p-8 pt-0">
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-gray-50 p-4 rounded-2xl border border-theo-black/5">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Students</p>
+                        <div className="flex items-center gap-2 text-theo-black font-bold">
+                          <Users className="h-4 w-4" />
+                          <span>{school.student_count}</span>
+                        </div>
+                      </div>
+                      <div className="bg-gray-50 p-4 rounded-2xl border border-theo-black/5">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Status</p>
+                        <div className="flex items-center gap-2 text-theo-black font-bold capitalize">
+                          {school.is_active ? 'Premium Partner' : 'Standard'}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 text-sm font-medium text-gray-500">
+                      <div className="flex items-center gap-3">
+                        <Mail className="h-4 w-4 text-gray-400" />
                         <span>{school.email}</span>
                       </div>
                       {school.phone && (
-                        <div className="flex items-center gap-2">
-                          <Phone className="h-4 w-4" />
+                        <div className="flex items-center gap-3">
+                          <Phone className="h-4 w-4 text-gray-400" />
                           <span>{school.phone}</span>
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4" />
-                        <span>{school.student_count} students</span>
-                      </div>
-                      {school.principal_name && (
-                        <div className="text-xs text-muted-foreground">
-                          Principal: {school.principal_name}
                         </div>
                       )}
                     </div>
                     
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 border-t border-gray-100 pt-6">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => openEditForm(school)}
-                        className="flex-1"
+                        className="flex-1 rounded-xl h-11 border-theo-black/10 font-bold"
                       >
                         <Edit className="h-4 w-4 mr-2" />
                         Edit
                       </Button>
                       <Button
-                        variant="secondary"
+                        variant="theo-black"
                         size="sm"
                         onClick={() => handleBulkUpload(school)}
-                        className="flex-1"
+                        className="flex-1 rounded-xl h-11 font-bold shadow-lg shadow-theo-black/10"
                       >
                         <Upload className="h-4 w-4 mr-2" />
-                        Students
+                        Manage
                       </Button>
                       <Button
-                        variant="destructive"
+                        variant="ghost"
                         size="sm"
                         onClick={() => handleDeleteSchool(school.id)}
+                        className="h-11 w-11 p-0 rounded-xl text-red-600 hover:bg-red-50"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-5 w-5" />
                       </Button>
                     </div>
                   </div>

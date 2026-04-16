@@ -121,32 +121,32 @@ export function DashboardContent() {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div className="min-h-screen bg-theo-white/50">
         {/* Enhanced Header with School Info */}
-        <div className="relative overflow-hidden bg-white border-b border-gray-200">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-indigo-600/5" />
-          <div className="relative max-w-7xl mx-auto px-6 py-8">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-lg">
-                  <GraduationCap className="w-8 h-8 text-white" />
+        <div className="relative overflow-hidden bg-theo-black text-white py-12">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(200,216,50,0.1),transparent)]" />
+          <div className="relative max-w-7xl mx-auto px-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+              <div className="flex items-center space-x-5">
+                <div className="flex items-center justify-center w-20 h-20 bg-theo-yellow rounded-3xl shadow-[0_0_20px_rgba(200,216,50,0.3)] transform -rotate-3 hover:rotate-0 transition-transform duration-500">
+                  <GraduationCap className="w-10 h-10 text-theo-black" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                  <h1 className="text-3xl font-bold text-white tracking-tight">
                     Welcome back, {user?.name || user?.email?.split('@')[0] || 'Student'}!
                   </h1>
-                  <div className="flex items-center gap-4 mt-1">
-                    <p className="text-gray-600">Continue your learning journey</p>
+                  <div className="flex flex-wrap items-center gap-3 mt-2">
+                    <p className="text-theo-white/60 font-medium">Continue your learning journey</p>
                     {userProfile?.grade && (
                       <div className="flex items-center gap-2">
-                        <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                        <span className="px-3 py-1 bg-theo-yellow/20 text-theo-yellow rounded-full text-xs font-bold uppercase tracking-widest border border-theo-yellow/30">
                           Grade {userProfile.grade}
                         </span>
                         {userProfile.school && (
-                          <span className={`px-2 py-1 rounded-full text-sm font-medium ${
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest border ${
                             userProfile.school.isActive 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
+                              ? 'bg-green-500/20 text-green-400 border-green-500/30' 
+                              : 'bg-red-500/20 text-red-400 border-red-500/30'
                           }`}>
                             {userProfile.school.name}
                           </span>
@@ -160,56 +160,62 @@ export function DashboardContent() {
 
             {/* Access Message */}
             {accessMessage && (
-              <div className={`mt-4 p-3 rounded-lg border ${
+              <div className={`mt-8 p-4 rounded-2xl border backdrop-blur-sm ${
                 accessType === 'school' 
-                  ? 'bg-green-50 border-green-200' 
+                  ? 'bg-green-500/10 border-green-500/20 text-green-400' 
                   : accessType === 'subscription'
-                  ? 'bg-blue-50 border-blue-200'
-                  : 'bg-yellow-50 border-yellow-200'
+                  ? 'bg-theo-yellow/10 border-theo-yellow/20 text-theo-yellow'
+                  : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500'
               }`}>
-                <p className={`text-sm font-medium ${
-                  accessType === 'school' 
-                    ? 'text-green-800' 
-                    : accessType === 'subscription'
-                    ? 'text-blue-800'
-                    : 'text-yellow-800'
-                }`}>
+                <p className="text-sm font-semibold flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full animate-pulse ${
+                    accessType === 'school' ? 'bg-green-400' : accessType === 'subscription' ? 'bg-theo-yellow' : 'bg-yellow-400'
+                  }`} />
                   {accessMessage}
                 </p>
               </div>
             )}
 
             {/* Stats Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 text-white">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+              <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-[32px] p-8 hover:bg-white/10 transition-colors group">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-blue-100 text-sm">Available programs</p>
-                    <p className="text-3xl font-bold text-gray-100">{programs.length}</p>
+                    <p className="text-theo-white/40 text-xs font-bold uppercase tracking-widest mb-1">Available Programs</p>
+                    <p className="text-4xl font-bold text-white tracking-tighter">{programs.length}</p>
                   </div>
-                  <BookOpen className="w-10 h-10 text-blue-200" />
+                  <div className="w-14 h-14 bg-theo-yellow/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <BookOpen className="w-7 h-7 text-theo-yellow" />
+                  </div>
                 </div>
               </div>
-              <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-2xl p-6 text-white">
+              <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-[32px] p-8 hover:bg-white/10 transition-colors group">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-green-100 text-sm">Total Units</p>
-                    <p className="text-3xl font-bold text-gray-100">{programs.reduce((acc, cls) => acc + (cls.subjects?.length || 0), 0)}</p>
+                    <p className="text-theo-white/40 text-xs font-bold uppercase tracking-widest mb-1">Total Units</p>
+                    <p className="text-4xl font-bold text-white tracking-tighter">{programs.reduce((acc, cls) => acc + (cls.subjects?.length || 0), 0)}</p>
                   </div>
-                  <Users className="w-10 h-10 text-green-200" />
+                  <div className="w-14 h-14 bg-green-500/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Users className="w-7 h-7 text-green-400" />
+                  </div>
                 </div>
               </div>
-              <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl p-6 text-white">
+              <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-[32px] p-8 hover:bg-white/10 transition-colors group">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-purple-100 text-sm">Avg Progress</p>
-                    <p className="text-3xl font-bold text-gray-100">
-                      {programs.length > 0 
-                        ? Math.round(programs.reduce((acc, cls) => acc + calculateProgramProgress(toProgramWithSubjects(cls)), 0) / programs.length)
-                        : 0}%
-                    </p>
+                    <p className="text-theo-white/40 text-xs font-bold uppercase tracking-widest mb-1">Avg Progress</p>
+                    <div className="flex items-baseline gap-2">
+                      <p className="text-4xl font-bold text-white tracking-tighter">
+                        {programs.length > 0 
+                          ? Math.round(programs.reduce((acc, cls) => acc + calculateProgramProgress(toProgramWithSubjects(cls)), 0) / programs.length)
+                          : 0}
+                      </p>
+                      <span className="text-theo-yellow text-xl font-bold">%</span>
+                    </div>
                   </div>
-                  <Star className="w-10 h-10 text-purple-200" />
+                  <div className="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Star className="w-7 h-7 text-purple-400" />
+                  </div>
                 </div>
               </div>
             </div>

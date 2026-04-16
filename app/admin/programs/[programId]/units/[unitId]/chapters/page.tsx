@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2, ArrowLeft, FileText } from 'lucide-react';
 import { ChapterForm } from '@/components/admin/ChapterForm';
 
@@ -83,22 +84,38 @@ export default function ChaptersPage() {
   };
 
   return (
-    <div className="p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-6 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <Button variant="outline" size="icon" onClick={() => router.push(`/admin/programs/${programId}`)}>
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold mb-2">Lessons</h1>
-              <p className="text-muted-foreground">Manage lessons for this unit</p>
+    <div className="p-8 bg-theo-white/30 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div className="flex items-center gap-6">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={() => router.push(`/admin/programs/${programId}`)}
+                className="rounded-2xl h-12 w-12 border-theo-black/10 hover:bg-theo-yellow hover:border-theo-yellow transition-all shadow-sm"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <div>
+                <h1 className="text-5xl font-bold text-theo-black tracking-tight mb-2">
+                  Unit Lessons
+                </h1>
+                <div className="flex items-center gap-3">
+                  <Badge variant="theo-black" className="rounded-full px-4 font-bold uppercase tracking-tighter text-[10px]">CONTENT MANAGEMENT</Badge>
+                  <p className="text-gray-500 font-medium text-lg">Manage structured lessons for this unit</p>
+                </div>
+              </div>
             </div>
+            <Button 
+                onClick={() => setFormOpen(true)}
+                variant="theo"
+                className="rounded-2xl h-12 px-6 shadow-lg shadow-theo-yellow/20"
+              >
+              <Plus className="h-5 w-5 mr-2" />
+              Add New Lesson
+            </Button>
           </div>
-          <Button onClick={() => setFormOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Lesson
-          </Button>
         </div>
 
         {loading ? (
@@ -108,36 +125,43 @@ export default function ChaptersPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {chapters.map((chapter) => (
-              <Card key={chapter.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle className="text-xl">{chapter.name}</CardTitle>
-                  <p className="text-sm text-muted-foreground">Order: {chapter.orderIndex}</p>
+              <Card key={chapter.id} className="border-0 shadow-sm rounded-[32px] overflow-hidden group hover:shadow-xl transition-all duration-300">
+                <CardHeader className="p-8">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-2xl font-bold text-theo-black">{chapter.name}</CardTitle>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">ORDER INDEX: {chapter.orderIndex}</p>
+                    </div>
+                    <div className="h-12 w-12 rounded-2xl bg-theo-yellow/10 flex items-center justify-center text-theo-black group-hover:scale-110 transition-transform">
+                      <FileText className="h-6 w-6" />
+                    </div>
+                  </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-8 pt-0">
                   <div className="space-y-4">
                     <Button
-                      variant="outline"
-                      className="w-full"
+                      variant="theo-black"
+                      className="w-full rounded-2xl h-12 shadow-sm font-bold"
                       onClick={() => goToTopics(chapter.id)}
                     >
-                      <FileText className="h-4 w-4 mr-2" />
+                      <FileText className="h-5 w-5 mr-3" />
                       Manage Topics
                     </Button>
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => { setEditingChapter(chapter); setFormOpen(true); }}
-                        className="flex-1"
+                        className="flex-1 rounded-xl h-10 border-theo-black/10 font-bold"
                       >
                         <Edit className="h-4 w-4 mr-2" />
                         Edit
                       </Button>
                       <Button
-                        variant="destructive"
+                        variant="ghost"
                         size="sm"
                         onClick={() => handleDeleteChapter(chapter.id)}
-                        className="flex-1"
+                        className="flex-1 rounded-xl h-10 text-red-600 hover:bg-red-50 font-bold"
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
                         Delete

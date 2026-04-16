@@ -153,27 +153,47 @@ export default function ProgramDetailPage() {
   };
 
   return (
-    <div className="p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-6 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <Button variant="outline" size="icon" onClick={() => router.push('/admin/programs')}>
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold mb-2">{className} - Units</h1>
-              <p className="text-muted-foreground">Manage units for this program</p>
+    <div className="p-8 bg-theo-white/30 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div className="flex items-center gap-6">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={() => router.push('/admin/programs')}
+                className="rounded-2xl h-12 w-12 border-theo-black/10 hover:bg-theo-yellow hover:border-theo-yellow transition-all shadow-sm"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <div>
+                <h1 className="text-5xl font-bold text-theo-black tracking-tight mb-2">
+                  {className}
+                </h1>
+                <div className="flex items-center gap-3">
+                  <Badge variant="theo-black" className="rounded-full px-4 font-bold uppercase tracking-tighter text-[10px]">PROGRAM CURRICULUM</Badge>
+                  <p className="text-gray-500 font-medium text-lg">Manage educational units and structure</p>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => router.push(`/admin/programs/${programSlug || programId}/pricing`)}>
-              <DollarSign className="h-4 w-4 mr-2" />
-              Manage Pricing
-            </Button>
-            <Button onClick={() => setFormOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Unit
-            </Button>
+            <div className="flex gap-4">
+              <Button 
+                variant="outline" 
+                onClick={() => router.push(`/admin/programs/${programSlug || programId}/pricing`)}
+                className="rounded-2xl h-12 px-6 border-theo-black/10 hover:bg-theo-black hover:text-theo-yellow"
+              >
+                <DollarSign className="h-5 w-5 mr-2" />
+                Pricing Strategy
+              </Button>
+              <Button 
+                onClick={() => setFormOpen(true)}
+                variant="theo"
+                className="rounded-2xl h-12 px-6 shadow-lg shadow-theo-yellow/20"
+              >
+                <Plus className="h-5 w-5 mr-2" />
+                Add Unit
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -184,46 +204,48 @@ export default function ProgramDetailPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {subjects.map((subject) => (
-              <Card key={subject.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
+              <Card key={subject.id} className="border-0 shadow-sm rounded-[32px] overflow-hidden group hover:shadow-xl transition-all duration-300">
+                <CardHeader className="p-8">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{subject.icon}</span>
+                    <div className="flex items-center gap-4">
+                      <div className="h-14 w-14 rounded-[20px] bg-theo-yellow/10 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                        {subject.icon}
+                      </div>
                       <div>
-                        <CardTitle className="text-xl">{subject.name}</CardTitle>
-                        <p className="text-sm text-muted-foreground">Order: {subject.orderIndex}</p>
+                        <CardTitle className="text-2xl font-bold text-theo-black">{subject.name}</CardTitle>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">ORDER INDEX: {subject.orderIndex}</p>
                       </div>
                     </div>
-                    <Badge variant={subject.isLocked ? 'destructive' : 'default'}>
-                      {subject.isLocked ? 'Locked' : 'Unlocked'}
+                    <Badge variant={subject.isLocked ? 'theo-black' : 'theo'} className="rounded-full shadow-sm px-3 font-bold uppercase tracking-tighter text-[9px]">
+                      {subject.isLocked ? 'Locked' : 'Available'}
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-8 pt-0">
                   <div className="space-y-4">
                     <Button
-                      variant="outline"
-                      className="w-full"
+                      variant="theo-black"
+                      className="w-full rounded-2xl h-12 shadow-sm font-bold"
                       onClick={() => goToChapters(subject.id)}
                     >
-                      <Layers className="h-4 w-4 mr-2" />
+                      <Layers className="h-5 w-5 mr-3" />
                       Manage Lessons
                     </Button>
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => { setEditingUnit(subject); setFormOpen(true); }}
-                        className="flex-1"
+                        className="flex-1 rounded-xl h-10 border-theo-black/10 font-bold"
                       >
                         <Edit className="h-4 w-4 mr-2" />
                         Edit
                       </Button>
                       <Button
-                        variant="destructive"
+                        variant="ghost"
                         size="sm"
                         onClick={() => handleDeleteUnit(subject.id)}
-                        className="flex-1"
+                        className="flex-1 rounded-xl h-10 text-red-600 hover:bg-red-50 font-bold"
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
                         Delete

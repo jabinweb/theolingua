@@ -121,33 +121,37 @@ export default function SubscriptionAnalyticsPage() {
     );
   }
 
-  const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7c7c', '#8dd1e1'];
+  const COLORS = ['#FFD700', '#1A1A1A', '#333333', '#666666', '#E5E5E5']; // Theo Yellow, Black, Dark Gray, Mid Gray, Light Gray
 
   return (
-    <div className="p-6">
+    <div className="p-8 bg-theo-white/30 min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Subscription Analytics</h1>
-            <p className="text-muted-foreground">Monitor subscription metrics and revenue insights</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <Select value={timePeriod} onValueChange={setTimePeriod}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Select period" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="7">Last 7 days</SelectItem>
-                <SelectItem value="30">Last 30 days</SelectItem>
-                <SelectItem value="90">Last 90 days</SelectItem>
-                <SelectItem value="month">This Month</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button onClick={fetchAnalytics} disabled={isLoading}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
-            </Button>
+        <div className="mb-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+              <h1 className="text-5xl font-bold text-theo-black tracking-tight mb-2">
+                Subscription Analytics
+              </h1>
+              <p className="text-gray-500 font-medium text-lg">Monitor growth, churn and revenue velocity</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <Select value={timePeriod} onValueChange={setTimePeriod}>
+                <SelectTrigger className="w-[180px] rounded-2xl h-11 border-theo-black/10 bg-white">
+                  <SelectValue placeholder="Select period" />
+                </SelectTrigger>
+                <SelectContent className="rounded-2xl border-theo-black/10">
+                  <SelectItem value="7">Last 7 days</SelectItem>
+                  <SelectItem value="30">Last 30 days</SelectItem>
+                  <SelectItem value="90">Last 90 days</SelectItem>
+                  <SelectItem value="month">This Month</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button onClick={fetchAnalytics} variant="outline" disabled={isLoading} className="rounded-2xl h-11 px-6">
+                <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -170,65 +174,65 @@ export default function SubscriptionAnalyticsPage() {
         ) : analyticsData ? (
           <div className="space-y-6">
             {/* Overview Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+              <Card className="bg-theo-black border-0 shadow-xl rounded-[32px] overflow-hidden group">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-theo-yellow/70 flex items-center gap-2">
                     <Users className="h-4 w-4" />
-                    Total Subscriptions
+                    Total Base
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{analyticsData.overview.totalSubscriptions.toLocaleString()}</div>
-                  <div className="flex items-center gap-1 text-blue-100 text-sm">
+                  <div className="text-4xl font-bold text-theo-yellow tracking-tighter">{analyticsData.overview.totalSubscriptions.toLocaleString()}</div>
+                  <div className="flex items-center gap-1 text-theo-yellow/50 text-xs font-bold mt-2 uppercase">
                     {analyticsData.overview.growthRate >= 0 ? (
                       <TrendingUp className="h-3 w-3" />
                     ) : (
                       <TrendingDown className="h-3 w-3" />
                     )}
-                    {Math.abs(analyticsData.overview.growthRate)}% from last period
+                    {Math.abs(analyticsData.overview.growthRate)}% Growth Rate
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+              <Card className="bg-theo-yellow border-0 shadow-xl rounded-[32px] overflow-hidden group">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-theo-black/50 flex items-center gap-2">
                     <UserCheck className="h-4 w-4" />
-                    Active Subscriptions
+                    Active Pulse
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{analyticsData.overview.activeSubscriptions.toLocaleString()}</div>
-                  <div className="text-green-100 text-sm">
-                    {((analyticsData.overview.activeSubscriptions / analyticsData.overview.totalSubscriptions) * 100).toFixed(1)}% of total
+                  <div className="text-4xl font-bold text-theo-black tracking-tighter">{analyticsData.overview.activeSubscriptions.toLocaleString()}</div>
+                  <div className="text-theo-black/50 text-xs font-bold mt-2 uppercase">
+                    {((analyticsData.overview.activeSubscriptions / analyticsData.overview.totalSubscriptions) * 100).toFixed(1)}% Conversion
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+              <Card className="bg-white border-0 shadow-sm rounded-[32px] overflow-hidden group">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    Expiring Soon
+                  <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-theo-yellow" />
+                    Renewal Risk
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{analyticsData.overview.expiringSubscriptions.toLocaleString()}</div>
-                  <div className="text-orange-100 text-sm">Next 7 days</div>
+                  <div className="text-4xl font-bold text-theo-black tracking-tighter">{analyticsData.overview.expiringSubscriptions.toLocaleString()}</div>
+                  <div className="text-gray-400 text-xs font-bold mt-2 uppercase tracking-widest">Next 7 days</div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+              <Card className="bg-theo-black border-0 shadow-xl rounded-[32px] overflow-hidden group">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-theo-yellow/70 flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />
                     Total Revenue
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">₹{analyticsData.overview.totalRevenue.toLocaleString()}</div>
-                  <div className="text-purple-100 text-sm">ARPU: ₹{analyticsData.overview.arpu}</div>
+                  <div className="text-4xl font-bold text-theo-yellow tracking-tighter">₹{analyticsData.overview.totalRevenue.toLocaleString()}</div>
+                  <div className="text-theo-yellow/50 text-xs font-bold mt-2 uppercase">ARPU: ₹{analyticsData.overview.arpu}</div>
                 </CardContent>
               </Card>
             </div>
@@ -276,86 +280,64 @@ export default function SubscriptionAnalyticsPage() {
             </div>
 
             {/* Charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Daily Subscription Trends */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5" />
-                    Daily Subscription Trends
+              <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden bg-white">
+                <CardHeader className="p-8 pb-0">
+                  <CardTitle className="flex items-center gap-3 text-2xl font-bold text-theo-black">
+                    <div className="h-10 w-10 rounded-2xl bg-theo-yellow/10 flex items-center justify-center">
+                      <BarChart3 className="h-5 w-5 text-theo-black" />
+                    </div>
+                    Growth Velocity
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-8">
                   <div className="h-80">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={analyticsData.charts.dailyData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis />
-                        <Tooltip />
-                        <Line type="monotone" dataKey="newSubscriptions" stroke="#8884d8" name="New Subscriptions" />
-                        <Line type="monotone" dataKey="expiredSubscriptions" stroke="#ff7c7c" name="Expired" />
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                        <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 600}} dy={10} />
+                        <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 600}} dx={-10} />
+                        <Tooltip 
+                          contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', padding: '12px'}}
+                          itemStyle={{fontWeight: 700, fontSize: '12px'}}
+                        />
+                        <Line type="monotone" dataKey="newSubscriptions" stroke="#FFD700" strokeWidth={4} dot={{r: 4, strokeWidth: 2, fill: '#fff'}} activeDot={{r: 6}} name="Acquisitions" />
+                        <Line type="monotone" dataKey="expiredSubscriptions" stroke="#1A1A1A" strokeWidth={2} strokeDasharray="5 5" dot={false} name="Attrition" />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Subscription Status Distribution */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <PieChart className="h-5 w-5" />
-                    Subscription Status Distribution
+              {/* Revenue Trends */}
+              <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden bg-white">
+                <CardHeader className="p-8 pb-0">
+                  <CardTitle className="flex items-center gap-3 text-2xl font-bold text-theo-black">
+                    <div className="h-10 w-10 rounded-2xl bg-theo-black/5 flex items-center justify-center">
+                      <DollarSign className="h-5 w-5 text-theo-black" />
+                    </div>
+                    Daily Revenue
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-8">
                   <div className="h-80">
                     <ResponsiveContainer width="100%" height="100%">
-                      <RechartsPieChart>
-                        <Pie
-                          data={analyticsData.charts.subscriptionsByStatus}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          outerRadius={80}
-                          fill="#8884d8"
-                          dataKey="count"
-                        >
-                          {analyticsData.charts.subscriptionsByStatus.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </RechartsPieChart>
+                      <BarChart data={analyticsData.charts.dailyData}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                        <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 600}} dy={10} />
+                        <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 600}} dx={-10} />
+                        <Tooltip 
+                          contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', padding: '12px'}}
+                          formatter={(value) => [`₹${Number(value).toLocaleString()}`, 'Revenue']}
+                        />
+                        <Bar dataKey="dailyRevenue" fill="#FFD700" radius={[8, 8, 0, 0]} name="Volume" />
+                      </BarChart>
                     </ResponsiveContainer>
                   </div>
                 </CardContent>
               </Card>
             </div>
-
-            {/* Revenue Chart */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <DollarSign className="h-5 w-5" />
-                  Daily Revenue Trends
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={analyticsData.charts.dailyData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip formatter={(value) => [`₹${value}`, 'Revenue']} />
-                      <Bar dataKey="dailyRevenue" fill="#82ca9d" name="Daily Revenue" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
 
             {/* Subscription Types */}
             <Card>

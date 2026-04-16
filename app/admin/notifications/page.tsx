@@ -134,16 +134,16 @@ export default function AdminNotificationsPage() {
 
   const getTypeBadge = (type: string) => {
     const typeConfig = {
-      INFO: { label: 'Info', className: 'bg-blue-100 text-blue-800' },
-      SUCCESS: { label: 'Success', className: 'bg-green-100 text-green-800' },
-      WARNING: { label: 'Warning', className: 'bg-yellow-100 text-yellow-800' },
-      ERROR: { label: 'Error', className: 'bg-red-100 text-red-800' },
-      ANNOUNCEMENT: { label: 'Announcement', className: 'bg-purple-100 text-purple-800' },
-      SUBSCRIPTION_REMINDER: { label: 'Subscription', className: 'bg-orange-100 text-orange-800' },
-      PAYMENT_REMINDER: { label: 'Payment', className: 'bg-pink-100 text-pink-800' },
+      INFO: { label: 'Info', className: 'bg-white border-theo-black/10 text-theo-black' },
+      SUCCESS: { label: 'Success', className: 'bg-theo-yellow text-theo-black font-bold' },
+      WARNING: { label: 'Warning', className: 'bg-theo-black text-theo-yellow font-bold' },
+      ERROR: { label: 'Error', className: 'bg-red-600 text-white font-bold' },
+      ANNOUNCEMENT: { label: 'Announcement', className: 'bg-theo-yellow text-theo-black font-bold border-2 border-theo-black' },
+      SUBSCRIPTION_REMINDER: { label: 'Subscription', className: 'bg-theo-yellow text-theo-black font-bold' },
+      PAYMENT_REMINDER: { label: 'Payment', className: 'bg-theo-yellow text-theo-black font-bold' },
     };
     const config = typeConfig[type as keyof typeof typeConfig] || typeConfig.INFO;
-    return <Badge className={config.className}>{config.label}</Badge>;
+    return <Badge className={`rounded-full px-4 py-1 uppercase tracking-tighter text-[10px] ${config.className}`} variant="outline">{config.label}</Badge>;
   };
 
   const getPriorityBadge = (priority: string) => {
@@ -257,22 +257,31 @@ export default function AdminNotificationsPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Notifications Management</h1>
-        <p className="text-gray-600">Create and manage system notifications</p>
-      </div>
+    <div className="p-8 bg-theo-white/30 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+              <h1 className="text-5xl font-bold text-theo-black tracking-tight mb-2">
+                Notifications
+              </h1>
+              <p className="text-gray-500 font-medium text-lg">Create and manage system notifications</p>
+            </div>
+          </div>
+        </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group bg-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Notifications</CardTitle>
-            <Bell className="h-4 w-4 text-blue-600" />
+            <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total Notifications</CardTitle>
+            <div className="h-12 w-12 rounded-2xl bg-theo-yellow/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Bell className="h-6 w-6 text-theo-black" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalNotifications}</div>
-            <p className="text-xs text-gray-500">All notifications sent</p>
+            <div className="text-4xl font-bold text-theo-black tracking-tighter">{stats.totalNotifications}</div>
+            <p className="text-xs text-gray-500 font-medium mt-1">All notifications sent</p>
           </CardContent>
         </Card>
 
@@ -417,25 +426,21 @@ export default function AdminNotificationsPage() {
       )}
 
       {/* Filters and Actions */}
-      <Card className="mb-6">
-        <CardHeader>
+      <Card className="mb-12 border-0 shadow-sm rounded-[32px] overflow-hidden">
+        <CardHeader className="bg-theo-black text-theo-yellow p-8">
           <CardTitle className="flex items-center justify-between">
-            <span className="flex items-center gap-2">
-              <Filter className="h-5 w-5" />
+            <span className="flex items-center gap-3 text-2xl font-bold uppercase tracking-tight">
+              <Filter className="h-6 w-6" />
               Filters & Actions
             </span>
-            <div className="flex gap-2">
-              <Button onClick={() => setShowCreateForm(true)} size="sm">
-                <Plus className="h-4 w-4 mr-2" />
-                Create Notification
+            <div className="flex gap-3">
+              <Button onClick={() => setShowCreateForm(true)} variant="theo" className="rounded-2xl h-11 px-6 shadow-lg shadow-theo-yellow/20">
+                <Plus className="h-5 w-5 mr-2" />
+                Create Announcement
               </Button>
-              <Button onClick={loadNotifications} variant="outline" size="sm">
-                <RefreshCw className="h-4 w-4 mr-2" />
+              <Button onClick={loadNotifications} variant="outline" className="rounded-2xl h-11 px-6 bg-theo-black/20 border-theo-yellow/30 text-theo-yellow hover:bg-theo-yellow hover:text-theo-black">
+                <RefreshCw className="h-5 w-5 mr-2" />
                 Refresh
-              </Button>
-              <Button onClick={exportNotifications} variant="outline" size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Export CSV
               </Button>
             </div>
           </CardTitle>
@@ -537,63 +542,68 @@ export default function AdminNotificationsPage() {
                   {paginatedNotifications.map((notification) => (
                     <tr 
                       key={notification.id} 
-                      className={`border-b hover:bg-gray-50 ${!notification.isRead ? 'bg-blue-50' : ''}`}
+                      className={`border-b hover:bg-theo-yellow/5 transition-colors ${!notification.isRead ? 'bg-theo-yellow/10 font-medium' : ''}`}
                     >
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-2">
-                          {getTypeIcon(notification.type)}
+                      <td className="py-5 px-6">
+                        <div className="flex items-center gap-3">
+                          <div className="h-8 w-8 rounded-full bg-theo-black/5 flex items-center justify-center">
+                            {getTypeIcon(notification.type)}
+                          </div>
                           {getTypeBadge(notification.type)}
                         </div>
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-5 px-6">
                         <div className="max-w-md">
-                          <div className="font-medium text-sm">{notification.title}</div>
-                          <div className="text-xs text-gray-500 truncate">{notification.message}</div>
+                          <div className="font-bold text-theo-black">{notification.title}</div>
+                          <div className="text-xs text-gray-500 mt-1">{notification.message}</div>
                         </div>
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-5 px-6">
                         <div className="text-sm">
                           {notification.user ? (
-                            <div>
-                              <div className="font-medium">{notification.user.name}</div>
-                              <div className="text-xs text-gray-500">{notification.user.email}</div>
+                            <div className="flex items-center gap-3">
+                              <div className="h-8 w-8 rounded-full bg-theo-black text-theo-yellow flex items-center justify-center text-[10px] font-bold">
+                                {(notification.user.name || 'U')[0].toUpperCase()}
+                              </div>
+                              <div>
+                                <div className="font-bold text-theo-black">{notification.user.name}</div>
+                                <div className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">{notification.user.email}</div>
+                              </div>
                             </div>
                           ) : (
-                            <div className="flex items-center gap-1 text-purple-600">
+                            <div className="flex items-center gap-2 px-3 py-1 bg-theo-black text-theo-yellow rounded-full w-fit text-[10px] font-bold uppercase tracking-widest">
                               <Users className="h-3 w-3" />
                               Broadcast
                             </div>
                           )}
                         </div>
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-5 px-6">
                         {getPriorityBadge(notification.priority)}
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-5 px-6">
                         <div className="flex items-center gap-2">
                           {notification.isRead ? (
-                            <Badge className="bg-gray-100 text-gray-800">Read</Badge>
+                            <Badge variant="outline" className="bg-gray-50 text-gray-400 border-gray-200 uppercase tracking-tighter text-[10px] font-bold">Read</Badge>
                           ) : (
-                            <Badge className="bg-red-100 text-red-800">Unread</Badge>
-                          )}
-                          {notification.expiresAt && new Date(notification.expiresAt) < new Date() && (
-                            <Badge className="bg-yellow-100 text-yellow-800">Expired</Badge>
+                            <Badge className="bg-theo-yellow text-theo-black border-theo-black/10 uppercase tracking-tighter text-[10px] font-bold">New</Badge>
                           )}
                         </div>
                       </td>
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-1 text-sm">
-                          <Calendar className="h-3 w-3 text-gray-400" />
+                      <td className="py-5 px-6">
+                        <div className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-tight">
+                          <Calendar className="h-3.5 w-3.5" />
                           {format(new Date(notification.created_at), 'MMM dd, HH:mm')}
                         </div>
                       </td>
-                      <td className="py-3 px-4">
-                        <div className="flex gap-1">
+                      <td className="py-5 px-6">
+                        <div className="flex gap-2">
                           {!notification.isRead && (
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => markAsRead(notification.id)}
+                              className="h-8 w-8 p-0 rounded-full hover:bg-theo-yellow hover:text-theo-black"
                             >
                               <Eye className="h-4 w-4" />
                             </Button>
@@ -602,7 +612,7 @@ export default function AdminNotificationsPage() {
                             variant="ghost"
                             size="sm"
                             onClick={() => deleteNotification(notification.id)}
-                            className="text-red-600 hover:text-red-700"
+                            className="h-8 w-8 p-0 rounded-full text-red-600 hover:bg-red-50"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -649,6 +659,7 @@ export default function AdminNotificationsPage() {
           )}
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

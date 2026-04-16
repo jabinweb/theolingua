@@ -186,24 +186,24 @@ export default function AdminPage() {
   }).length;
 
   return (
-    <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <div className="p-8 bg-theo-white/30 min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex justify-between items-start mb-4">
+        <div className="mb-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+              <h1 className="text-5xl font-bold text-theo-black tracking-tight mb-2">
                 Admin Dashboard
               </h1>
-              <p className="text-gray-600 text-lg">Welcome back! Here's what's happening today.</p>
+              <p className="text-gray-500 font-medium text-lg">Platform statistics and management</p>
             </div>
-            <div className="flex gap-3">
-              <Button onClick={refreshData} disabled={dataLoading} variant="outline" size="lg">
+            <div className="flex gap-4">
+              <Button onClick={refreshData} disabled={dataLoading} variant="outline" className="rounded-2xl h-12 px-6">
                 <RefreshCw className={`h-4 w-4 mr-2 ${dataLoading ? 'animate-spin' : ''}`} />
                 Refresh
               </Button>
-              <Button onClick={() => setTopicFormOpen(true)} size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90">
-                <Plus className="h-4 w-4 mr-2" />
+              <Button onClick={() => setTopicFormOpen(true)} variant="theo" className="rounded-2xl h-12 px-6">
+                <Plus className="h-5 w-5 mr-2" />
                 Add Topic
               </Button>
             </div>
@@ -211,64 +211,64 @@ export default function AdminPage() {
         </div>
 
         {/* Quick Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Total Users</CardTitle>
-              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                <Users className="h-5 w-5 text-blue-600" />
+              <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total Users</CardTitle>
+              <div className="h-12 w-12 rounded-2xl bg-theo-yellow/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Users className="h-6 w-6 text-theo-black" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-gray-900">{registeredUsers.length}</div>
-              <p className="text-xs text-green-600 mt-1 flex items-center">
+              <div className="text-4xl font-bold text-theo-black tracking-tighter">{registeredUsers.length}</div>
+              <p className="text-[10px] text-theo-black font-bold mt-2 flex items-center bg-theo-yellow w-fit px-2 py-0.5 rounded-full uppercase tracking-tighter">
                 <TrendingUp className="h-3 w-3 mr-1" />
                 +{todayRegistrations} today
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-green-500 hover:shadow-lg transition-shadow gap-3">
+          <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group bg-theo-black">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Active Subscriptions</CardTitle>
-              <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                <UserCheck className="h-5 w-5 text-green-600" />
+              <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-theo-yellow/50">Active Subs</CardTitle>
+              <div className="h-12 w-12 rounded-2xl bg-theo-yellow flex items-center justify-center group-hover:scale-110 transition-transform">
+                <UserCheck className="h-6 w-6 text-theo-black" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-gray-900">{activeSubscriptions.length}</div>
-              <p className="text-xs text-gray-500 mt-1">
-                {((activeSubscriptions.length / (registeredUsers.length || 1)) * 100).toFixed(1)}% conversion rate
+              <div className="text-4xl font-bold text-theo-yellow tracking-tighter">{activeSubscriptions.length}</div>
+              <p className="text-[10px] text-theo-yellow/50 font-bold mt-2 uppercase tracking-tighter">
+                {((activeSubscriptions.length / (registeredUsers.length || 1)) * 100).toFixed(1)}% conversion
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-purple-500 hover:shadow-lg transition-shadow gap-3">
+          <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Total Revenue</CardTitle>
-              <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
-                <DollarSign className="h-5 w-5 text-purple-600" />
+              <CardTitle className="text-xs font-bold uppercase tracking-widest text-gray-400">Total Revenue</CardTitle>
+              <div className="h-12 w-12 rounded-2xl bg-theo-black/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <DollarSign className="h-6 w-6 text-theo-black" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-gray-900">₹{(totalRevenue/100).toLocaleString()}</div>
-              <p className="text-xs text-gray-500 mt-1">
+              <div className="text-4xl font-bold text-theo-black tracking-tighter">₹{(totalRevenue/100).toLocaleString()}</div>
+              <p className="text-xs text-gray-500 font-medium mt-2">
                 ₹{(totalRevenue/(registeredUsers.length || 1)/100).toFixed(0)} per user
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-orange-500 hover:shadow-lg transition-shadow gap-3">
+          <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Monthly Revenue</CardTitle>
-              <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center">
-                <TrendingUp className="h-5 w-5 text-orange-600" />
+              <CardTitle className="text-xs font-bold uppercase tracking-widest text-gray-400">Monthly</CardTitle>
+              <div className="h-12 w-12 rounded-2xl bg-theo-yellow flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Activity className="h-6 w-6 text-theo-black" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-gray-900">₹{(monthlyRevenue/100).toLocaleString()}</div>
-              <p className="text-xs text-gray-500 mt-1">
-                {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+              <div className="text-4xl font-bold text-theo-black tracking-tighter">₹{(monthlyRevenue/100).toLocaleString()}</div>
+              <p className="text-xs text-gray-500 font-medium mt-2">
+                {new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
               </p>
             </CardContent>
           </Card>
@@ -350,13 +350,13 @@ export default function AdminPage() {
 
         {/* Recent Activity Tables */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="border-b bg-gradient-to-r from-blue-50 to-purple-50">
-              <CardTitle className="flex items-center">
-                <Users className="h-5 w-5 mr-2 text-blue-600" />
+          <Card className="hover:shadow-lg transition-shadow overflow-hidden border-0 shadow-sm rounded-[32px]">
+            <CardHeader className="border-b bg-theo-black text-theo-yellow p-6">
+              <CardTitle className="flex items-center text-lg font-bold uppercase tracking-tight">
+                <Users className="h-5 w-5 mr-3" />
                 Recent Registrations
               </CardTitle>
-              <CardDescription>Latest users who joined the platform</CardDescription>
+              <CardDescription className="text-theo-yellow/60 text-xs font-medium">Latest users who joined the platform</CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
               <div className="space-y-4">
@@ -391,13 +391,13 @@ export default function AdminPage() {
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="border-b bg-gradient-to-r from-green-50 to-emerald-50">
-              <CardTitle className="flex items-center">
-                <CreditCard className="h-5 w-5 mr-2 text-green-600" />
+          <Card className="hover:shadow-lg transition-shadow overflow-hidden border-0 shadow-sm rounded-[32px]">
+            <CardHeader className="border-b bg-theo-black text-theo-yellow p-6">
+              <CardTitle className="flex items-center text-lg font-bold uppercase tracking-tight">
+                <CreditCard className="h-5 w-5 mr-3" />
                 Recent Subscriptions
               </CardTitle>
-              <CardDescription>Latest subscription payments received</CardDescription>
+              <CardDescription className="text-theo-yellow/60 text-xs font-medium">Latest subscription payments received</CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
               <div className="space-y-4">

@@ -142,12 +142,14 @@ export default function BookDemo({ children }: BookDemoProps) {
         {children}
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg max-w-[95vw] mx-auto max-h-[95vh] overflow-y-auto p-4 sm:p-6">
-        <DialogHeader className="text-left">
-          <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
-            <Calendar className="w-5 h-5 text-blue-600" />
+        <DialogHeader className="text-left pb-6 border-b border-gray-100 mb-6">
+          <DialogTitle className="flex items-center gap-3 text-2xl font-bold text-theo-black">
+            <div className="p-2 bg-theo-yellow rounded-xl shadow-lg">
+              <Calendar className="w-6 h-6 text-theo-black" />
+            </div>
             Book a Demo Session
           </DialogTitle>
-          <DialogDescription className="text-sm sm:text-base">
+          <DialogDescription className="text-sm sm:text-base pt-2 font-medium text-gray-500">
             Schedule a personalized demo to see how TheoLingua can transform your theological education programs.
           </DialogDescription>
         </DialogHeader>
@@ -270,37 +272,55 @@ export default function BookDemo({ children }: BookDemoProps) {
               </div>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+            <div className="flex flex-col sm:flex-row gap-4 pt-6">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setOpen(false)}
-                className="w-full sm:flex-1 py-2.5"
+                className="w-full sm:flex-1 py-6 rounded-2xl font-bold transition-all"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="w-full sm:flex-1 bg-blue-600 hover:bg-blue-700 py-2.5"
+                variant="theo"
+                className="w-full sm:flex-1 py-6 rounded-2xl font-extrabold text-base"
                 disabled={isSubmitting}
               >
-                <Clock className="w-4 h-4 mr-2" />
-                {isSubmitting ? 'Submitting...' : 'Book Demo'}
+                {isSubmitting ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-theo-black/20 border-t-theo-black rounded-full animate-spin" />
+                    Submitting...
+                  </div>
+                ) : (
+                  <>
+                    <Clock className="w-5 h-5 mr-2" />
+                    Book My Demo
+                  </>
+                )}
               </Button>
             </div>
           </form>
         )}
 
-        <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-blue-50 rounded-lg">
-          <div className="flex items-start gap-3">
-            <Users className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+        <div className="mt-8 p-6 bg-theo-black rounded-[24px] text-white shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-theo-yellow/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+          <div className="flex items-start gap-4 relative z-10">
+            <div className="p-2 bg-theo-yellow/20 rounded-xl">
+              <Users className="w-6 h-6 text-theo-yellow" />
+            </div>
             <div>
-              <h4 className="font-semibold text-blue-900 text-sm sm:text-base">What to expect:</h4>
-              <ul className="text-xs sm:text-sm text-blue-700 mt-1 space-y-1">
-                <li>• 30-minute personalized demo session</li>
-                <li>• Program overview and customization options</li>
-                <li>• Implementation roadmap discussion</li>
-                <li>• Q&A with our education specialists</li>
+              <h4 className="font-bold text-theo-yellow text-base mb-2 uppercase tracking-widest text-[10px]">What to expect:</h4>
+              <ul className="text-sm text-white/80 space-y-2 font-medium">
+                <li className="flex items-center gap-2">
+                  <div className="w-1 h-1 rounded-full bg-theo-yellow" /> 30-minute personalized demo session
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-1 h-1 rounded-full bg-theo-yellow" /> Program overview & customization
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-1 h-1 rounded-full bg-theo-yellow" /> Implementation roadmap discussion
+                </li>
               </ul>
             </div>
           </div>

@@ -591,9 +591,11 @@ Would you like to refresh the page now?`;
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="!fixed !inset-0 !translate-x-0 !translate-y-0 !max-w-none !w-screen !h-screen !m-0 !rounded-none overflow-y-auto">
-        <DialogHeader className="sticky top-0 bg-white z-10 pb-4 border-b">
-          <DialogTitle className="flex items-center gap-2 text-xl">
-            <BookOpen className="h-6 w-6 text-blue-600" />
+        <DialogHeader className="sticky top-0 bg-white z-10 pb-6 border-b border-gray-100">
+          <DialogTitle className="flex items-center gap-3 text-2xl font-bold text-theo-black">
+            <div className="p-2 bg-theo-yellow rounded-xl shadow-[0_0_15px_rgba(200,216,50,0.3)]">
+              <BookOpen className="h-6 w-6 text-theo-black" />
+            </div>
             Subscribe to {classData.name}
           </DialogTitle>
         </DialogHeader>
@@ -648,15 +650,15 @@ Would you like to refresh the page now?`;
 
         {/* Login Notice for Guest Users */}
         {!user && !paymentSuccess.show && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-            <div className="flex items-center gap-3">
-              <LogIn className="h-5 w-5 text-blue-600" />
-              <div>
-                <h4 className="font-medium text-blue-900">Login Required</h4>
-                <p className="text-sm text-blue-700">
-                  Please login to subscribe and access premium content. We&apos;ll bring you back here after login.
-                </p>
-              </div>
+          <div className="bg-theo-yellow/10 border border-theo-yellow/20 rounded-2xl p-6 mb-8 flex items-start gap-4">
+            <div className="p-2 bg-theo-yellow rounded-xl">
+              <LogIn className="h-5 w-5 text-theo-black" />
+            </div>
+            <div>
+              <h4 className="font-bold text-theo-black">Login Required</h4>
+              <p className="text-sm text-theo-black/70">
+                Please login to subscribe and access premium content. We&apos;ll bring you back here after login.
+              </p>
             </div>
           </div>
         )}
@@ -708,22 +710,22 @@ Would you like to refresh the page now?`;
               </Card>
             ) : (
               // User doesn't have program subscription - show subscription option
-              <Card className="border-blue-200 bg-blue-50">
+              <Card className="border-theo-black bg-theo-black text-white rounded-[32px] overflow-hidden">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span className="flex items-center gap-2">
-                      <Star className="h-5 w-5 text-blue-600" />
+                      <Star className="h-5 w-5 text-theo-yellow" />
                       Complete Program Access
                     </span>
-                    <Badge className="bg-blue-600 text-white">Best Value</Badge>
+                    <Badge className="bg-theo-yellow text-theo-black hover:bg-theo-yellow border-0 font-bold uppercase tracking-widest text-[10px]">Best Value</Badge>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-6">
                   {/* Duration Selection for programs with custom pricing */}
                   {hasCustomPricing && !isPricingLoading && (
                     <div className="space-y-3">
                       <div className="text-sm font-medium text-gray-700">Choose your plan duration:</div>
-                      <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-3 gap-3">
                         {pricingPlans.map((plan) => {
                           const price = plan.price / 100;
                           const isSelected = selectedDuration === plan.durationMonths;
@@ -732,26 +734,21 @@ Would you like to refresh the page now?`;
                             <button
                               key={plan.id}
                               onClick={() => setSelectedDuration(plan.durationMonths)}
-                              className={`p-3 rounded-lg border-2 transition-all ${
+                              className={`p-4 rounded-2xl border-2 transition-all group ${
                                 isSelected 
-                                  ? 'border-blue-500 bg-blue-50 shadow-md' 
-                                  : 'border-gray-200 hover:border-blue-200'
+                                  ? 'border-theo-yellow bg-theo-yellow/10 shadow-[0_0_20px_rgba(200,216,50,0.15)]' 
+                                  : 'border-white/10 hover:border-white/20'
                               }`}
                             >
-                              <div className={`text-lg font-bold ${isSelected ? 'text-blue-700' : 'text-gray-700'}`}>
-                                {plan.durationMonths} Mo
+                              <div className={`text-sm font-bold uppercase tracking-wider ${isSelected ? 'text-theo-yellow' : 'text-white/40'}`}>
+                                {plan.durationMonths} Months
                               </div>
-                              <div className={`text-xl font-bold ${isSelected ? 'text-blue-600' : 'text-gray-900'}`}>
+                              <div className={`text-3xl font-bold mt-1 ${isSelected ? 'text-white' : 'text-white/80'}`}>
                                 ₹{price}
                               </div>
-                              <div className="text-xs text-gray-500">
+                              <div className="text-[10px] text-white/40 mt-1">
                                 ₹{monthlyPrice}/mo
                               </div>
-                              {plan.isPopular && (
-                                <div className="text-xs text-green-600 font-medium mt-1">
-                                  Best Value
-                                </div>
-                              )}
                             </button>
                           );
                         })}

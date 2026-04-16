@@ -24,10 +24,10 @@ interface FormResponse {
 }
 
 const statusOptions = [
-  { value: 'PENDING', label: 'Pending', color: 'bg-yellow-100 text-yellow-800' },
-  { value: 'IN_PROGRESS', label: 'In Progress', color: 'bg-blue-100 text-blue-800' },
-  { value: 'RESOLVED', label: 'Resolved', color: 'bg-green-100 text-green-800' },
-  { value: 'CLOSED', label: 'Closed', color: 'bg-gray-100 text-gray-800' },
+  { value: 'PENDING', label: 'Pending', color: 'bg-yellow-50 text-yellow-700 border-yellow-200 font-bold' },
+  { value: 'IN_PROGRESS', label: 'In Progress', color: 'bg-theo-yellow/10 text-theo-black border-theo-yellow/20 font-bold' },
+  { value: 'RESOLVED', label: 'Resolved', color: 'bg-theo-black text-theo-yellow font-bold' },
+  { value: 'CLOSED', label: 'Closed', color: 'bg-gray-100 text-gray-800 border-gray-200 font-bold' },
 ];
 
 const formTypeOptions = [
@@ -176,12 +176,12 @@ export default function ResponsesPage() {
 
   const getFormTypeBadge = (formType: string) => {
     const colors = {
-      CONTACT: 'bg-blue-100 text-blue-800',
-      DEMO: 'bg-purple-100 text-purple-800',
-      SUPPORT: 'bg-orange-100 text-orange-800'
+      CONTACT: 'bg-theo-black/5 text-theo-black/70 border-theo-black/10 font-bold',
+      DEMO: 'bg-theo-yellow text-theo-black font-bold border border-theo-yellow/20',
+      SUPPORT: 'bg-gray-100 text-gray-800 font-bold border border-gray-200'
     };
     return (
-      <Badge className={colors[formType as keyof typeof colors] || 'bg-gray-100 text-gray-800'}>
+      <Badge className={colors[formType as keyof typeof colors] || 'bg-gray-100 text-gray-800 font-bold'}>
         {formType}
       </Badge>
     );
@@ -331,12 +331,12 @@ export default function ResponsesPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-          <Card>
+          <Card className="border-0 shadow-sm rounded-[24px] overflow-hidden">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total</CardTitle>
+              <CardTitle className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Total</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{Array.isArray(responses) ? responses.length : 0}</div>
+              <div className="text-2xl font-bold text-theo-black">{Array.isArray(responses) ? responses.length : 0}</div>
               {searchTerm && (
                 <p className="text-xs text-muted-foreground">
                   {filteredResponses.length} matching
@@ -390,7 +390,7 @@ export default function ResponsesPage() {
           <CardContent>
             <div className="space-y-4">
               {Array.isArray(filteredResponses) && filteredResponses.map((response) => (
-                <div key={response.id} className="flex flex-col lg:flex-row lg:items-center justify-between p-6 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
+                <div key={response.id} className="flex flex-col lg:flex-row lg:items-center justify-between p-6 border border-gray-100 rounded-[20px] bg-white shadow-sm hover:shadow-md transition-all duration-300 hover:border-theo-yellow/50">
                   <div className="flex-1 space-y-3">
                     {/* Header with name and badges */}
                     <div className="flex items-center gap-3 flex-wrap">
@@ -402,15 +402,15 @@ export default function ResponsesPage() {
                     {/* Contact Information */}
                     <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
-                        <Mail className="h-4 w-4" />
-                        <a href={`mailto:${response.email}`} className="text-blue-600 hover:underline">
+                        <Mail className="h-4 w-4 text-theo-black" />
+                        <a href={`mailto:${response.email}`} className="text-theo-black font-semibold hover:text-theo-yellow transition-colors">
                           {response.email}
                         </a>
                       </div>
                       {response.phone && (
                         <div className="flex items-center gap-1">
-                          <Phone className="h-4 w-4" />
-                          <a href={`tel:${response.phone}`} className="text-blue-600 hover:underline">
+                          <Phone className="h-4 w-4 text-theo-black" />
+                          <a href={`tel:${response.phone}`} className="text-theo-black font-semibold hover:text-theo-yellow transition-colors">
                             {response.phone}
                           </a>
                         </div>

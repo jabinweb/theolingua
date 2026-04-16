@@ -32,22 +32,28 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
-      <div className="w-full max-w-md space-y-6">
+    <div className="min-h-screen flex items-center justify-center bg-theo-white/50 p-4 relative overflow-hidden">
+      {/* Abstract background elements */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-theo-yellow/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-theo-black/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+
+      <div className="w-full max-w-md space-y-8 relative z-10">
         {/* Logo and Header */}
         <div className="text-center">
-          <div className="flex justify-center mb-4">
-            <Image
-              src="/logo.png"
-              alt="TheoLingua"
-              width={60}
-              height={60}
-              className="rounded-lg"
-            />
+          <div className="flex justify-center mb-6">
+            <div className="w-20 h-20 bg-theo-black rounded-[24px] flex items-center justify-center shadow-xl rotate-3 hover:rotate-0 transition-transform duration-500">
+              <Image
+                src="/logo.png"
+                alt="TheoLingua"
+                width={50}
+                height={50}
+                className="rounded-lg object-contain"
+              />
+            </div>
           </div>
-          <h1 className="text-2xl font-bold">Welcome to TheoLingua</h1>
-          <p className="text-muted-foreground">
-            Sign in or create a new account
+          <h1 className="text-4xl font-bold text-theo-black tracking-tight mb-2">Welcome Back</h1>
+          <p className="text-gray-500 font-medium">
+            Continue your language excellence journey
           </p>
         </div>
 
@@ -60,12 +66,12 @@ function LoginForm() {
         />
 
         {/* Back to Home */}
-        <div className="text-center pt-4">
+        <div className="text-center pt-2">
           <Link 
             href="/"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="text-sm font-bold text-theo-black hover:text-theo-yellow transition-colors inline-flex items-center gap-2"
           >
-            ← Back to Home
+            <span className="text-lg">←</span> Back to homepage
           </Link>
         </div>
       </div>

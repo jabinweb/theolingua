@@ -124,21 +124,21 @@ export default function AdminActivitiesPage() {
 
   const getActionBadge = (action: string) => {
     const actionConfig = {
-      LOGIN: { label: 'Login', className: 'bg-green-100 text-green-800' },
-      LOGOUT: { label: 'Logout', className: 'bg-gray-100 text-gray-800' },
-      TOPIC_STARTED: { label: 'Topic Started', className: 'bg-blue-100 text-blue-800' },
-      TOPIC_COMPLETED: { label: 'Topic Completed', className: 'bg-green-100 text-green-800' },
-      SUBSCRIPTION_CREATED: { label: 'Subscription Created', className: 'bg-purple-100 text-purple-800' },
-      SUBSCRIPTION_CANCELLED: { label: 'Subscription Cancelled', className: 'bg-red-100 text-red-800' },
-      PAYMENT_INITIATED: { label: 'Payment Started', className: 'bg-yellow-100 text-yellow-800' },
-      PAYMENT_COMPLETED: { label: 'Payment Completed', className: 'bg-green-100 text-green-800' },
-      PAYMENT_FAILED: { label: 'Payment Failed', className: 'bg-red-100 text-red-800' },
-      PROFILE_UPDATED: { label: 'Profile Updated', className: 'bg-blue-100 text-blue-800' },
-      CLASS_ACCESSED: { label: 'Class Accessed', className: 'bg-indigo-100 text-indigo-800' },
-      SUBJECT_ACCESSED: { label: 'Subject Accessed', className: 'bg-cyan-100 text-cyan-800' },
+      LOGIN: { label: 'Login', className: 'bg-green-600 text-white font-bold' },
+      LOGOUT: { label: 'Logout', className: 'bg-theo-black text-theo-yellow font-bold' },
+      TOPIC_STARTED: { label: 'Topic Started', className: 'bg-theo-yellow text-theo-black font-bold' },
+      TOPIC_COMPLETED: { label: 'Topic Completed', className: 'bg-theo-black text-theo-yellow font-bold border-2 border-theo-yellow/20' },
+      SUBSCRIPTION_CREATED: { label: 'Subscription', className: 'bg-theo-yellow text-theo-black font-bold' },
+      SUBSCRIPTION_CANCELLED: { label: 'Cancelled', className: 'bg-red-600 text-white font-bold' },
+      PAYMENT_INITIATED: { label: 'Payment Started', className: 'bg-theo-yellow text-theo-black font-bold' },
+      PAYMENT_COMPLETED: { label: 'Payment Success', className: 'bg-theo-black text-theo-yellow font-bold' },
+      PAYMENT_FAILED: { label: 'Payment Failed', className: 'bg-red-600 text-white font-bold' },
+      PROFILE_UPDATED: { label: 'Profile Updated', className: 'bg-theo-yellow text-theo-black font-bold' },
+      CLASS_ACCESSED: { label: 'Class Accessed', className: 'bg-theo-black text-theo-yellow font-bold' },
+      SUBJECT_ACCESSED: { label: 'Subject Accessed', className: 'bg-theo-black text-theo-yellow font-bold' },
     };
-    const config = actionConfig[action as keyof typeof actionConfig] || { label: action, className: 'bg-gray-100 text-gray-800' };
-    return <Badge className={config.className}>{config.label}</Badge>;
+    const config = actionConfig[action as keyof typeof actionConfig] || { label: action, className: 'bg-white border-theo-black/10 text-theo-black' };
+    return <Badge className={`rounded-full px-4 py-1 uppercase tracking-tighter text-[10px] ${config.className}`} variant="outline">{config.label}</Badge>;
   };
 
   const filteredActivities = activities.filter(activity => {
@@ -183,63 +183,78 @@ export default function AdminActivitiesPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">User Activities</h1>
-        <p className="text-gray-600">Monitor user actions and system engagement</p>
-      </div>
+    <div className="p-8 bg-theo-white/30 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+              <h1 className="text-5xl font-bold text-theo-black tracking-tight mb-2">
+                User Activities
+              </h1>
+              <p className="text-gray-500 font-medium text-lg">Monitor user actions and system engagement</p>
+            </div>
+          </div>
+        </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group bg-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Activities</CardTitle>
-            <Activity className="h-4 w-4 text-blue-600" />
+            <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total Activities</CardTitle>
+            <div className="h-12 w-12 rounded-2xl bg-theo-yellow/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Activity className="h-6 w-6 text-theo-black" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalActivities}</div>
-            <p className="text-xs text-gray-500">All user actions logged</p>
+            <div className="text-4xl font-bold text-theo-black tracking-tighter">{stats.totalActivities}</div>
+            <p className="text-xs text-gray-500 font-medium mt-1">All user actions logged</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group bg-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-            <User className="h-4 w-4 text-green-600" />
+            <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Active Users</CardTitle>
+            <div className="h-12 w-12 rounded-2xl bg-theo-black/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <User className="h-6 w-6 text-theo-black" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.uniqueUsers}</div>
-            <p className="text-xs text-gray-500">Unique users with activity</p>
+            <div className="text-4xl font-bold text-theo-black tracking-tighter">{stats.uniqueUsers}</div>
+            <p className="text-xs text-gray-500 font-medium mt-1">Unique active participants</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group bg-theo-black">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Top Action</CardTitle>
-            <CheckCircle className="h-4 w-4 text-purple-600" />
+            <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-theo-yellow/50">Top Dynamic</CardTitle>
+            <div className="h-12 w-12 rounded-2xl bg-theo-yellow/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <CheckCircle className="h-6 w-6 text-theo-yellow" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-sm font-bold">
+            <div className="text-xl font-bold text-theo-yellow uppercase tracking-tight">
               {Object.keys(stats.activitiesByAction).length > 0 
                 ? Object.entries(stats.activitiesByAction)
                     .sort(([,a], [,b]) => b - a)[0][0]
                     .replace('_', ' ')
                 : 'None'}
             </div>
-            <p className="text-xs text-gray-500">Most frequent action</p>
+            <p className="text-xs text-theo-yellow/50 font-medium mt-1">Most frequent user action</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group bg-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Today&apos;s Activities</CardTitle>
-            <Clock className="h-4 w-4 text-orange-600" />
+            <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-gray-400">24H Velocity</CardTitle>
+            <div className="h-12 w-12 rounded-2xl bg-theo-yellow/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Clock className="h-6 w-6 text-theo-black" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-4xl font-bold text-theo-black tracking-tighter">
               {stats.recentTrends.length > 0 ? stats.recentTrends[0].count : 0}
             </div>
-            <p className="text-xs text-gray-500">Activities in last 24 hours</p>
+            <p className="text-xs text-gray-500 font-medium mt-1">Actions in last 24 hours</p>
           </CardContent>
         </Card>
       </div>
@@ -533,6 +548,7 @@ export default function AdminActivitiesPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

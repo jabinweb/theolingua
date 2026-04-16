@@ -19,9 +19,9 @@ model Class {
   updatedAt     DateTime       @updatedAt @map("updated_at")
   currency      String         @default("INR")
   price         Int?           @default(29900)
+  pricingPlans  PricingPlan[]
   subjects      Subject[]
   subscriptions Subscription[]
-  pricingPlans  PricingPlan[]
 
   @@map("classes")
 }
@@ -281,19 +281,19 @@ model ContentPage {
 model PricingPlan {
   id             String   @id @default(cuid())
   classId        Int
-  name           String   // "3 Months", "6 Months", "12 Months"
-  durationMonths Int      // 3, 6, 12
-  price          Int      // Price in paise (e.g., 39900 = ₹399)
-  originalPrice  Int?     // Original price for showing discounts
-  discount       Int?     // Discount percentage
+  name           String
+  durationMonths Int
+  price          Int
+  originalPrice  Int?
+  discount       Int?
   currency       String   @default("INR")
   isActive       Boolean  @default(true)
-  isPopular      Boolean  @default(false) // Mark as "Best Value" etc
+  isPopular      Boolean  @default(false)
   features       String[] @default([])
   sortOrder      Int      @default(0)
-  workbookPrice  Int?     // Workbook price in paise (e.g., 24900 = ₹249)
-  workbookNote   String?  // Note about workbook (e.g., "inclusive of shipping")
-  comboDiscount  Int?     // Discount % when buying both programs (e.g., 20 for 20% off)
+  workbookPrice  Int?
+  workbookNote   String?
+  comboDiscount  Int?
   created_at     DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
   class          Class    @relation(fields: [classId], references: [id], onDelete: Cascade)

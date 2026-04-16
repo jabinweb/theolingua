@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2, ArrowLeft } from 'lucide-react';
 import { TopicForm } from '@/components/admin/TopicForm';
 
@@ -155,22 +156,38 @@ export default function TopicsPage() {
   };
 
   return (
-    <div className="p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-6 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <Button variant="outline" size="icon" onClick={() => router.push(`/admin/programs/${programId}/units/${unitId}/chapters`)}>
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold mb-2">Topics</h1>
-              <p className="text-muted-foreground">Manage topics for this chapter</p>
+    <div className="p-8 bg-theo-white/30 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div className="flex items-center gap-6">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={() => router.push(`/admin/programs/${programId}/units/${unitId}/chapters`)}
+                className="rounded-2xl h-12 w-12 border-theo-black/10 hover:bg-theo-yellow hover:border-theo-yellow transition-all shadow-sm"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <div>
+                <h1 className="text-5xl font-bold text-theo-black tracking-tight mb-2">
+                  Lesson Topics
+                </h1>
+                <div className="flex items-center gap-3">
+                  <Badge variant="theo-black" className="rounded-full px-4 font-bold uppercase tracking-tighter text-[10px]">CONTENT MANAGEMENT</Badge>
+                  <p className="text-gray-500 font-medium text-lg">Manage educational topics and media</p>
+                </div>
+              </div>
             </div>
+            <Button 
+                onClick={() => setFormOpen(true)}
+                variant="theo"
+                className="rounded-2xl h-12 px-6 shadow-lg shadow-theo-yellow/20"
+              >
+              <Plus className="h-5 w-5 mr-2" />
+              Add New Topic
+            </Button>
           </div>
-          <Button onClick={() => setFormOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Topic
-          </Button>
         </div>
 
         {loading ? (
@@ -180,28 +197,35 @@ export default function TopicsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {topics.map((topic) => (
-              <Card key={topic.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle className="text-xl">{topic.name}</CardTitle>
-                  <p className="text-sm text-muted-foreground">Order: {topic.orderIndex}</p>
+              <Card key={topic.id} className="border-0 shadow-sm rounded-[32px] overflow-hidden group hover:shadow-xl transition-all duration-300">
+                <CardHeader className="p-8">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-2xl font-bold text-theo-black">{topic.name}</CardTitle>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">ORDER INDEX: {topic.orderIndex}</p>
+                    </div>
+                    <Badge variant="theo-black" className="rounded-full px-3 font-bold uppercase tracking-tighter text-[9px] h-fit">
+                      {topic.type || 'TOPIC'}
+                    </Badge>
+                  </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-8 pt-0">
                   <div className="space-y-4">
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                       <Button
-                        variant="outline"
+                        variant="theo-black"
                         size="sm"
                         onClick={() => handleEditTopic(topic)}
-                        className="flex-1"
+                        className="flex-1 rounded-xl h-10 font-bold"
                       >
                         <Edit className="h-4 w-4 mr-2" />
                         Edit
                       </Button>
                       <Button
-                        variant="destructive"
+                        variant="ghost"
                         size="sm"
                         onClick={() => handleDeleteTopic(topic.id)}
-                        className="flex-1"
+                        className="flex-1 rounded-xl h-10 text-red-600 hover:bg-red-50 font-bold"
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
                         Delete

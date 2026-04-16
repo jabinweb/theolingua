@@ -279,7 +279,7 @@ useEffect(() => {
             <p className="text-muted-foreground">Manage user subscriptions and payments</p>
           </div>
           <div className="flex gap-2">
-            <Button onClick={() => setShowCreateModal(true)} variant="default" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold">
+            <Button onClick={() => setShowCreateModal(true)} variant="theo" className="font-bold">
               + Create Subscription
             </Button>
             <Button onClick={refreshData} disabled={dataLoading} variant="outline">
@@ -446,8 +446,8 @@ useEffect(() => {
             const isActive = subscription.status === 'ACTIVE';
             
             return (
-              <Card key={subscription.id} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
-                <CardHeader className={`pb-4 ${isActive ? 'bg-gradient-to-r from-green-50 to-emerald-50' : 'bg-gradient-to-r from-gray-50 to-slate-50'}`}>
+              <Card key={subscription.id} className="group hover:shadow-xl transition-all duration-300 border border-gray-100 shadow-md">
+                <CardHeader className={`pb-4 ${isActive ? 'bg-theo-yellow/5' : 'bg-gray-50'}`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className={`relative ${isActive ? 'ring-2 ring-green-200' : 'ring-2 ring-gray-200'} rounded-full`}>
@@ -455,7 +455,7 @@ useEffect(() => {
                             {subscriptionUser?.photoUrl && (
                               <AvatarImage src={subscriptionUser?.photoUrl} alt={subscriptionUser?.displayName || 'User'} />
                             )}
-                          <AvatarFallback className={`${isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'} font-semibold text-sm`}>
+                          <AvatarFallback className={`${isActive ? 'bg-theo-black text-theo-yellow' : 'bg-gray-200 text-gray-700'} font-bold text-sm`}>
                             {subscriptionUser?.displayName?.[0] || subscriptionUser?.email?.[0].toUpperCase() || 'U'}
                           </AvatarFallback>
                         </Avatar>
@@ -475,8 +475,8 @@ useEffect(() => {
                       </div>
                     </div>
                     <Badge 
-                      variant={isActive ? 'default' : 'secondary'}
-                      className={`${isActive ? 'bg-green-100 text-green-800 hover:bg-green-200' : 'bg-gray-100 text-gray-800'} font-medium text-xs`}
+                      variant={isActive ? 'theo' : 'secondary'}
+                      className="font-bold text-xs"
                     >
                       {subscription.status}
                     </Badge>
@@ -486,18 +486,18 @@ useEffect(() => {
                 <CardContent className="space-y-4 p-4">
                   {/* Subscription Details */}
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-lg">
-                      <DollarSign className="h-3 w-3 text-blue-600" />
+                    <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-xl border border-gray-100">
+                      <DollarSign className="h-3 w-3 text-theo-black" />
                       <div>
-                        <div className="text-xs text-blue-600 font-medium">Amount</div>
-                        <div className="font-semibold text-gray-900 text-sm">₹{subscription.amount/100}</div>
+                        <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Amount</div>
+                        <div className="font-bold text-theo-black text-sm">₹{subscription.amount/100}</div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 p-2 bg-purple-50 rounded-lg">
-                      <Calendar className="h-3 w-3 text-purple-600" />
+                    <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-xl border border-gray-100">
+                      <Calendar className="h-3 w-3 text-theo-black" />
                       <div>
-                        <div className="text-xs text-purple-600 font-medium">Date</div>
-                        <div className="font-semibold text-gray-900 text-xs">
+                        <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Date</div>
+                        <div className="font-bold text-theo-black text-xs">
                           {new Date(subscription.created_at).toLocaleDateString('en-US', { 
                             month: 'short', 
                             day: 'numeric',
@@ -511,29 +511,29 @@ useEffect(() => {
                   {/* Program/Unit Information */}
                   <div className="space-y-2">
                     {subscription.class && (
-                      <div className="flex items-center gap-2 p-2 bg-indigo-50 rounded-lg">
-                        <div className="w-3 h-3 bg-indigo-600 rounded-full"></div>
+                      <div className="flex items-center gap-2 p-2 bg-theo-black/5 rounded-xl border border-theo-black/10">
+                        <div className="w-2 h-2 bg-theo-black rounded-full"></div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-xs text-indigo-600 font-medium">Program Subscription</div>
-                          <div className="font-semibold text-gray-900 text-sm line-clamp-1">{subscription.class.name}</div>
+                          <div className="text-[10px] text-theo-black/60 font-bold uppercase tracking-wider">Program</div>
+                          <div className="font-bold text-theo-black text-sm line-clamp-1">{subscription.class.name}</div>
                         </div>
                       </div>
                     )}
                     {subscription.subject && (
-                      <div className="flex items-center gap-2 p-2 bg-emerald-50 rounded-lg">
-                        <div className="w-3 h-3 bg-emerald-600 rounded-full"></div>
+                      <div className="flex items-center gap-2 p-2 bg-theo-yellow/10 rounded-xl border border-theo-yellow/20">
+                        <div className="w-2 h-2 bg-theo-yellow rounded-full"></div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-xs text-emerald-600 font-medium">Unit Subscription</div>
-                          <div className="font-semibold text-gray-900 text-sm line-clamp-1">{subscription.subject.name}</div>
+                          <div className="text-[10px] text-theo-yellow font-bold uppercase tracking-wider">Unit</div>
+                          <div className="font-bold text-theo-black text-sm line-clamp-1">{subscription.subject.name}</div>
                         </div>
                       </div>
                     )}
                     {subscription.planName && !subscription.class && !subscription.subject && (
-                      <div className="flex items-center gap-2 p-2 bg-orange-50 rounded-lg">
-                        <div className="w-3 h-3 bg-orange-600 rounded-full"></div>
+                      <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-xl border border-gray-200">
+                        <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-xs text-orange-600 font-medium">Plan</div>
-                          <div className="font-semibold text-gray-900 text-sm line-clamp-1">{subscription.planName}</div>
+                          <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Plan</div>
+                          <div className="font-bold text-gray-900 text-sm line-clamp-1">{subscription.planName}</div>
                         </div>
                       </div>
                     )}
@@ -545,19 +545,19 @@ useEffect(() => {
                   <div className="space-y-3">
                     <div className="flex gap-2">
                       <Button
-                        variant={subscription.status === 'ACTIVE' ? 'default' : 'outline'}
+                        variant={subscription.status === 'ACTIVE' ? 'theo' : 'outline'}
                         size="sm"
                         onClick={() => updateSubscriptionStatus(subscription.id, 'ACTIVE')}
-                        className="flex-1 text-xs h-8"
+                        className="flex-1 text-xs h-8 font-bold"
                         disabled={subscription.status === 'ACTIVE'}
                       >
                         {subscription.status === 'ACTIVE' ? 'Active' : 'Activate'}
                       </Button>
                       <Button
-                        variant={subscription.status === 'INACTIVE' ? 'default' : 'outline'}
+                        variant={subscription.status === 'INACTIVE' ? 'theo-black' : 'outline'}
                         size="sm"
                         onClick={() => updateSubscriptionStatus(subscription.id, 'INACTIVE')}
-                        className="flex-1 text-xs h-8"
+                        className="flex-1 text-xs h-8 font-bold"
                         disabled={subscription.status === 'INACTIVE'}
                       >
                         {subscription.status === 'INACTIVE' ? 'Inactive' : 'Deactivate'}

@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import PublicMain from "@/components/layout/PublicMain";
+
 
 
 export const viewport: Viewport = {
@@ -52,12 +54,12 @@ export default function PublicLayout({
   children: React.ReactNode;
 }>) {
   return (
-      <>
-        <Header />
-        <main className="flex-1">
-          {children}
-        </main>
-        <Footer />
-      </>
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      <PublicMain>
+        {children}
+      </PublicMain>
+      <Footer />
+    </div>
   );
 }

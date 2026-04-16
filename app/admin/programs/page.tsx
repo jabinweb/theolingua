@@ -187,7 +187,7 @@ export default function ProgramsPage() {
               <RefreshCw className="h-4 w-4 mr-2" />
               Refresh
             </Button>
-            <Button onClick={() => setFormOpen(true)}>
+            <Button onClick={() => setFormOpen(true)} variant="theo" className="font-bold">
               <Plus className="h-4 w-4 mr-2" />
               Add Program
             </Button>
@@ -209,10 +209,10 @@ export default function ProgramsPage() {
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-xl">{classItem.name}</CardTitle>
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-green-600 border-green-200">
+                        <Badge variant="outline" className="text-theo-black border-theo-yellow bg-theo-yellow/10 font-bold">
                           ₹{Math.round((priceNum || 0) / 100)}
                         </Badge>
-                        <Badge variant={classItem.isActive ? 'default' : 'secondary'}>
+                        <Badge variant={classItem.isActive ? 'theo' : 'secondary'} className="font-bold">
                           {classItem.isActive ? 'Active' : 'Inactive'}
                         </Badge>
                       </div>
@@ -227,7 +227,7 @@ export default function ProgramsPage() {
                           <BookOpen className="h-4 w-4" />
                           <span>{classItem.subjects?.length || 0} Units</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 text-theo-black font-medium">
                           <Users className="h-4 w-4" />
                           <span>{classItem.subscriptions?.length || 0} Students</span>
                         </div>
@@ -256,10 +256,10 @@ export default function ProgramsPage() {
                           Delete
                         </Button>
                         <Button
-                          variant="default"
+                          variant="theo-black"
                           size="sm"
                           onClick={() => handleManageProgram(classItem)}
-                          className="flex-1"
+                          className="flex-1 font-bold"
                         >
                           Manage
                           <ChevronRight className="h-4 w-4 ml-2" />

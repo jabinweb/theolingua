@@ -103,11 +103,11 @@ export default function AdminPaymentsPage() {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      COMPLETED: { label: 'Completed', className: 'bg-green-100 text-green-800 border-green-200' },
-      PENDING: { label: 'Pending', className: 'bg-yellow-100 text-yellow-800 border-yellow-200' },
-      FAILED: { label: 'Failed', className: 'bg-red-100 text-red-800 border-red-200' },
-      REFUNDED: { label: 'Refunded', className: 'bg-blue-100 text-blue-800 border-blue-200' },
-      CANCELLED: { label: 'Cancelled', className: 'bg-gray-100 text-gray-800 border-gray-200' },
+      COMPLETED: { label: 'Completed', className: 'bg-theo-yellow/10 text-theo-black border-theo-yellow/20 font-bold' },
+      PENDING: { label: 'Pending', className: 'bg-yellow-50 text-yellow-700 border-yellow-200 font-bold' },
+      FAILED: { label: 'Failed', className: 'bg-red-50 text-red-700 border-red-200 font-bold' },
+      REFUNDED: { label: 'Refunded', className: 'bg-theo-black/5 text-theo-black/70 border-theo-black/10 font-bold' },
+      CANCELLED: { label: 'Cancelled', className: 'bg-gray-100 text-gray-800 border-gray-200 font-bold' },
     };
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.PENDING;
     return <Badge className={config.className}>{config.label}</Badge>;
@@ -115,8 +115,8 @@ export default function AdminPaymentsPage() {
 
   const getGatewayBadge = (gateway: string) => {
     const gatewayConfig = {
-      RAZORPAY: { label: 'Razorpay', className: 'bg-blue-100 text-blue-800' },
-      CASHFREE: { label: 'Cashfree', className: 'bg-purple-100 text-purple-800' },
+      RAZORPAY: { label: 'Razorpay', className: 'bg-theo-black text-theo-yellow font-bold' },
+      CASHFREE: { label: 'Cashfree', className: 'bg-theo-yellow text-theo-black font-bold border border-theo-yellow/20' },
     };
     const config = gatewayConfig[gateway as keyof typeof gatewayConfig];
     return config ? <Badge className={config.className}>{config.label}</Badge> : <Badge>{gateway}</Badge>;
@@ -181,8 +181,8 @@ export default function AdminPaymentsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <TrendingUp className="h-4 w-4 text-green-600" />
+            <CardTitle className="text-sm font-bold uppercase tracking-wider text-gray-500">Total Revenue</CardTitle>
+            <TrendingUp className="h-4 w-4 text-theo-black" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatAmount(stats.totalRevenue)}</div>
@@ -192,8 +192,8 @@ export default function AdminPaymentsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Payments</CardTitle>
-            <DollarSign className="h-4 w-4 text-blue-600" />
+            <CardTitle className="text-sm font-bold uppercase tracking-wider text-gray-500">Total Payments</CardTitle>
+            <DollarSign className="h-4 w-4 text-theo-black" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalPayments}</div>
@@ -206,7 +206,7 @@ export default function AdminPaymentsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Failed Payments</CardTitle>
+            <CardTitle className="text-sm font-bold uppercase tracking-wider text-gray-500">Failed Payments</CardTitle>
             <XCircle className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
@@ -217,8 +217,8 @@ export default function AdminPaymentsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
-            <ArrowUpRight className="h-4 w-4 text-green-600" />
+            <CardTitle className="text-sm font-bold uppercase tracking-wider text-gray-500">Success Rate</CardTitle>
+            <ArrowUpRight className="h-4 w-4 text-theo-black" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.successRate.toFixed(1)}%</div>
@@ -324,7 +324,7 @@ export default function AdminPaymentsPage() {
                 </thead>
                 <tbody>
                   {paginatedPayments.map((payment) => (
-                    <tr key={payment.id} className="border-b hover:bg-gray-50">
+                    <tr key={payment.id} className="border-b transition-colors hover:bg-theo-yellow/5">
                       <td className="py-3 px-4">
                         <div className="font-mono text-sm">{payment.id}</div>
                         {payment.razorpayPaymentId && (

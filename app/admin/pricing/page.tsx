@@ -293,22 +293,26 @@ export default function PricingPage() {
   }
 
   return (
-    <div className="p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Pricing Management</h1>
-            <p className="text-muted-foreground">Manage subscription pricing for all programs</p>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={fetchData} variant="outline" disabled={loading}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
-            </Button>
-            <Button onClick={openCreateDialog}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Plan
-            </Button>
+    <div className="p-8 bg-theo-white/30 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+              <h1 className="text-5xl font-bold text-theo-black tracking-tight mb-2">
+                Pricing Plans
+              </h1>
+              <p className="text-gray-500 font-medium text-lg">Manage subscription layouts and pricing strategy</p>
+            </div>
+            <div className="flex gap-4">
+              <Button onClick={fetchData} variant="outline" disabled={loading} className="rounded-2xl h-11 px-6">
+                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+              <Button onClick={openCreateDialog} variant="theo" className="rounded-2xl h-11 px-6 shadow-lg shadow-theo-yellow/20">
+                <Plus className="h-5 w-5 mr-2" />
+                Add New Plan
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -319,15 +323,15 @@ export default function PricingPage() {
         ) : (
           <div className="grid gap-6">
             {Object.values(plansByProgram).map(({ program, plans: programPlans }) => (
-              <Card key={program.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader className="flex flex-row items-center justify-between">
+              <Card key={program.id} className="border-0 shadow-sm rounded-[32px] overflow-hidden hover:shadow-xl transition-all duration-300">
+                <CardHeader className="bg-theo-black text-theo-yellow p-8 flex flex-row items-center justify-between">
                   <div>
-                    <CardTitle className="flex items-center gap-2 text-xl">
-                      <Tag className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-3 text-2xl font-bold uppercase tracking-tight">
+                      <Tag className="h-6 w-6" />
                       {program.name}
                     </CardTitle>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {programPlans.length} pricing plan(s)
+                    <p className="text-theo-yellow/60 text-xs font-medium mt-1 uppercase tracking-widest">
+                      {programPlans.length} PRICING PLAN(S) CONFIGURED
                     </p>
                   </div>
                   <Button onClick={() => {
@@ -342,10 +346,12 @@ export default function PricingPage() {
                       isActive: true,
                       isPopular: false,
                       features: '',
-                      sortOrder: programPlans.length,                      workbookPrice: 0,
-                      workbookNote: 'inclusive of shipping',                    });
+                      sortOrder: programPlans.length,
+                      workbookPrice: 0,
+                      workbookNote: 'inclusive of shipping',
+                    });
                     setDialogOpen(true);
-                  }}>
+                  }} variant="theo" size="sm" className="rounded-xl h-10 px-4">
                     <Plus className="h-4 w-4 mr-2" />
                     Add Plan
                   </Button>
@@ -354,13 +360,13 @@ export default function PricingPage() {
                   {programPlans.length > 0 ? (
                     <Table>
                       <TableHeader>
-                        <TableRow>
-                          <TableHead>Plan</TableHead>
-                          <TableHead>Duration</TableHead>
-                          <TableHead>Price</TableHead>
-                          <TableHead>Original</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
+                        <TableRow className="border-b-0 hover:bg-transparent">
+                          <TableHead className="text-theo-black font-bold uppercase tracking-widest text-[10px] py-4">Plan Name</TableHead>
+                          <TableHead className="text-theo-black font-bold uppercase tracking-widest text-[10px] py-4">Duration</TableHead>
+                          <TableHead className="text-theo-black font-bold uppercase tracking-widest text-[10px] py-4">Current Price</TableHead>
+                          <TableHead className="text-theo-black font-bold uppercase tracking-widest text-[10px] py-4">Original Price</TableHead>
+                          <TableHead className="text-theo-black font-bold uppercase tracking-widest text-[10px] py-4">Status</TableHead>
+                          <TableHead className="text-right text-theo-black font-bold uppercase tracking-widest text-[10px] py-4">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -378,13 +384,13 @@ export default function PricingPage() {
                               </div>
                             </TableCell>
                             <TableCell>{plan.durationMonths} months</TableCell>
-                            <TableCell className="font-semibold text-green-600">
+                            <TableCell className="font-bold text-theo-black text-lg py-6">
                               <div className="flex items-center">
-                                <IndianRupee className="h-3 w-3" />
+                                <IndianRupee className="h-4 w-4 mr-1 text-theo-black" />
                                 {(plan.price / 100).toLocaleString('en-IN')}
                               </div>
                             </TableCell>
-                            <TableCell className="text-muted-foreground">
+                            <TableCell className="text-gray-400 font-medium py-6">
                               {plan.originalPrice ? (
                                 <div className="flex items-center line-through">
                                   <IndianRupee className="h-3 w-3" />
