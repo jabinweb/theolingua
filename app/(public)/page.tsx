@@ -11,13 +11,14 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Star, Quote, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 // --- 1. HERO ---
 function Hero() {
   return (
-    <section className="relative min-h-[90vh] flex flex-col justify-center py-24 md:py-28 pt-28 md:pt-32 bg-theo-black text-theo-white overflow-hidden">
+    <section className="relative min-h-screen flex flex-col justify-center py-24 md:py-28 pt-28 md:pt-32 bg-theo-black text-theo-white overflow-hidden">
       <div className="absolute inset-0 z-0">
         <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover">
           <source src="https://videos.pexels.com/video-files/5183314/5183314-hd_1920_1080_30fps.mp4" type="video/mp4" />
@@ -26,7 +27,7 @@ function Hero() {
       </div>
 
       <div className="container mx-auto px-6 relative z-20">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -60,29 +61,6 @@ function Hero() {
             </div>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.85, delay: 0.12 }}
-            className="relative flex justify-center lg:justify-end"
-          >
-            <div className="relative w-full max-w-md aspect-[4/5]">
-              <div
-                className="absolute inset-0 bg-theo-yellow/25 blur-3xl rounded-full scale-90"
-                aria-hidden
-              />
-              <div className="absolute inset-0 overflow-hidden rounded-[48%_52%_58%_42%/46%_44%_56%_54%] border-4 border-white/20 shadow-2xl">
-                <Image
-                  src="https://images.pexels.com/photos/5905448/pexels-photo-5905448.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Theological students in discussion"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 400px"
-                  priority
-                />
-              </div>
-            </div>
-          </motion.div>
         </div>
       </div>
     </section>
@@ -121,16 +99,41 @@ function Challenge() {
           </div>
           <div className="relative flex justify-center lg:justify-end lg:sticky lg:top-28">
             <div className="relative w-full max-w-md aspect-square">
-              <div className="absolute inset-0 bg-theo-tint/80 blur-3xl rounded-full scale-75" aria-hidden />
-              <div className="absolute inset-0 overflow-hidden rounded-[42%_58%_48%_52%/52%_48%_58%_42%] border border-gray-200 shadow-xl bg-white">
+               {/* Blob container */}
+            <div className="relative w-96 h-96">
+              {/* Animated blob shape background */}
+              <motion.div
+                className="absolute inset-0 z-10"
+                animate={{
+                  borderRadius: [
+                    "60% 40% 30% 70%/60% 30% 70% 40%",
+                    "30% 60% 70% 40%/50% 60% 30% 60%",
+                    "60% 40% 30% 70%/60% 30% 70% 40%"
+                  ]
+                }}
+                transition={{
+                  duration: 8,
+                  repeat: Infinity,
+                  repeatType: "reverse"
+                }}
+                style={{
+                  background: "linear-gradient(45deg, rgba(164, 199, 255, 0.7), rgba(147, 197, 253, 0.8))"
+                }}
+              />
+              
+              {/* Image positioned to overflow blob */}
+              <div className="absolute -inset-16 z-20">
                 <Image
-                  src="https://images.pexels.com/photos/8534245/pexels-photo-8534245.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Students studying together"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 400px"
+                  src="/5.png"
+                  alt="Stressed student struggling with traditional revision methods"
+                  width={600}
+                  height={600}
+                  className="object-contain w-full h-full scale-110"
+                  priority
+                  quality={95}
                 />
               </div>
+            </div>
             </div>
           </div>
         </div>
@@ -337,7 +340,7 @@ function DeliveryModels() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 items-stretch pt-8">
-          <Card className="rounded-[32px] border border-gray-200 shadow-lg bg-white overflow-hidden flex flex-col hover:-translate-y-1 transition-transform duration-300">
+          <Card className="rounded-[32px] border border-gray-200 shadow-lg bg-white py-0 overflow-hidden flex flex-col hover:-translate-y-1 transition-transform duration-300">
             <CardContent className="p-10 flex-1 flex flex-col">
               <h3 className="text-3xl font-bold mb-8">Classroom Model</h3>
               <ul className="flex-1 border-t border-b border-gray-200 divide-y divide-gray-200">
@@ -350,7 +353,7 @@ function DeliveryModels() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-[32px] border border-gray-200 shadow-lg bg-white overflow-hidden flex flex-col hover:-translate-y-1 transition-transform duration-300">
+          <Card className="rounded-[32px] border border-gray-200 shadow-lg py-0 bg-white overflow-hidden flex flex-col hover:-translate-y-1 transition-transform duration-300">
             <CardContent className="p-10 flex-1 flex flex-col">
               <h3 className="text-3xl font-bold mb-8">Self-learning Model</h3>
               <ul className="flex-1 border-t border-b border-gray-200 divide-y divide-gray-200">
@@ -441,12 +444,49 @@ function CredibilityStrip() {
   );
 }
 
+type TestimonialQuote = {
+  quote: string;
+  author: string;
+  meta: string;
+};
+
+function TestimonialCard({ q, className }: { q: TestimonialQuote; className?: string }) {
+  return (
+    <Card
+      className={cn(
+        'group py-0 relative h-full overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-[0_2px_20px_-4px_rgba(0,0,0,0.08)] transition-all duration-300',
+        'hover:border-theo-yellow/35 hover:shadow-[0_12px_40px_-12px_rgba(0,0,0,0.12)]',
+        className
+      )}
+    >
+      <div className="absolute left-0 top-0 h-full w-1 bg-theo-yellow" aria-hidden />
+      <CardContent className="relative flex h-full min-h-[200px] flex-col p-5 pl-6 sm:min-h-0 sm:p-6 sm:pl-7 md:p-7 md:pl-8 lg:p-8">
+        <div className="mb-4 flex items-start justify-between gap-3 sm:mb-5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-theo-yellow/15 sm:h-11 sm:w-11">
+            <Quote className="h-5 w-5 text-theo-yellow" fill="#C8D832" />
+          </div>
+          <span
+            className="select-none font-serif text-3xl leading-none text-gray-100 transition-colors group-hover:text-theo-yellow/20 sm:text-4xl"
+            aria-hidden
+          >
+            &ldquo;
+          </span>
+        </div>
+        <blockquote className="mb-6 grow text-[15px] leading-relaxed text-gray-700 sm:mb-8 sm:text-base md:text-[17px] md:leading-relaxed">
+          {q.quote}
+        </blockquote>
+        <footer className="mt-auto border-t border-gray-100 pt-4 sm:pt-5">
+          <p className="text-sm font-bold leading-snug text-theo-black sm:text-base md:text-lg">{q.author}</p>
+          <p className="mt-1 text-xs font-medium text-gray-500 md:text-sm">{q.meta}</p>
+        </footer>
+      </CardContent>
+    </Card>
+  );
+}
+
 // --- 9. STUDENT TESTIMONIALS ---
 function Testimonials() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  const quotes = [
+  const quotes: TestimonialQuote[] = [
     { quote: "TheoLingua transformed how I read commentaries. I can now actively participate in deep theological discussions without hesitation.", author: "Birila A. Yimchunger", meta: "Level 2, Grace Biblical Seminary" },
     { quote: "I wrote and practised my very first sermon efficiently. The grammar modules built into Scripture made everything click for me.", author: "Samuel M.", meta: "Level 1, Southern Bible Institute" },
     { quote: "As a facilitator, the lesson plans save me hours of prep. The interactive games keep my GenZ students completely engaged.", author: "Dr. Abraham K.", meta: "Faculty, Bethel Bible College" },
@@ -454,81 +494,126 @@ function Testimonials() {
     { quote: "The portal and workbooks together helped our cohort stay on track. Students finally feel equipped for English-medium classes.", author: "Rev. James P.", meta: "Academic Dean, Bible college in North India" },
   ];
 
-  const handleScroll = () => {
-    if (scrollRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-      // Calculate index based on the proportion of scroll
-      const maxScroll = scrollWidth - clientWidth;
-      if (maxScroll <= 0) return;
-      
-      const percentage = scrollLeft / maxScroll;
-      const index = Math.round(percentage * (quotes.length - 1));
-      setActiveIndex(index);
-    }
-  };
+  const [mobileSlide, setMobileSlide] = useState(0);
+  const n = quotes.length;
+
+  const goPrev = () => setMobileSlide((i) => (i - 1 + n) % n);
+  const goNext = () => setMobileSlide((i) => (i + 1) % n);
 
   return (
-    <section id="testimonials" className="py-16 md:py-24 bg-white text-theo-black overflow-hidden">
-      <div className="container mx-auto px-6 max-w-7xl">
-        <div className="text-center mb-16">
-          <p className="text-sm font-bold tracking-[0.15em] uppercase text-gray-500 mb-4">Students speak</p>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tighter">Hear it from the learners</h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+    <section id="testimonials" className="relative overflow-hidden bg-gradient-to-b from-theo-white via-white to-gray-50/60 py-14 text-theo-black sm:py-16 md:py-24">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-theo-yellow/40 to-transparent" aria-hidden />
+      <div className="container relative mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="mx-auto mb-10 max-w-2xl text-center sm:mb-12 md:mb-16">
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-gray-500 sm:text-sm">Students speak</p>
+          <h2 className="mb-3 text-3xl font-bold tracking-tighter sm:mb-4 sm:text-4xl md:text-5xl">Hear it from the learners</h2>
+          <p className="text-base leading-relaxed text-gray-600 sm:text-lg">
             Theological students who are reading Scripture, writing assignments, and speaking English with newfound confidence.
           </p>
         </div>
 
-        {/* Horizontal scroll on mobile, grid on desktop */}
-        <div className="relative group">
-          <div
-            ref={scrollRef}
-            onScroll={handleScroll}
-            className="flex lg:grid lg:grid-cols-5 gap-6 overflow-x-auto lg:overflow-x-visible pb-8 snap-x snap-mandatory no-scrollbar -mx-6 px-6"
-          >
-            {quotes.map((q, idx) => (
-              <div key={idx} className="flex flex-col h-full snap-center shrink-0 w-[min(85vw,380px)] lg:w-auto lg:shrink-0">
-                <Card className="rounded-[24px] md:rounded-[32px] border-none shadow-lg shadow-black/5 bg-theo-white h-full hover:shadow-xl transition-shadow w-full overflow-hidden">
-                  <CardContent className="p-6 md:p-8 h-full flex flex-col">
-                    <Quote className="w-12 h-12 text-theo-yellow mb-6 shrink-0" fill="#C8D832" />
-                    <p className="text-base md:text-lg text-gray-700 leading-relaxed font-medium mb-8 grow break-words whitespace-normal">"{q.quote}"</p>
-                    <div className="mt-auto">
-                      <p className="font-bold text-theo-black text-base md:text-lg leading-tight">{q.author}</p>
-                      <p className="text-gray-500 text-xs md:text-sm mt-1">{q.meta}</p>
-                    </div>
-                  </CardContent>
-                </Card>
+        {/* Small screens: carousel */}
+        <div className="md:hidden">
+          <div className="overflow-hidden pb-1">
+            <div
+              className="flex transition-transform duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)] motion-reduce:transition-none"
+              style={{ transform: `translateX(-${mobileSlide * 100}%)` }}
+            >
+              {quotes.map((q, idx) => (
+                <div key={idx} className="w-full shrink-0 grow-0 basis-full px-0.5 sm:px-1">
+                  <TestimonialCard q={q} />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="mt-5 flex items-center justify-between gap-2 sm:mt-6 sm:gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="h-10 w-10 shrink-0 rounded-full border-gray-200 bg-white shadow-sm sm:h-11 sm:w-11"
+              onClick={goPrev}
+              aria-label="Previous testimonial"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            <div className="flex min-w-0 flex-1 flex-wrap justify-center gap-1.5 px-1 sm:gap-2">
+              {quotes.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setMobileSlide(i)}
+                  aria-label={`Show testimonial ${i + 1}`}
+                  aria-current={mobileSlide === i ? 'true' : undefined}
+                  className={cn(
+                    'h-2 rounded-full transition-all duration-300',
+                    mobileSlide === i ? 'w-7 bg-theo-yellow sm:w-8' : 'w-2 bg-gray-300 hover:bg-gray-400'
+                  )}
+                />
+              ))}
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="h-10 w-10 shrink-0 rounded-full border-gray-200 bg-white shadow-sm sm:h-11 sm:w-11"
+              onClick={goNext}
+              aria-label="Next testimonial"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+
+        {/* md–xl: 3 + 2 rows */}
+        <div className="hidden md:block 2xl:hidden">
+          <div className="grid grid-cols-2 gap-5 lg:gap-6 xl:grid-cols-3 xl:gap-7">
+            {quotes.slice(0, 3).map((q, idx) => (
+              <div
+                key={idx}
+                className={cn(
+                  'min-w-0',
+                  idx === 2 && 'col-span-2 flex justify-center xl:col-span-1 xl:block'
+                )}
+              >
+                <div className={cn('w-full', idx === 2 && 'max-w-lg xl:max-w-none')}>
+                  <TestimonialCard q={q} />
+                </div>
               </div>
             ))}
           </div>
-
-          {/* Indicators for mobile */}
-          <div className="flex justify-center gap-2 mt-4 lg:hidden">
-            {quotes.map((_, i) => (
-              <div 
-                key={i} 
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  activeIndex === i ? 'bg-theo-yellow w-6' : 'bg-gray-200'
-                }`}
-              />
+          <div className="mx-auto mt-5 grid max-w-2xl grid-cols-1 gap-5 sm:max-w-none sm:grid-cols-2 lg:mt-6 lg:gap-6 xl:max-w-4xl">
+            {quotes.slice(3).map((q, idx) => (
+              <div key={idx + 3} className="min-w-0">
+                <TestimonialCard q={q} />
+              </div>
             ))}
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-center sm:text-left">
-          <div className="flex items-center gap-3">
-            <div className="flex">
-              <Star className="w-5 h-5 text-theo-yellow" fill="currentColor" />
-              <Star className="w-5 h-5 text-theo-yellow" fill="currentColor" />
-              <Star className="w-5 h-5 text-theo-yellow" fill="currentColor" />
-              <Star className="w-5 h-5 text-theo-yellow" fill="currentColor" />
-              <Star className="w-5 h-5 text-theo-yellow" fill="currentColor" />
+        {/* 2xl: single row */}
+        <div className="hidden 2xl:grid 2xl:grid-cols-5 2xl:gap-5">
+          {quotes.map((q, idx) => (
+            <div key={idx} className="min-w-0">
+              <TestimonialCard q={q} />
             </div>
-            <span className="font-bold text-gray-800 tracking-wide text-lg">4.8 Average Rating</span>
+          ))}
+        </div>
+
+        <div className="mx-auto mt-10 max-w-3xl rounded-2xl border border-gray-100 bg-white/90 px-4 py-5 shadow-sm backdrop-blur-sm sm:mt-12 sm:px-6 sm:py-6 md:mt-14 md:flex md:max-w-none md:items-center md:justify-center md:gap-10 md:px-8 md:py-7">
+          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-6 md:gap-10">
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+              <div className="flex gap-0.5" aria-hidden>
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <Star key={i} className="h-5 w-5 text-theo-yellow sm:h-6 sm:w-6" fill="currentColor" />
+                ))}
+              </div>
+              <span className="text-base font-bold tracking-tight text-theo-black sm:text-lg">4.8</span>
+              <span className="text-sm font-semibold text-gray-600 sm:text-base">Average rating</span>
+            </div>
+            <span className="hidden h-8 w-px bg-gray-200 md:block" aria-hidden />
+            <p className="text-center text-base font-bold text-theo-black sm:text-lg md:text-left">400+ happy learners</p>
           </div>
-          <span className="hidden sm:inline text-gray-300 font-light text-2xl" aria-hidden>
-            /
-          </span>
-          <p className="font-bold text-gray-800 tracking-wide text-lg">400+ Happy learners</p>
         </div>
       </div>
     </section>
