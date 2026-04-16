@@ -7,199 +7,195 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import BookDemo from '@/components/BookDemo';
 import { UserDropdown } from '@/components/UserDropdown';
-import { 
-  Menu, 
-  X, 
-  Phone, 
-  Mail, 
-  Download,
-  BookOpen,
-  Users, Globe
-} from 'lucide-react';
+import { Menu, X } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
   const isHomePage = pathname === '/';
+  const { data: session } = useSession();
+
+  // Prevent scroll when side panel is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  }, [isMenuOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      setIsScrolled(scrollTop > 100);
+      setIsScrolled(window.scrollY > 50);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const navigation = [
-    { name: 'About', href: '#hero', icon: Globe },
-    { name: 'Features', href: '#features', icon: BookOpen },
-    // { name: 'Games', href: '#games', icon: Users },
-    { name: 'Testimonials', href: '#testimonials', icon: Phone },
+    { name: 'About', href: '#about' },
+    { name: 'The Program', href: '#program' },
+    { name: 'How It Works', href: '#how-it-works' },
+    { name: 'For Institutions', href: '#institutions' },
+    { name: 'Testimonials', href: '#testimonials' },
   ];
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      isScrolled 
-        ? 'bg-white/95 backdrop-blur-md border-b border-gray-200' 
-        : isHomePage 
-          ? 'bg-transparent backdrop-blur-md border-b border-white/10'
-          : 'bg-white/90 backdrop-blur-md border-b border-gray-200'
-    }`}>
-      <div className="max-w-7xl mx-auto px-4 md:px-6">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3">
-            <div className="w-28 md:w-32 h-8 relative">
-              <Image
-                src={isScrolled || !isHomePage ? "/logo.png" : "/logo.png"}
-                alt="TheoLingua Logo"
-                fill
-                className="object-contain object-left"
-              />
-            </div>
-          </Link>
+    <>
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 h-20 ${isScrolled || !isHomePage
+          ? 'bg-white shadow-sm'
+          : 'bg-transparent'
+        }`}>
+        <div className="container mx-auto px-6 h-full flex items-center justify-between">
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            {navigation.map((item) => {
-              const IconComponent = item.icon;
-              return (
+          {/* Left: Logo + Nav */}
+          <div className="flex items-center gap-8 h-full">
+            {/* Logo */}
+            <Link href="/" className="flex items-center">
+              <div className={`relative transition-all ${isScrolled || !isHomePage ? 'w-32 h-10' : 'w-40 h-12'
+                }`}>
+                <Image
+                  src="/logo.png"
+                  alt="TheoLingua Logo"
+                  fill
+                  className="object-contain object-left"
+                  priority
+                />
+              </div>
+            </Link>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center gap-6 text-sm font-semibold tracking-wide">
+              {navigation.map((item) => (
                 <Link
                   key={item.name}
-                  href={item.href}
-                  className={`flex items-center space-x-2 font-medium transition-colors duration-300 ${
-                    isScrolled || !isHomePage
-                      ? 'text-gray-700 hover:text-blue-700'
-                      : 'text-white/80 hover:text-white'
-                  }`}
+                  href={isHomePage ? item.href : `/${item.href}`}
+                  className={`transition-colors ${!isScrolled && isHomePage
+                      ? 'text-white/90 hover:text-theo-yellow'
+                      : 'text-gray-700 hover:text-theo-yellow'
+                    }`}
                 >
-                  <IconComponent className="w-4 h-4" />
-                  <span>{item.name}</span>
+                  {item.name}
                 </Link>
-              );
-            })}
-          </nav>
-
-          {/* Desktop CTA Buttons */}
-          <div className="hidden md:flex items-center space-x-3">
-            <Link href="#brochures">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className={`transition-colors duration-300 ${
-                  isScrolled || !isHomePage
-                    ? 'border-orange-200 hover:bg-orange-50 text-gray-700'
-                    : 'border-white/30 bg-white/10 backdrop-blur-sm text-white hover:bg-white hover:text-slate-900'
-                }`}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Brochure
-              </Button>
-            </Link>
-            <BookDemo>
-              <Button 
-                size="sm" 
-                className={`font-semibold transition-colors duration-300 ${
-                  isScrolled || !isHomePage
-                    ? 'bg-blue-700 hover:bg-blue-800 text-white'
-                    : 'bg-white text-slate-900 hover:bg-white/90'
-                }`}
-              >
-                <Mail className="w-4 h-4 mr-2" />
-                Get Demo
-              </Button>
-            </BookDemo>
-            <UserDropdown />
+              ))}
+            </nav>
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden p-2 rounded-lg transition-colors duration-300"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {isMenuOpen ? (
-              <X className={`w-6 h-6 transition-colors duration-300 ${
-                isScrolled || !isHomePage ? 'text-gray-700' : 'text-white'
-              }`} />
-            ) : (
-              <Menu className={`w-6 h-6 transition-colors duration-300 ${
-                isScrolled || !isHomePage ? 'text-gray-700' : 'text-white'
-              }`} />
-            )}
-          </button>
-        </div>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className={`md:hidden pb-6 pt-4 backdrop-blur-sm transition-all duration-300 ${
-            isScrolled || !isHomePage
-              ? 'border-t border-gray-200 bg-white/95'
-              : 'border-t border-white/10 bg-slate-900/95'
-          }`}>
-            {/* Mobile Navigation Links */}
-            <nav className="space-y-1 mb-6">
-              {navigation.map((item) => {
-                const IconComponent = item.icon;
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`flex items-center space-x-3 font-medium py-3 px-4 rounded-lg transition-all duration-300 ${
-                      isScrolled || !isHomePage
-                        ? 'text-gray-700 hover:text-blue-700 hover:bg-blue-50'
-                        : 'text-white/90 hover:text-white hover:bg-white/10'
+          {/* Right: CTAs */}
+          <div className="flex items-center gap-6 h-full">
+            <div className="hidden md:flex items-center gap-6">
+              {!session ? (
+                <Link
+                  href="/auth/login"
+                  className={`text-sm font-semibold transition-colors ${!isScrolled && isHomePage
+                      ? 'text-white hover:text-theo-yellow'
+                      : 'text-gray-700 hover:text-theo-yellow'
                     }`}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <IconComponent className="w-5 h-5" />
-                    <span className="text-base">{item.name}</span>
-                  </Link>
-                );
-              })}
-            </nav>
-            
-            {/* Mobile CTA Buttons */}
-            <div className="space-y-3 px-4">
-              <Link href="#brochures" className="block">
-                <Button 
-                  variant="outline" 
-                  className={`w-full py-3 text-base transition-colors duration-300 ${
-                    isScrolled || !isHomePage
-                      ? 'border-gray-300 hover:bg-gray-50 text-gray-700'
-                      : 'border-white/30 bg-white/10 backdrop-blur-sm text-white hover:bg-white hover:text-slate-900'
-                  }`}
-                  onClick={() => setIsMenuOpen(false)}
                 >
-                  <Download className="w-5 h-5 mr-2" />
-                  Download Brochure
-                </Button>
-              </Link>
+                  Sign In
+                </Link>
+              ) : (
+                <UserDropdown />
+              )}
+
               <BookDemo>
-                <Button 
-                  className={`w-full py-3 text-base font-semibold transition-colors duration-300 ${
-                    isScrolled || !isHomePage
-                      ? 'bg-blue-700 hover:bg-blue-800 text-white'
-                      : 'bg-white text-slate-900 hover:bg-white/90'
-                  }`}
-                >
-                  <Mail className="w-5 h-5 mr-2" />
+                <Button className="bg-theo-yellow hover:bg-[#b0bd2a] text-theo-black rounded-full px-6 font-bold shadow-none">
                   Get Demo
                 </Button>
               </BookDemo>
-              
-              {/* Mobile User Dropdown */}
-              <div className="pt-3 border-t border-gray-200">
-                <UserDropdown />
-              </div>
             </div>
+
+            {/* Mobile menu button */}
+            <button
+              className="lg:hidden p-2 rounded-lg hover:bg-black/5"
+              onClick={() => setIsMenuOpen(true)}
+              aria-label="Open menu"
+            >
+              <Menu className={`w-7 h-7 transition-colors ${!isScrolled && isHomePage ? 'text-white' : 'text-theo-black'
+                }`} />
+            </button>
           </div>
+        </div>
+      </header>
+
+      {/* Side Panel (Mobile Menu) */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMenuOpen(false)}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] lg:hidden"
+            />
+
+            {/* Panel */}
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed inset-y-0 right-0 w-[280px] bg-white z-[101] lg:hidden shadow-2xl flex flex-col"
+            >
+              <div className="p-6 flex flex-col h-full">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="relative w-32 h-10">
+                    <Image
+                      src="/logo.png"
+                      alt="TheoLingua Logo"
+                      fill
+                      className="object-contain object-left"
+                    />
+                  </div>
+                  <button
+                    onClick={() => setIsMenuOpen(false)}
+                    className="p-2 rounded-full hover:bg-gray-100"
+                  >
+                    <X className="w-6 h-6 text-theo-black" />
+                  </button>
+                </div>
+
+                <nav className="flex flex-col gap-2">
+                  {navigation.map((item) => (
+                    <Link
+                      key={item.name}
+                      href={isHomePage ? item.href : `/${item.href}`}
+                      className="text-lg font-bold text-theo-black hover:text-theo-yellow py-3 border-b border-gray-100 transition-colors"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                </nav>
+
+                <div className="mt-auto pt-6 flex flex-col gap-4">
+                  {!session ? (
+                    <Link href="/auth/login" className="w-full" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="outline" className="w-full justify-center rounded-full font-bold h-12 text-base">
+                        Sign In
+                      </Button>
+                    </Link>
+                  ) : (
+                    <div className="px-2 pb-4">
+                      <UserDropdown />
+                    </div>
+                  )}
+                  <BookDemo>
+                    <Button className="w-full bg-theo-yellow hover:bg-[#b0bd2a] text-theo-black rounded-full h-12 text-base font-bold shadow-lg shadow-theo-yellow/20">
+                      Get Demo
+                    </Button>
+                  </BookDemo>
+                </div>
+              </div>
+            </motion.div>
+          </>
         )}
-      </div>
-    </header>
+      </AnimatePresence>
+    </>
   );
 }
-         

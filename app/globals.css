@@ -61,6 +61,10 @@
 }
 
 @theme inline {
+  --color-theo-yellow: #C8D832;
+  --color-theo-black: #1A1A1A;
+  --color-theo-white: #FAFAF5;
+  --color-theo-tint: #F4F8B0;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -250,6 +254,14 @@
   
   .animate-scroll:hover {
     animation-play-state: paused;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
 

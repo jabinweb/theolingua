@@ -26,6 +26,7 @@ interface BookDemoProps {
 
 export default function BookDemo({ children }: BookDemoProps) {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -38,6 +39,10 @@ export default function BookDemo({ children }: BookDemoProps) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -126,6 +131,10 @@ export default function BookDemo({ children }: BookDemoProps) {
   const handleOpenDialog = () => {
     setOpen(true);
   };
+
+  if (!mounted) {
+    return <span onClick={handleOpenDialog} className="cursor-pointer">{children}</span>;
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
