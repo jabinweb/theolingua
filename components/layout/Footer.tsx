@@ -1,7 +1,9 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import BookDemo from '@/components/BookDemo';
+import { openCalendlyPopup } from '@/lib/calendly';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -25,11 +27,13 @@ export default function Footer() {
             </Link>
             <p className="text-xl font-bold mb-4 text-white/90">Learn English to study Theology.</p>
             <p className="text-white/60 mb-8 leading-relaxed font-medium">An ESP program by ScioLabs &middot; CEFR-aligned &middot; Designed for theological students in India</p>
-            <BookDemo>
-              <Button className="bg-theo-yellow hover:bg-[#b0bd2a] text-theo-black rounded-full px-8 py-6 font-bold">
-                Book a Free Demo
-              </Button>
-            </BookDemo>
+            <Button
+              type="button"
+              className="bg-theo-yellow hover:bg-[#b0bd2a] text-theo-black rounded-full px-8 py-6 font-bold"
+              onClick={() => void openCalendlyPopup()}
+            >
+              Book a Demo
+            </Button>
           </div>
 
           {/* Quick Links */}
@@ -51,7 +55,15 @@ export default function Footer() {
             <ul className="space-y-4 font-medium text-white/80">
               <li><Link href="#" className="hover:text-theo-yellow transition-colors">Download Brochure</Link></li>
               <li><Link href="/auth/login" className="hover:text-theo-yellow transition-colors">Student Portal (Sign In)</Link></li>
-              <li><BookDemo><span className="hover:text-theo-yellow transition-colors cursor-pointer">Book a Demo</span></BookDemo></li>
+              <li>
+                <button
+                  type="button"
+                  className="text-left font-medium text-white/80 hover:text-theo-yellow transition-colors"
+                  onClick={() => void openCalendlyPopup()}
+                >
+                  Book a Demo
+                </button>
+              </li>
               <li><Link href="mailto:info@sciolabs.in" className="hover:text-theo-yellow transition-colors">Contact Us</Link></li>
               <li className="pt-4"><Link href="/privacy" className="hover:text-theo-yellow transition-colors text-sm">Privacy Policy</Link></li>
               <li><Link href="/terms" className="hover:text-theo-yellow transition-colors text-sm">Terms of Service</Link></li>

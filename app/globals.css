@@ -109,12 +109,16 @@
     font-family: var(--font-inter);
     /* Ensure scrollbar is always visible to prevent layout shift */
     overflow-y: scroll;
+    /* Clip any stray horizontal overflow (fixes iOS/Safari + scaled content) */
+    overflow-x: hidden;
+    max-width: 100%;
   }
 
   /* Fix scrollbar hiding issue with Select component */
   body {
     /* Prevent horizontal scroll */
     overflow-x: hidden;
+    max-width: 100%;
   }
 
   /* Prevent layout shift when Radix components open */

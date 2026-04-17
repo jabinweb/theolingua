@@ -7,7 +7,7 @@ export default function PublicMain({ children }: { children: React.ReactNode }) 
   const isHomePage = pathname === '/';
 
   return (
-    <main className={`flex-1 ${!isHomePage ? 'pt-20' : ''}`}>
+    <main className={`min-w-0 flex-1 overflow-x-hidden ${!isHomePage ? 'pt-20' : ''}`}>
       {children}
     </main>
   );

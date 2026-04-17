@@ -14,6 +14,7 @@ import { Star, Quote, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { openCalendlyPopup } from '@/lib/calendly';
 
 // --- 1. HERO ---
 function Hero() {
@@ -78,9 +79,9 @@ function Challenge() {
   ];
 
   return (
-    <section id="about" className="py-16 md:py-24 bg-theo-white text-theo-black">
+    <section id="about" className="overflow-x-hidden py-16 md:py-24 bg-theo-white text-theo-black">
       <div className="container mx-auto px-6 max-w-6xl">
-        <div className="grid lg:grid-cols-2 gap-14 lg:gap-20 items-start">
+        <div className="grid min-w-0 lg:grid-cols-2 gap-14 lg:gap-20 items-start">
           <div>
             <h2 className="text-4xl md:text-5xl font-bold mb-10 tracking-tighter">
               Is English becoming a barrier?
@@ -97,43 +98,39 @@ function Challenge() {
               <div className="w-12 h-2 rounded-full bg-theo-yellow shrink-0" />
             </div>
           </div>
-          <div className="relative flex justify-center lg:justify-end lg:sticky lg:top-28">
-            <div className="relative w-full max-w-md aspect-square">
-               {/* Blob container */}
-            <div className="relative w-96 h-96">
-              {/* Animated blob shape background */}
-              <motion.div
-                className="absolute inset-0 z-10"
-                animate={{
-                  borderRadius: [
-                    "60% 40% 30% 70%/60% 30% 70% 40%",
-                    "30% 60% 70% 40%/50% 60% 30% 60%",
-                    "60% 40% 30% 70%/60% 30% 70% 40%"
-                  ]
-                }}
-                transition={{
-                  duration: 8,
-                  repeat: Infinity,
-                  repeatType: "reverse"
-                }}
-                style={{
-                  background: "linear-gradient(45deg, rgba(164, 199, 255, 0.7), rgba(147, 197, 253, 0.8))"
-                }}
-              />
-              
-              {/* Image positioned to overflow blob */}
-              <div className="absolute -inset-16 z-20">
-                <Image
-                  src="/5.png"
-                  alt="Stressed student struggling with traditional revision methods"
-                  width={600}
-                  height={600}
-                  className="object-contain w-full h-full scale-110"
-                  priority
-                  quality={95}
+          <div className="relative flex min-w-0 w-full justify-center lg:justify-end lg:sticky lg:top-28">
+            <div className="relative mx-auto aspect-square w-full max-w-[min(100%,28rem)] overflow-hidden sm:max-w-md">
+              <div className="absolute inset-0">
+                <motion.div
+                  className="absolute inset-0 z-10"
+                  animate={{
+                    borderRadius: [
+                      '60% 40% 30% 70%/60% 30% 70% 40%',
+                      '30% 60% 70% 40%/50% 60% 30% 60%',
+                      '60% 40% 30% 70%/60% 30% 70% 40%',
+                    ],
+                  }}
+                  transition={{
+                    duration: 8,
+                    repeat: Infinity,
+                    repeatType: 'reverse',
+                  }}
+                  style={{
+                    background: 'linear-gradient(45deg, rgba(164, 199, 255, 0.7), rgba(147, 197, 253, 0.8))',
+                  }}
                 />
+                <div className="absolute inset-0 z-20 sm:-inset-6 md:-inset-10 lg:-inset-14">
+                  <Image
+                    src="/5.png"
+                    alt="Stressed student struggling with traditional revision methods"
+                    width={600}
+                    height={600}
+                    className="h-full w-full object-contain sm:scale-105"
+                    priority
+                    quality={95}
+                  />
+                </div>
               </div>
-            </div>
             </div>
           </div>
         </div>
@@ -223,8 +220,8 @@ function Pathway() {
   const ordered = [leftIdx, centerIdx, rightIdx];
 
   return (
-    <section className="py-16 md:py-24 bg-theo-white text-theo-black">
-      <div className="container mx-auto px-6 max-w-6xl">
+    <section className="overflow-x-hidden py-16 md:py-24 bg-theo-white text-theo-black">
+      <div className="mx-auto w-full min-w-0 max-w-6xl px-4 sm:px-6">
         <p className="text-sm font-bold tracking-[0.15em] uppercase text-gray-500 mb-4">The Learning Pathway</p>
         <h2 className="text-4xl md:text-5xl font-bold mb-6 max-w-2xl tracking-tighter">A clear path from basic English to academic readiness</h2>
         <p className="text-lg text-gray-600 mb-10 max-w-3xl leading-relaxed">
@@ -258,7 +255,7 @@ function Pathway() {
           </Button>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 items-stretch">
+        <div className="grid min-w-0 grid-cols-1 gap-6 md:grid-cols-3 md:items-stretch">
           {ordered.map((levelIdx, slot) => {
             const level = levels[levelIdx];
             const isCenter = slot === 1;
@@ -662,10 +659,12 @@ function Institutions() {
         </div>
 
         <div className="text-center">
-          <Button asChild className="bg-theo-yellow hover:bg-[#b0bd2a] text-theo-black rounded-full px-12 py-8 text-xl font-bold shadow-2xl mb-6">
-            <Link href="https://calendly.com/sciolabs-info/30min" target="_blank" rel="noopener noreferrer">
-              Book a Demo
-            </Link>
+          <Button
+            type="button"
+            className="mb-6 bg-theo-yellow px-12 py-8 text-xl font-bold text-theo-black shadow-2xl hover:bg-[#b0bd2a] rounded-full"
+            onClick={() => void openCalendlyPopup()}
+          >
+            Book a Demo
           </Button>
           <p className="text-sm font-semibold text-gray-400 flex items-center justify-center gap-3 flex-wrap">
             <span>No credit card required</span>
@@ -788,7 +787,7 @@ function FAQSection() {
 // --- FULL PAGE EXPORT ---
 export default function HomePage() {
   return (
-    <div className="bg-theo-white text-theo-black font-sans selection:bg-theo-yellow selection:text-theo-black">
+    <div className="min-w-0 overflow-x-hidden bg-theo-white font-sans text-theo-black selection:bg-theo-yellow selection:text-theo-black">
       <Hero />
       <Challenge />
       <FeatureESP />

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import BookDemo from '@/components/BookDemo';
+import { openCalendlyPopup } from '@/lib/calendly';
 import { UserDropdown } from '@/components/UserDropdown';
 import { Menu, X } from 'lucide-react';
 import { useSession } from 'next-auth/react';
@@ -45,17 +45,17 @@ export default function Header() {
 
   return (
     <>
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 h-20 ${isScrolled || !isHomePage
+      <header className={`fixed top-0 left-0 right-0 z-50 w-full max-w-full transition-colors duration-300 h-20 ${isScrolled || !isHomePage
           ? 'bg-white shadow-sm'
           : 'bg-transparent'
         }`}>
-        <div className="container mx-auto px-6 h-full flex items-center justify-between">
+        <div className="container mx-auto flex h-full min-w-0 max-w-full items-center justify-between gap-3 px-4 sm:px-6">
 
           {/* Left: Logo + Nav */}
-          <div className="flex items-center gap-8 h-full">
+          <div className="flex min-w-0 flex-1 items-center gap-4 sm:gap-8 h-full pr-2">
             {/* Logo */}
-            <Link href="/" className="flex items-center">
-              <div className={`relative transition-all ${isScrolled || !isHomePage ? 'w-32 h-10' : 'w-40 h-12'
+            <Link href="/" className="flex min-w-0 shrink items-center">
+              <div className={`relative shrink-0 transition-all ${isScrolled || !isHomePage ? 'h-9 w-28 sm:h-10 sm:w-32' : 'h-10 w-36 sm:h-12 sm:w-40'
                 }`}>
                 <Image
                   src="/logo.png"
@@ -85,7 +85,7 @@ export default function Header() {
           </div>
 
           {/* Right: CTAs */}
-          <div className="flex items-center gap-6 h-full">
+          <div className="flex shrink-0 items-center gap-3 sm:gap-6 h-full">
             <div className="hidden md:flex items-center gap-6">
               {!session ? (
                 <Link
@@ -101,11 +101,13 @@ export default function Header() {
                 <UserDropdown />
               )}
 
-              <BookDemo>
-                <Button className="bg-theo-yellow hover:bg-[#b0bd2a] text-theo-black rounded-full px-6 font-bold shadow-none">
-                  Get Demo
-                </Button>
-              </BookDemo>
+              <Button
+                type="button"
+                className="bg-theo-yellow hover:bg-[#b0bd2a] text-theo-black rounded-full px-6 font-bold shadow-none"
+                onClick={() => void openCalendlyPopup()}
+              >
+                Book a Demo
+              </Button>
             </div>
 
             {/* Mobile menu button */}
@@ -185,11 +187,16 @@ export default function Header() {
                       <UserDropdown />
                     </div>
                   )}
-                  <BookDemo>
-                    <Button className="w-full bg-theo-yellow hover:bg-[#b0bd2a] text-theo-black rounded-full h-12 text-base font-bold shadow-lg shadow-theo-yellow/20">
-                      Get Demo
-                    </Button>
-                  </BookDemo>
+                  <Button
+                    type="button"
+                    className="w-full bg-theo-yellow hover:bg-[#b0bd2a] text-theo-black rounded-full h-12 text-base font-bold shadow-lg shadow-theo-yellow/20"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      void openCalendlyPopup();
+                    }}
+                  >
+                    Book a Demo
+                  </Button>
                 </div>
               </div>
             </motion.div>
