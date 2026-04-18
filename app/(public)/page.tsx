@@ -10,7 +10,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Star, Quote, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Star, Quote, ArrowRight, ChevronLeft, ChevronRight, BookOpen, FileText, Globe2 } from 'lucide-react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -27,41 +27,76 @@ function Hero() {
         <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A] via-[#1A1A1A]/85 to-[#1A1A1A]/50 z-10" />
       </div>
 
-      <div className="container mx-auto px-6 relative z-20">
-        <div className="max-w-6xl mx-auto">
+      <div className="container relative z-20 mx-auto px-4 sm:px-6">
+        <div className="mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center flex flex-col items-center"
+            className="flex flex-col items-center text-center"
           >
-            <h1 className="text-4xl md:text-5xl lg:text-[56px] font-bold leading-tight tracking-tight mb-6 text-white drop-shadow-xl">
+            <h1 className="mb-6 text-4xl font-bold leading-[1.12] tracking-tight text-white drop-shadow-xl md:text-5xl lg:text-[56px]">
               Learn English to study Theology <br className="hidden sm:block" />
               with <span className="text-theo-yellow">TheoLingua.</span>
             </h1>
-            <p className="text-lg md:text-xl text-white/90 mb-8 max-w-xl leading-relaxed">
+            <p className="mb-10 max-w-4xl text-lg leading-relaxed text-white/90 md:text-xl md:leading-relaxed lg:text-[1.35rem] lg:leading-relaxed">
               Read Scripture. Write assignments. Speak with confidence. Go from basic English to theological fluency — one level at a time.
             </p>
-            <div className="w-full max-w-md border-y border-white/25 divide-y divide-white/20 text-left">
-              <p className="py-3.5 text-base md:text-lg font-medium text-white/95 tracking-tight">
-                3 Levels - CEFR A1 to B2+
-              </p>
-              <p className="py-3.5 text-base md:text-lg font-medium text-white/95 tracking-tight">
-                400+ students - 8+ colleges
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 mt-10 justify-center w-full sm:w-auto">
+            <div className="flex w-full flex-col justify-center gap-4 sm:flex-row sm:w-auto">
               <Link href="/auth/register" className="w-full sm:w-auto">
-                <Button className="bg-theo-yellow hover:bg-[#b0bd2a] text-theo-black rounded-full px-8 py-6 text-lg font-bold w-full sm:w-auto">
+                <Button className="w-full rounded-full bg-theo-yellow px-8 py-6 text-lg font-bold text-theo-black hover:bg-[#b0bd2a] sm:w-auto">
                   Start Learning Free
                 </Button>
               </Link>
-              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-theo-black rounded-full px-8 py-6 text-lg font-bold bg-transparent w-full sm:w-auto">
+              <Button
+                variant="outline"
+                className="w-full rounded-full border-white bg-transparent px-8 py-6 text-lg font-bold text-white hover:bg-white hover:text-theo-black sm:w-auto"
+              >
                 Download Brochure
               </Button>
             </div>
-          </motion.div>
 
+            {/* Stat highlights — separate band below CTAs */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, delay: 0.2 }}
+              className="mt-14 w-full max-w-5xl pt-12 md:mt-16 md:pt-14"
+            >
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-5">
+                {[
+                  {
+                    line: '3 Levels',
+                    sub: 'CEFR A1 to B2+',
+                  },
+                  {
+                    line: '400+ students',
+                    sub: '8+ colleges',
+                  },
+                  {
+                    line: 'Rich curriculum',
+                    sub: '250+ videos · 150+ hours',
+                  },
+                ].map((item, i) => (
+                  <motion.div
+                    key={i}
+                    whileHover={{ y: -4, scale: 1.02 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                    className="group relative overflow-hidden rounded-2xl border border-white/20 bg-white/[0.07] px-5 py-7 text-center shadow-none backdrop-blur-sm transition-shadow duration-300 hover:border-theo-yellow/55 hover:bg-white/[0.12] hover:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.45)] md:px-6 md:py-8"
+                  >
+                    <p className="text-lg font-bold tracking-tight text-white md:text-xl">{item.line}</p>
+                    <p className="mt-2 text-sm font-medium leading-snug text-white/75 transition-colors group-hover:text-white/90 md:text-base">
+                      {item.sub}
+                    </p>
+                    <div
+                      className="pointer-events-none absolute inset-x-0 bottom-0 h-1 origin-left scale-x-0 bg-theo-yellow transition-transform duration-300 group-hover:scale-x-100"
+                      aria-hidden
+                    />
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
     </section>
@@ -70,32 +105,56 @@ function Hero() {
 
 // --- 2. THE CHALLENGE ---
 function Challenge() {
-  const painPoints = [
-    "General English courses don't prepare theology students for academic reading and study.",
-    "Students struggle to read, understand, and discuss theological texts in English.",
-    "Many find it difficult to write sermons, assignments, and research papers clearly.",
-    "Limited English makes it hard to use commentaries, journals, and global resources.",
-    "Communicating in ministry — letters, emails, and presentations — remains a challenge.",
+  const painCards = [
+    {
+      icon: BookOpen,
+      title: 'Reading & discussion',
+      line: 'Theological texts and seminars stay hard in English.',
+    },
+    {
+      icon: FileText,
+      title: 'Writing & papers',
+      line: 'Sermons, essays, and assignments need clearer expression.',
+    },
+    {
+      icon: Globe2,
+      title: 'Ministry & resources',
+      line: 'Commentaries, email, and global voices stay out of reach.',
+    },
   ];
 
   return (
-    <section id="about" className="overflow-x-hidden py-16 md:py-24 bg-theo-white text-theo-black">
-      <div className="container mx-auto px-6 max-w-6xl">
-        <div className="grid min-w-0 lg:grid-cols-2 gap-14 lg:gap-20 items-start">
+    <section id="about" className="overflow-x-hidden bg-white py-20 text-theo-black md:py-28">
+      <div className="container mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="grid min-w-0 items-start gap-12 lg:grid-cols-2 lg:gap-16">
           <div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-10 tracking-tighter">
+            <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-gray-400">The challenge</p>
+            <h2 className="mb-8 text-4xl font-bold tracking-tighter md:text-5xl lg:mb-10">
               Is English becoming a barrier?
             </h2>
-            <div className="border-y border-gray-200 divide-y divide-gray-200">
-              {painPoints.map((text, idx) => (
-                <p key={idx} className="py-4 md:py-5 text-lg leading-relaxed text-gray-700 font-medium">
-                  {text}
-                </p>
+            <div className="grid gap-4 sm:grid-cols-2 sm:gap-4 lg:grid-cols-1 lg:gap-5">
+              {painCards.map(({ icon: Icon, title, line }, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ duration: 0.45, delay: idx * 0.06 }}
+                  className="group flex gap-4 rounded-3xl border border-gray-100 bg-theo-white p-5 shadow-sm transition-all duration-300 hover:border-theo-yellow/40 hover:shadow-md md:p-6"
+                >
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-theo-yellow/20 text-theo-black transition-transform duration-300 group-hover:scale-105">
+                    <Icon className="h-7 w-7" strokeWidth={1.75} />
+                  </div>
+                  <div className="min-w-0 pt-0.5">
+                    <h3 className="font-bold leading-snug text-theo-black">{title}</h3>
+                    <p className="mt-1.5 text-sm leading-relaxed text-gray-600 md:text-base">{line}</p>
+                  </div>
+                </motion.div>
               ))}
             </div>
-            <div className="flex items-center gap-4 border-t border-transparent pt-10 mt-2">
-              <h3 className="text-2xl font-bold italic tracking-tight text-gray-800">But it doesn&apos;t have to be this way…</h3>
-              <div className="w-12 h-2 rounded-full bg-theo-yellow shrink-0" />
+            <div className="mt-10 flex items-center gap-3 border-t border-gray-100 pt-10">
+              <div className="h-1 w-10 rounded-full bg-theo-yellow" />
+              <p className="text-lg font-semibold italic text-gray-800">It doesn&apos;t have to stay that way.</p>
             </div>
           </div>
           <div className="relative flex min-w-0 w-full justify-center lg:justify-end lg:sticky lg:top-28">
@@ -139,41 +198,51 @@ function Challenge() {
   );
 }
 
-// --- 4. WHAT IS THEOLINGUA? ---
+// --- 3. WHAT IS THEOLINGUA? (bento — short labels, visual tiles) ---
 function FeatureESP() {
   const features = [
-    { icon: '📖', title: 'Bible-centric content', desc: 'Grammar and vocabulary built directly on Scripture and Christian literature.' },
-    { icon: '🎬', title: '250+ video lessons', desc: 'Watch, practise, and revisit every lesson at your own pace on the portal.' },
-    { icon: '🎮', title: 'Songs, games & memory verses', desc: 'Interactive and gamified — designed to be memorable for GenZ learners.' },
-    { icon: '📓', title: 'Workbook + digital portal', desc: 'Pen-and-paper workbook practice alongside a fully digital learning portal.' },
-    { icon: '👨‍🏫', title: 'Facilitator training & support', desc: 'Detailed lesson plans, group revision games, and full teacher training provided.' },
-    { icon: '🏅', title: 'Certificate on completion', desc: 'Students receive a TheoLingua certificate when they complete each level.' },
+    { icon: '📖', title: 'Bible-first ESP', desc: 'Grammar & vocab from Scripture & Christian texts.', className: 'md:col-span-1' },
+    { icon: '🎬', title: '250+ video lessons', desc: 'Self-paced on the learning portal.', className: 'md:col-span-1' },
+    { icon: '🎮', title: 'Games & memory', desc: 'Built for how Gen Z actually learns.', className: 'md:col-span-1' },
+    { icon: '📓', title: 'Workbook + LMS', desc: 'Paper practice + digital access together.', className: 'md:col-span-1' },
+    { icon: '👨‍🏫', title: 'Teacher-ready', desc: 'Lesson plans, games & facilitator support.', className: 'md:col-span-1' },
+    { icon: '🏅', title: 'Certificate', desc: 'Recognition when you complete a level.', className: 'md:col-span-1' },
   ];
 
   return (
-    <section id="program" className="py-16 md:py-24 bg-white text-theo-black">
-      <div className="container mx-auto px-6 max-w-6xl">
-        <div className="mb-16 max-w-3xl">
-          <p className="text-sm font-bold tracking-[0.15em] uppercase text-gray-500 mb-4">What is TheoLingua?</p>
-          <p className="text-2xl leading-relaxed text-gray-800 mb-6 font-medium">
-            TheoLingua is an English for Specific Purposes (ESP) program that equips students with the English skills to understand Scripture, participate in theological study, and engage in meaningful ministry communication.
-          </p>
-          <p className="text-lg text-gray-600 leading-relaxed">
-            Unlike general English courses, every lesson, vocabulary set, and grammar exercise is built around the Bible, theological literature, and real ministry contexts.
+    <section id="program" className="bg-theo-white py-20 text-theo-black md:py-28">
+      <div className="container mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="mb-12 max-w-2xl md:mb-14">
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-gray-400">What is TheoLingua?</p>
+          <h2 className="text-3xl font-bold tracking-tighter text-theo-black md:text-4xl lg:text-[2.75rem] lg:leading-[1.15]">
+            English built for theology — not generic classroom English.
+          </h2>
+          <p className="mt-4 text-lg text-gray-600">
+            ESP for seminaries and Bible colleges: lessons, drills, and vocabulary tied to Scripture and ministry.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-x-12 gap-y-10">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
           {features.map((feature, idx) => (
-            <div key={idx} className="flex gap-6">
-              <div className="w-14 h-14 shrink-0 rounded-full bg-theo-yellow flex items-center justify-center text-2xl shadow-sm">
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-30px' }}
+              transition={{ duration: 0.4, delay: idx * 0.04 }}
+              className={cn(
+                'flex min-h-[132px] flex-col justify-between rounded-[1.75rem] border border-gray-200/80 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-theo-yellow/50 hover:shadow-lg md:min-h-[150px]',
+                feature.className
+              )}
+            >
+              <span className="text-3xl" aria-hidden>
                 {feature.icon}
-              </div>
+              </span>
               <div>
-                <h4 className="text-xl font-bold mb-2">{feature.title}</h4>
-                <p className="text-gray-600 leading-relaxed">{feature.desc}</p>
+                <h4 className="text-lg font-bold leading-snug text-theo-black">{feature.title}</h4>
+                <p className="mt-2 text-sm leading-relaxed text-gray-600">{feature.desc}</p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -191,7 +260,7 @@ function Pathway() {
       badge: 'CEFR: A1 → A2',
       meta: '45+ hrs · 8 units',
       body:
-        'Build foundational English using biblical texts. Focus: listening, speaking, basic reading and writing. Includes songs, memory verses, and vocabulary sets.',
+        'Foundations with Scripture: listening, speaking, reading, writing — plus songs and memory work.',
     },
     {
       id: 'l2',
@@ -200,7 +269,7 @@ function Pathway() {
       badge: 'CEFR: A2 → B1+',
       meta: '40+ hrs · 6 units',
       body:
-        'Develop the language of theological study. Focus: academic reading and writing, with articles, podcasts, and complex grammar for Scripture engagement.',
+        'Academic English for theology: readings, podcasts, and grammar that unlocks serious Scripture study.',
     },
     {
       id: 'l3',
@@ -209,7 +278,7 @@ function Pathway() {
       badge: 'CEFR: B1+ → B2+',
       meta: '60+ hrs',
       body:
-        'Master academic writing for essays, assignments, and research. Practice-driven: observe, practise, apply, produce.',
+        'Essays and research writing — observe, practise, apply, and produce with feedback.',
     },
   ] as const;
 
@@ -220,16 +289,12 @@ function Pathway() {
   const ordered = [leftIdx, centerIdx, rightIdx];
 
   return (
-    <section className="overflow-x-hidden py-16 md:py-24 bg-theo-white text-theo-black">
+    <section className="overflow-x-hidden bg-white py-20 text-theo-black md:py-28">
       <div className="mx-auto w-full min-w-0 max-w-6xl px-4 sm:px-6">
-        <p className="text-sm font-bold tracking-[0.15em] uppercase text-gray-500 mb-4">The Learning Pathway</p>
-        <h2 className="text-4xl md:text-5xl font-bold mb-6 max-w-2xl tracking-tighter">A clear path from basic English to academic readiness</h2>
-        <p className="text-lg text-gray-600 mb-10 max-w-3xl leading-relaxed">
-          TheoLingua is structured across three levels, each mapped to the international CEFR framework — so you always know where you are and where you&apos;re going.
-        </p>
-
-        <p className="text-sm text-gray-500 mb-6 text-center md:text-left">
-          Tap a level or use the arrows to explore the pathway in a loop.
+        <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-gray-400">The learning pathway</p>
+        <h2 className="mb-4 max-w-2xl text-4xl font-bold tracking-tighter md:text-5xl">From basic English to academic readiness</h2>
+        <p className="mb-10 max-w-xl text-lg text-gray-600">
+          Three CEFR-aligned levels — tap or use arrows to explore.
         </p>
 
         <div className="flex items-center justify-center gap-3 mb-8">
@@ -326,20 +391,20 @@ function DeliveryModels() {
   ];
 
   return (
-    <section id="how-it-works" className="py-16 md:py-24 bg-white text-theo-black">
-      <div className="container mx-auto px-6 max-w-6xl">
-        <div className="text-center mb-16">
-          <p className="text-sm font-bold tracking-[0.15em] uppercase text-gray-500 mb-4 divider-label">Two Ways To Learn</p>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tighter">Two ways to learn TheoLingua</h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Whether you are in a seminary classroom or learning on your own, the program fits your context.
+    <section id="how-it-works" className="bg-theo-white py-20 text-theo-black md:py-28">
+      <div className="container mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="mb-12 text-center md:mb-14">
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-gray-400">Two ways to learn</p>
+          <h2 className="mb-4 text-4xl font-bold tracking-tighter md:text-5xl">Classroom or self-paced</h2>
+          <p className="mx-auto max-w-lg text-lg text-gray-600">
+            Same curriculum — pick the delivery that fits your context.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 items-stretch pt-8">
-          <Card className="rounded-[32px] border border-gray-200 shadow-lg bg-white py-0 overflow-hidden flex flex-col hover:-translate-y-1 transition-transform duration-300">
-            <CardContent className="p-10 flex-1 flex flex-col">
-              <h3 className="text-3xl font-bold mb-8">Classroom Model</h3>
+        <div className="grid items-stretch gap-6 pt-2 md:grid-cols-2 md:gap-8">
+          <Card className="flex flex-col overflow-hidden rounded-[2rem] border border-gray-200 bg-white py-0 shadow-lg transition-transform duration-300 hover:-translate-y-1">
+            <CardContent className="flex flex-1 flex-col p-8 md:p-10">
+              <h3 className="mb-8 text-2xl font-bold md:text-3xl">Classroom model</h3>
               <ul className="flex-1 border-t border-b border-gray-200 divide-y divide-gray-200">
                 {classRows.map((row, i) => (
                   <li key={i} className="py-4 text-lg text-gray-700 leading-relaxed font-medium">
@@ -350,9 +415,9 @@ function DeliveryModels() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-[32px] border border-gray-200 shadow-lg py-0 bg-white overflow-hidden flex flex-col hover:-translate-y-1 transition-transform duration-300">
-            <CardContent className="p-10 flex-1 flex flex-col">
-              <h3 className="text-3xl font-bold mb-8">Self-learning Model</h3>
+          <Card className="flex flex-col overflow-hidden rounded-[2rem] border border-gray-200 bg-white py-0 shadow-lg transition-transform duration-300 hover:-translate-y-1">
+            <CardContent className="flex flex-1 flex-col p-8 md:p-10">
+              <h3 className="mb-8 text-2xl font-bold md:text-3xl">Self-learning model</h3>
               <ul className="flex-1 border-t border-b border-gray-200 divide-y divide-gray-200">
                 {selfRows.map((row, i) => (
                   <li key={i} className="py-4 text-lg text-gray-700 leading-relaxed font-medium">
@@ -368,58 +433,18 @@ function DeliveryModels() {
   );
 }
 
-// --- 7. THE THEOLINGUA PROMISE ---
-function PromiseSection() {
-  const promises = [
-    { title: "Confidence in theological English", desc: "Speak, read, and write about Scripture without hesitation." },
-    { title: "Stronger core language skills", desc: "Grammar gaps filled through targeted, remedial support." },
-    { title: "Visible improvement in weeks", desc: "Structured practice that shows results quickly." },
-    { title: "Engaging for GenZ learners", desc: "Songs, games, videos, and digital tools built for today's students." },
-    { title: "Practice before production", desc: "Observe, practise, apply, then create — never thrown in at the deep end." },
-    { title: "A clear pathway forward", desc: "From basic English to academic readiness, one level at a time." },
-  ];
-
-  return (
-    <section className="py-16 md:py-24 bg-theo-white text-theo-black">
-      <div className="container mx-auto px-6 max-w-6xl">
-        <div className="text-center mb-16">
-          <p className="text-sm font-bold tracking-[0.15em] uppercase text-gray-500 mb-4">The TheoLingua Promise</p>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tighter">What you will gain</h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Every student who completes TheoLingua walks away with something real.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-x-12 gap-y-12 mt-12">
-          {promises.map((p, idx) => (
-            <div key={idx} className="flex gap-6 items-start">
-              <div className="w-14 h-14 shrink-0 rounded-full bg-theo-yellow flex items-center justify-center text-theo-black">
-                <Star className="w-6 h-6" fill="currentColor" />
-              </div>
-              <div className="pt-2">
-                <h4 className="text-xl font-bold mb-2">{p.title}</h4>
-                <p className="text-gray-600 leading-relaxed text-lg">{p.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// --- 7. POWERED BY SCIOLABS ---
+// --- 6. POWERED BY SCIOLABS ---
 function CredibilityStrip() {
   return (
-    <section className="bg-theo-tint py-16">
-      <div className="container mx-auto px-6 max-w-6xl">
-        <div className="flex flex-col lg:flex-row items-center gap-12">
+    <section className="bg-theo-tint py-16 md:py-20">
+      <div className="container mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-start">
           <div className="lg:w-1/3">
-            <h3 className="text-xl font-bold mb-4">
-              Powered by ScioLabs<sup className="text-xs align-super">®</sup>
+            <h3 className="mb-4 text-xl font-bold">
+              Powered by ScioLabs<sup className="align-super text-xs">®</sup>
             </h3>
-            <p className="text-base text-gray-800 leading-relaxed font-medium">
-              TheoLingua is built by ScioLabs, an educational innovation organisation with experience designing learning programs for institutions including ONGC, NPC, CMAI and several educational institutions. In the theological space, ScioLabs works closely with the ATA and leading seminaries in pedagogical training across India.
+            <p className="text-base font-medium leading-relaxed text-gray-800">
+              ScioLabs designs learning programs for institutions (ONGC, NPC, CMAI and more). In theology, we work with the ATA and seminaries across India.
             </p>
           </div>
           <div className="lg:w-2/3 grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
@@ -481,7 +506,7 @@ function TestimonialCard({ q, className }: { q: TestimonialQuote; className?: st
   );
 }
 
-// --- 9. STUDENT TESTIMONIALS ---
+// --- 8. STUDENT TESTIMONIALS ---
 function Testimonials() {
   const quotes: TestimonialQuote[] = [
     { quote: "TheoLingua transformed how I read commentaries. I can now actively participate in deep theological discussions without hesitation.", author: "Birila A. Yimchunger", meta: "Level 2, Grace Biblical Seminary" },
@@ -501,12 +526,10 @@ function Testimonials() {
     <section id="testimonials" className="relative overflow-hidden bg-gradient-to-b from-theo-white via-white to-gray-50/60 py-14 text-theo-black sm:py-16 md:py-24">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-theo-yellow/40 to-transparent" aria-hidden />
       <div className="container relative mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="mx-auto mb-10 max-w-2xl text-center sm:mb-12 md:mb-16">
-          <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-gray-500 sm:text-sm">Students speak</p>
-          <h2 className="mb-3 text-3xl font-bold tracking-tighter sm:mb-4 sm:text-4xl md:text-5xl">Hear it from the learners</h2>
-          <p className="text-base leading-relaxed text-gray-600 sm:text-lg">
-            Theological students who are reading Scripture, writing assignments, and speaking English with newfound confidence.
-          </p>
+        <div className="mx-auto mb-10 max-w-xl text-center sm:mb-12 md:mb-14">
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-gray-400 sm:text-sm">Students speak</p>
+          <h2 className="mb-3 text-3xl font-bold tracking-tighter sm:mb-4 sm:text-4xl md:text-5xl">Voices from the classroom</h2>
+          <p className="text-base text-gray-600 sm:text-lg">Learners and facilitators on real progress.</p>
         </div>
 
         {/* Small screens: carousel */}
@@ -617,42 +640,42 @@ function Testimonials() {
   );
 }
 
-// --- 10. FOR INSTITUTIONS ---
+// --- 9. FOR INSTITUTIONS ---
 function Institutions() {
   return (
-    <section id="institutions" className="py-16 md:py-24 bg-theo-black text-theo-white">
-      <div className="container mx-auto px-6 max-w-6xl">
-        <div className="text-center mb-16">
-          <p className="text-sm font-bold tracking-[0.15em] uppercase text-gray-400 mb-4">For Institutions</p>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tighter">Bring TheoLingua to your seminary or Bible college</h2>
-          <p className="text-lg text-gray-400 max-w-3xl mx-auto leading-relaxed">
-            TheoLingua is designed for classroom deployment. We provide everything your institution needs — facilitator training, assessments, student portals, and ongoing support — so you can focus on your students, not the logistics.
+    <section id="institutions" className="bg-theo-black py-20 text-theo-white md:py-28">
+      <div className="container mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="mb-12 text-center md:mb-16">
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-gray-500">For institutions</p>
+          <h2 className="mb-4 text-4xl font-bold tracking-tighter md:text-5xl">Deploy at your seminary or college</h2>
+          <p className="mx-auto max-w-2xl text-lg text-gray-400">
+            Training, LMS, workbooks, and assessments — we set you up so you can focus on students.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 mb-16">
+        <div className="mb-16 grid gap-6 md:grid-cols-3">
           {[
             {
               num: '01',
               title: '30-min demo',
-              desc: 'Book a short call — we walk you through the program, LMS, workbooks, and how TheoLingua fits your seminary or Bible college.',
+              desc: 'Walk through the program, portal, and materials.',
             },
             {
               num: '02',
-              title: 'Once onboarded, your teachers…',
-              desc: 'Receive facilitator training, detailed lesson plans, unit-wise assessments with answer keys, and ongoing support to lead each level with confidence.',
+              title: 'Train your teachers',
+              desc: 'Facilitator training, lesson plans, assessments & keys.',
             },
             {
               num: '03',
-              title: 'Launch with clarity',
-              desc: 'Students will be given portal access and printed workbooks and teachers will be given lesson plans and assessments with answer keys.',
+              title: 'Launch',
+              desc: 'Students on the portal & workbooks; teachers fully equipped.',
             },
           ].map((step, i) => (
-            <Card key={i} className="bg-white/5 border border-white/10 rounded-[32px] overflow-hidden text-white hover:bg-white/10 transition-colors">
-              <CardContent className="p-10 flex flex-col items-start">
-                <span className="text-6xl font-bold text-theo-yellow opacity-90 tracking-tighter mb-6">{step.num}</span>
-                <h3 className="text-2xl font-bold mb-4">{step.title}</h3>
-                <p className="text-gray-300 leading-relaxed text-lg">{step.desc}</p>
+            <Card key={i} className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 py-0 text-white transition-colors hover:bg-white/10">
+              <CardContent className="flex flex-col items-start p-8 md:p-10">
+                <span className="mb-5 text-5xl font-bold tracking-tighter text-theo-yellow opacity-90 md:text-6xl">{step.num}</span>
+                <h3 className="mb-3 text-xl font-bold md:text-2xl">{step.title}</h3>
+                <p className="text-base leading-relaxed text-gray-300">{step.desc}</p>
               </CardContent>
             </Card>
           ))}
@@ -679,24 +702,21 @@ function Institutions() {
   );
 }
 
-// --- 11. GET STARTED CTA ---
+// --- 10. GET STARTED CTA ---
 function GetStartedCTA() {
   return (
-    <section className="py-16 md:py-24 bg-theo-white text-theo-black border-b border-gray-200">
-      <div className="container mx-auto px-6 max-w-5xl">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tighter">Ready to transform your English journey?</h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Join hundreds of theological students who are mastering English through biblical wisdom. Start your journey today.
-          </p>
+    <section className="border-b border-gray-200 bg-white py-20 text-theo-black md:py-28">
+      <div className="container mx-auto max-w-5xl px-4 sm:px-6">
+        <div className="mb-12 text-center md:mb-14">
+          <h2 className="mb-3 text-4xl font-bold tracking-tighter md:text-5xl">Start or sign in</h2>
+          <p className="mx-auto max-w-md text-lg text-gray-600">Pick up where you left off — or create an account.</p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
-          {/* Card 1 */}
-          <Card className="rounded-[32px] border border-gray-200 shadow-sm bg-white p-2">
-            <CardContent className="p-10 text-center flex flex-col h-full items-center">
-              <h3 className="text-2xl font-bold mb-4">Already a student?</h3>
-              <p className="text-lg text-gray-600 mb-8 flex-1">Sign in to your learning portal and continue where you left off.</p>
+        <div className="mb-12 grid gap-6 md:grid-cols-2 md:gap-8">
+          <Card className="rounded-[2rem] border border-gray-200 bg-theo-white p-2 shadow-sm">
+            <CardContent className="flex h-full flex-col items-center p-8 text-center md:p-10">
+              <h3 className="mb-3 text-2xl font-bold">Already enrolled?</h3>
+              <p className="mb-8 flex-1 text-gray-600">Open your learning portal.</p>
               <Link href="/auth/login" className="w-full">
                 <Button variant="outline" className="w-full rounded-full py-6 text-lg font-bold border-2 border-gray-200 hover:border-gray-300 bg-transparent text-gray-800">
                   Sign In
@@ -705,11 +725,10 @@ function GetStartedCTA() {
             </CardContent>
           </Card>
 
-          {/* Card 2 */}
-          <Card className="rounded-[32px] border-none shadow-xl bg-theo-black text-theo-white p-2">
-            <CardContent className="p-10 text-center flex flex-col h-full items-center">
-              <h3 className="text-2xl font-bold mb-4">New to TheoLingua?</h3>
-              <p className="text-lg text-gray-300 mb-8 flex-1">Start with a free trial — no credit card required.</p>
+          <Card className="rounded-[2rem] border-none bg-theo-black p-2 text-theo-white shadow-xl">
+            <CardContent className="flex h-full flex-col items-center p-8 text-center md:p-10">
+              <h3 className="mb-3 text-2xl font-bold">New here?</h3>
+              <p className="mb-8 flex-1 text-gray-300">Create a free account to explore.</p>
               <Link href="/auth/register" className="w-full">
                 <Button className="w-full bg-theo-yellow hover:bg-[#b0bd2a] text-theo-black rounded-full py-6 text-lg font-bold">
                   Start Free
@@ -733,7 +752,7 @@ function GetStartedCTA() {
   );
 }
 
-// --- 12. FAQ ---
+// --- 11. FAQ ---
 function FAQSection() {
   const faqsLeft = [
     { q: 'What level should I start at?', a: "If you are new to English or find reading and writing in English very difficult, start with Level 1 (A1–A2). If you already understand basic English but struggle with academic or theological texts, Level 2 is the right fit. Not sure? Book a free demo and we will help you place yourself." },
@@ -749,9 +768,9 @@ function FAQSection() {
   const columnClass = 'space-y-4';
 
   return (
-    <section id="faq" className="py-16 md:py-24 bg-white text-theo-black">
-      <div className="container mx-auto px-6 max-w-6xl">
-        <h2 className="text-4xl md:text-5xl font-bold mb-12 tracking-tighter text-center">FAQs</h2>
+    <section id="faq" className="bg-theo-white py-20 text-theo-black md:py-28">
+      <div className="container mx-auto max-w-6xl px-4 sm:px-6">
+        <h2 className="mb-10 text-center text-4xl font-bold tracking-tighter md:mb-12 md:text-5xl">FAQs</h2>
 
         <div className="grid md:grid-cols-2 gap-8 md:gap-10">
           <Accordion type="multiple" defaultValue={[]} className={columnClass}>
@@ -793,7 +812,6 @@ export default function HomePage() {
       <FeatureESP />
       <Pathway />
       <DeliveryModels />
-      <PromiseSection />
       <CredibilityStrip />
       <Testimonials />
       <Institutions />
