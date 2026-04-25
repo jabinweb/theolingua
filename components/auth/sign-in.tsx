@@ -15,6 +15,7 @@ interface SignInProps {
   showGoogleAuth?: boolean;
   showEmailAuth?: boolean;
   allowRegistration?: boolean;
+  defaultMode?: 'signin' | 'signup';
 }
 
 export function SignIn({ 
@@ -22,14 +23,15 @@ export function SignIn({
   title = "Sign In",
   showGoogleAuth = true,
   showEmailAuth = true,
-  allowRegistration = true
+  allowRegistration = true,
+  defaultMode = 'signin',
 }: SignInProps) {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(defaultMode === 'signup');
   const [showPassword, setShowPassword] = useState(false);
 
   const handleGoogleSignIn = async () => {

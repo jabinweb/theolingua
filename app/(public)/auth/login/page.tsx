@@ -13,6 +13,8 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect') || '/dashboard';
+  const mode = searchParams.get('mode');
+  const defaultMode = mode === 'signup' ? 'signup' : 'signin';
 
   // Redirect if already logged in
   useEffect(() => {
@@ -63,6 +65,7 @@ function LoginForm() {
           title="Sign In"
           showGoogleAuth={true}
           showEmailAuth={true}
+          defaultMode={defaultMode}
         />
 
         {/* Back to Home */}

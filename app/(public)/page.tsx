@@ -11,7 +11,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Star, Quote, ArrowRight, ChevronLeft, ChevronRight, BookOpen, FileText, Globe2 } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { openCalendlyPopup } from '@/lib/calendly';
@@ -43,17 +43,26 @@ function Hero() {
               Read Scripture. Write assignments. Speak with confidence. Go from basic English to theological fluency — one level at a time.
             </p>
             <div className="flex w-full flex-col justify-center gap-4 sm:flex-row sm:w-auto">
-              <Link href="/auth/register" className="w-full sm:w-auto">
-                <Button className="w-full rounded-full bg-theo-yellow px-8 py-6 text-lg font-bold text-theo-black hover:bg-[#b0bd2a] sm:w-auto">
-                  Start Learning Free
-                </Button>
-              </Link>
               <Button
-                variant="outline"
-                className="w-full rounded-full border-white bg-transparent px-8 py-6 text-lg font-bold text-white hover:bg-white hover:text-theo-black sm:w-auto"
+                type="button"
+                className="w-full rounded-full bg-theo-yellow px-8 py-6 text-lg font-bold text-theo-black hover:bg-[#b0bd2a] sm:w-auto"
+                onClick={() => void openCalendlyPopup()}
               >
-                Download Brochure
+                Get started – Demo call
               </Button>
+              <a
+                href="/TheoLingua_Overview.pdf"
+                target="_blank"
+                rel="noreferrer"
+                className="w-full sm:w-auto"
+              >
+                <Button
+                  variant="outline"
+                  className="w-full rounded-full border-white bg-transparent px-8 py-6 text-lg font-bold text-white hover:bg-white hover:text-theo-black sm:w-auto"
+                >
+                  Download Brochure
+                </Button>
+              </a>
             </div>
 
             {/* Stat highlights — separate band below CTAs */}
@@ -283,28 +292,48 @@ function Pathway() {
   ] as const;
 
   const [active, setActive] = useState(0);
-  const leftIdx = (active + 2) % 3;
-  const centerIdx = active;
-  const rightIdx = (active + 1) % 3;
-  const ordered = [leftIdx, centerIdx, rightIdx];
+  const levelRefs = useRef<Array<HTMLDivElement | null>>([]);
+
+  const scrollToLevel = (idx: number) => {
+    levelRefs.current[idx]?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  };
+
+  const goPrev = () => {
+    const next = (active + 2) % 3;
+    setActive(next);
+    scrollToLevel(next);
+  };
+
+  const goNext = () => {
+    const next = (active + 1) % 3;
+    setActive(next);
+    scrollToLevel(next);
+  };
 
   return (
     <section className="overflow-x-hidden bg-white py-20 text-theo-black md:py-28">
       <div className="mx-auto w-full min-w-0 max-w-6xl px-4 sm:px-6">
         <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-gray-400">The learning pathway</p>
         <h2 className="mb-4 max-w-2xl text-4xl font-bold tracking-tighter md:text-5xl">From basic English to academic readiness</h2>
-        <p className="mb-10 max-w-xl text-lg text-gray-600">
-          Three CEFR-aligned levels — tap or use arrows to explore.
-        </p>
+        <div className="mb-10 max-w-xl">
+          <p className="text-lg text-gray-600">Three CEFR-aligned levels — tap to explore.</p>
+          <div className="mt-5 inline-flex items-center gap-3 rounded-full border border-gray-200 bg-white px-5 py-2.5 shadow-sm">
+            <span className="text-xs font-bold uppercase tracking-[0.18em] text-gray-400">Basic English</span>
+            <ArrowRight className="h-4 w-4 text-theo-yellow" aria-hidden />
+            <span className="text-xs font-bold uppercase tracking-[0.18em] text-gray-800">Academic readiness</span>
+            <ArrowRight className="h-4 w-4 text-theo-yellow" aria-hidden />
+            <span className="text-xs font-bold uppercase tracking-[0.18em] text-gray-400">Ministry fluency</span>
+          </div>
+        </div>
 
-        <div className="flex items-center justify-center gap-3 mb-8">
+        <div className="hidden md:flex items-center justify-center gap-3 mb-8">
           <Button
             type="button"
             variant="outline"
             size="icon"
             className="rounded-full border-gray-300"
             aria-label="Show previous level"
-            onClick={() => setActive((a) => (a + 2) % 3)}
+            onClick={goPrev}
           >
             <ChevronLeft className="w-5 h-5" />
           </Button>
@@ -314,16 +343,103 @@ function Pathway() {
             size="icon"
             className="rounded-full border-gray-300"
             aria-label="Show next level"
-            onClick={() => setActive((a) => (a + 1) % 3)}
+            onClick={goNext}
           >
             <ChevronRight className="w-5 h-5" />
           </Button>
         </div>
 
-        <div className="grid min-w-0 grid-cols-1 gap-6 md:grid-cols-3 md:items-stretch">
-          {ordered.map((levelIdx, slot) => {
-            const level = levels[levelIdx];
-            const isCenter = slot === 1;
+        {/* Mobile: scroll-snap carousel (smooth, non-awkward) */}
+        <div className="md:hidden">
+          <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {levels.map((level, idx) => {
+              const isActive = idx === active;
+              return (
+                <div
+                  key={level.id}
+                  ref={(el) => {
+                    levelRefs.current[idx] = el;
+                  }}
+                  className="min-w-[86%] snap-center sm:min-w-[72%]"
+                >
+                  <Card
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => {
+                      setActive(idx);
+                      scrollToLevel(idx);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setActive(idx);
+                        scrollToLevel(idx);
+                      }
+                    }}
+                    className={cn(
+                      'h-full rounded-[32px] overflow-hidden p-2 cursor-pointer transition-all duration-300 border bg-white',
+                      isActive
+                        ? 'border-2 border-theo-yellow shadow-xl'
+                        : 'border border-gray-100 shadow-md hover:shadow-lg hover:border-gray-200'
+                    )}
+                  >
+                    <CardContent className="p-7">
+                      <div className="flex flex-wrap items-center gap-3 mb-4">
+                        <h3 className="text-2xl font-bold leading-tight">{level.title}</h3>
+                        <div className={`px-3 py-1 font-bold text-sm rounded-full ${level.badgeClass}`}>{level.badge}</div>
+                        <span className="text-gray-500 text-sm font-medium">{level.meta}</span>
+                      </div>
+                      <p className="text-base leading-relaxed text-gray-700">{level.body}</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-5 flex items-center justify-between gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="h-10 w-10 shrink-0 rounded-full border-gray-200 bg-white shadow-sm"
+              onClick={goPrev}
+              aria-label="Previous level"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            <div className="flex min-w-0 flex-1 flex-wrap justify-center gap-2 px-1">
+              {levels.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => {
+                    setActive(i);
+                    scrollToLevel(i);
+                  }}
+                  aria-label={`Show level ${i + 1}`}
+                  aria-current={active === i ? 'true' : undefined}
+                  className={cn('h-2 rounded-full transition-all duration-300', active === i ? 'w-8 bg-theo-yellow' : 'w-2 bg-gray-300 hover:bg-gray-400')}
+                />
+              ))}
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="h-10 w-10 shrink-0 rounded-full border-gray-200 bg-white shadow-sm"
+              onClick={goNext}
+              aria-label="Next level"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Desktop: 3-up grid */}
+        <div className="hidden md:grid min-w-0 grid-cols-3 gap-6 md:items-stretch">
+          {levels.map((level, idx) => {
+            const isActive = idx === active;
             return (
               <motion.div
                 key={level.id}
@@ -334,41 +450,31 @@ function Pathway() {
                 <Card
                   role="button"
                   tabIndex={0}
-                  onClick={() => setActive(levelIdx)}
+                  onClick={() => setActive(idx)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      setActive(levelIdx);
+                      setActive(idx);
                     }
                   }}
                   className={`h-full rounded-[32px] overflow-hidden p-2 cursor-pointer transition-all duration-300 border bg-white ${
-                    isCenter
-                      ? 'border-2 border-theo-yellow shadow-xl scale-[1.02] md:scale-105 z-10'
+                    isActive
+                      ? 'border-2 border-theo-yellow shadow-xl scale-[1.02] md:scale-105'
                       : 'border border-gray-100 shadow-md hover:shadow-lg hover:border-gray-200'
                   }`}
                 >
                   <CardContent className="p-8 md:p-10">
                     <div className="flex flex-wrap items-center gap-3 mb-4">
-                      <h3 className={`font-bold ${isCenter ? 'text-2xl md:text-3xl' : 'text-xl md:text-2xl'}`}>{level.title}</h3>
+                      <h3 className="text-xl font-bold md:text-2xl">{level.title}</h3>
                       <div className={`px-3 py-1 font-bold text-sm rounded-full ${level.badgeClass}`}>{level.badge}</div>
                       <span className="text-gray-500 text-sm font-medium">{level.meta}</span>
                     </div>
-                    <p className={`text-gray-700 leading-relaxed ${isCenter ? 'text-lg md:text-xl font-medium' : 'text-base md:text-lg'}`}>{level.body}</p>
+                    <p className="text-base text-gray-700 leading-relaxed md:text-lg">{level.body}</p>
                   </CardContent>
                 </Card>
               </motion.div>
             );
           })}
-        </div>
-
-        <div className="mt-16 text-center max-w-4xl mx-auto border-t border-gray-200 pt-8">
-          <p className="text-lg font-bold text-gray-400 tracking-wide flex flex-col md:flex-row items-center justify-center gap-4">
-            <span>BASIC ENGLISH</span>
-            <ArrowRight className="hidden md:block w-4 h-4 text-theo-yellow" />
-            <span className="text-gray-800">ACADEMIC READINESS</span>
-            <ArrowRight className="hidden md:block w-4 h-4 text-theo-yellow" />
-            <span>MINISTRY FLUENCY</span>
-          </p>
         </div>
       </div>
     </section>
@@ -509,15 +615,66 @@ function TestimonialCard({ q, className }: { q: TestimonialQuote; className?: st
 // --- 8. STUDENT TESTIMONIALS ---
 function Testimonials() {
   const quotes: TestimonialQuote[] = [
-    { quote: "TheoLingua transformed how I read commentaries. I can now actively participate in deep theological discussions without hesitation.", author: "Birila A. Yimchunger", meta: "Level 2, Grace Biblical Seminary" },
-    { quote: "I wrote and practised my very first sermon efficiently. The grammar modules built into Scripture made everything click for me.", author: "Samuel M.", meta: "Level 1, Southern Bible Institute" },
-    { quote: "As a facilitator, the lesson plans save me hours of prep. The interactive games keep my GenZ students completely engaged.", author: "Dr. Abraham K.", meta: "Faculty, Bethel Bible College" },
-    { quote: "I passed my assignments with confidence. Previously, academic writing was a nightmare, but the structured practice truly helps.", author: "Esther R.", meta: "Level 2, Faith Theological Seminary" },
-    { quote: "The portal and workbooks together helped our cohort stay on track. Students finally feel equipped for English-medium classes.", author: "Rev. James P.", meta: "Academic Dean, Bible college in North India" },
+    {
+      quote:
+        'I appreciate the lesson on stative and dynamic verbs — it highlighted common speaking mistakes. Teaching the vocabulary along with the memory verse was truly commendable.',
+      author: 'Jemmy ma’am',
+      meta: 'JMBC Facilitator',
+    },
+    {
+      quote:
+        'TheoLingua provided strong academic support throughout the year. Students benefited from the lessons, interactive games, and the engaging online experience through gamification.',
+      author: 'Jemmy ma’am',
+      meta: 'JMBC Facilitator',
+    },
+    {
+      quote:
+        'TheoLingua lessons were effective and interesting because of the diverse teaching methodologies. Video lessons, activities, assignments, and assessments enhanced students’ English proficiency.',
+      author: 'Thresiamma (Susan) ma’am',
+      meta: 'ACCOT Facilitator',
+    },
+    {
+      quote:
+        'TheoLingua helped me improve listening, reading, and writing — and it gave me confidence to speak more fluently and correctly.',
+      author: 'Ngun Za Men',
+      meta: 'ACCOT student',
+    },
+    {
+      quote:
+        'Because of your guidance, learning English became easier for me. The videos and assignments helped me practise and speak with confidence.',
+      author: 'Salomi',
+      meta: 'ACCOT student',
+    },
+    {
+      quote:
+        'The grammar and classroom activities helped me start from the basics. I also enjoyed the Bible stories — they helped me learn English and study the Bible.',
+      author: 'Roshani Kashyap',
+      meta: 'ACCOT student',
+    },
+    {
+      quote:
+        'I learned how to form sentences and questions. The vocabulary and videos helped me improve a lot — I’m thankful for the chance to learn.',
+      author: 'Amrit Kunwar',
+      meta: 'ACCOT student',
+    },
+    {
+      quote:
+        'TheoLingua helped me with grammar, pronunciation, and making sentences. It taught me how to read and speak more correctly — thank you so much.',
+      author: 'Cung Mang Bawi',
+      meta: 'ACCOT student',
+    },
+    {
+      quote:
+        'The lessons focus on practical communication. The conversational practice built my confidence in speaking.',
+      author: 'Yedida Abhishek',
+      meta: 'ACCOT student',
+    },
   ];
 
   const [mobileSlide, setMobileSlide] = useState(0);
+  const [showAll, setShowAll] = useState(false);
   const n = quotes.length;
+  const visibleQuotes = showAll ? quotes : quotes.slice(0, 6);
 
   const goPrev = () => setMobileSlide((i) => (i - 1 + n) % n);
   const goNext = () => setMobileSlide((i) => (i + 1) % n);
@@ -585,39 +742,28 @@ function Testimonials() {
           </div>
         </div>
 
-        {/* md–xl: 3 + 2 rows */}
-        <div className="hidden md:block 2xl:hidden">
-          <div className="grid grid-cols-2 gap-5 lg:gap-6 xl:grid-cols-3 xl:gap-7">
-            {quotes.slice(0, 3).map((q, idx) => (
-              <div
-                key={idx}
-                className={cn(
-                  'min-w-0',
-                  idx === 2 && 'col-span-2 flex justify-center xl:col-span-1 xl:block'
-                )}
-              >
-                <div className={cn('w-full', idx === 2 && 'max-w-lg xl:max-w-none')}>
-                  <TestimonialCard q={q} />
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="mx-auto mt-5 grid max-w-2xl grid-cols-1 gap-5 sm:max-w-none sm:grid-cols-2 lg:mt-6 lg:gap-6 xl:max-w-4xl">
-            {quotes.slice(3).map((q, idx) => (
-              <div key={idx + 3} className="min-w-0">
+        {/* md+: responsive grid (keeps section compact) */}
+        <div className="hidden md:block">
+          <div className="grid grid-cols-2 gap-5 lg:grid-cols-3 lg:gap-6 xl:gap-7">
+            {visibleQuotes.map((q, idx) => (
+              <div key={idx} className="min-w-0">
                 <TestimonialCard q={q} />
               </div>
             ))}
           </div>
-        </div>
 
-        {/* 2xl: single row */}
-        <div className="hidden 2xl:grid 2xl:grid-cols-5 2xl:gap-5">
-          {quotes.map((q, idx) => (
-            <div key={idx} className="min-w-0">
-              <TestimonialCard q={q} />
+          {quotes.length > 6 && (
+            <div className="mt-8 flex justify-center">
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-full border-gray-200 bg-white px-6 py-6 text-base font-bold text-theo-black shadow-sm hover:bg-gray-50"
+                onClick={() => setShowAll((v) => !v)}
+              >
+                {showAll ? 'Show fewer' : 'Show more'}
+              </Button>
             </div>
-          ))}
+          )}
         </div>
 
         <div className="mx-auto mt-10 max-w-3xl rounded-2xl border border-gray-100 bg-white/90 px-4 py-5 shadow-sm backdrop-blur-sm sm:mt-12 sm:px-6 sm:py-6 md:mt-14 md:flex md:max-w-none md:items-center md:justify-center md:gap-10 md:px-8 md:py-7">
@@ -689,13 +835,6 @@ function Institutions() {
           >
             Book a Demo
           </Button>
-          <p className="text-sm font-semibold text-gray-400 flex items-center justify-center gap-3 flex-wrap">
-            <span>No credit card required</span>
-            <span>&middot;</span>
-            <span>30-minute session</span>
-            <span>&middot;</span>
-            <span>For seminaries and Bible colleges</span>
-          </p>
         </div>
       </div>
     </section>
@@ -729,7 +868,7 @@ function GetStartedCTA() {
             <CardContent className="flex h-full flex-col items-center p-8 text-center md:p-10">
               <h3 className="mb-3 text-2xl font-bold">New here?</h3>
               <p className="mb-8 flex-1 text-gray-300">Create a free account to explore.</p>
-              <Link href="/auth/register" className="w-full">
+              <Link href="/auth/login?mode=signup" className="w-full">
                 <Button className="w-full bg-theo-yellow hover:bg-[#b0bd2a] text-theo-black rounded-full py-6 text-lg font-bold">
                   Start Free
                 </Button>
@@ -738,15 +877,6 @@ function GetStartedCTA() {
           </Card>
         </div>
 
-        <div className="text-center">
-          <p className="text-sm font-bold text-gray-400 flex items-center justify-center gap-3 flex-wrap uppercase tracking-wider">
-            <span>No credit card required</span>
-            <span className="text-theo-yellow">&bull;</span>
-            <span>Free trial available</span>
-            <span className="text-theo-yellow">&bull;</span>
-            <span>Cancel anytime</span>
-          </p>
-        </div>
       </div>
     </section>
   );
