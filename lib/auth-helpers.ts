@@ -40,7 +40,7 @@ export async function createUserWithPassword(input: CreateUserInput) {
       name: name || email.split('@')[0],
       displayName: displayName || name || email.split('@')[0],
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      role: (role as any) || 'USER',
+      role: (role as any) || 'STUDENT',
       collegeName: collegeName || null,
       phone: phone || null,
       isActive: isActive !== undefined ? isActive : true,

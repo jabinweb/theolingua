@@ -59,7 +59,11 @@ export async function GET() {
       smtpFromName: 'ScioLabs Team'
     });
 
-    return NextResponse.json(settingsObj);
+    return NextResponse.json({
+      ...settingsObj,
+      rbacConfig: settingsObj.RBAC_CONFIG || null,
+      programPlural: settingsObj.PROGRAM_PLURAL || settingsObj.programPlural || 'Programs',
+    });
   } catch (error) {
     console.error('Unexpected error fetching settings:', error);
     
@@ -180,5 +184,32 @@ function getSettingCategory(key: string): string {
   if (key.includes('smtp') || key.includes('email') || key.includes('mail')) return 'email';
   if (key.includes('site') || key.includes('contact') || key.includes('support') || key.includes('description')) return 'general';
   if (key.includes('maintenance')) return 'system';
+  if (key === 'RBAC_CONFIG') return 'system';
   return 'general';
+}
+
+export async function PATCH(request: Request) {
+  try {
+    const data = await request.json();
+
+    if (data.rbacConfig !== undefined) {
+      await prisma.adminSettings.upsert({
+        where: { key: 'RBAC_CONFIG' },
+        update: { value: String(data.rbacConfig), updatedAt: new Date() },
+        create: {
+          key: 'RBAC_CONFIG',
+          value: String(data.rbacConfig),
+          description: 'Role-based access control configuration',
+          category: 'system',
+          dataType: 'string',
+          isPublic: false,
+        },
+      });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error patching settings:', error);
+    return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 });
+  }
 }

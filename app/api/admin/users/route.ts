@@ -1,27 +1,29 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { isAdminOrModerator } from '@/lib/auth-utils';
 
 export async function GET() {
+  const [authOk, authVal] = await isAdminOrModerator();
+  if (!authOk) return authVal;
+
   try {
-    // Get all users with their subscriptions and payments
     const users = await prisma.user.findMany({
       include: {
-        subscriptions: {
-          orderBy: { created_at: 'desc' }
-        },
-        payments: {
-          orderBy: { created_at: 'desc' }
-        }
+        subscriptions: { orderBy: { created_at: 'desc' } },
+        payments: { orderBy: { created_at: 'desc' } },
+        batch: { select: { id: true, name: true } },
+        progress: { select: { timeSpent: true } },
       },
-      orderBy: { created_at: 'desc' }
+      orderBy: { created_at: 'desc' },
     });
 
-    // Transform data to match expected format
-    const usersWithSubscriptions = users.map((user: typeof users[number]) => {
-      const activeSubscription = user.subscriptions.find((sub: typeof user.subscriptions[number]) => sub.status === 'ACTIVE');
-      const completedPayments = user.payments.filter((payment: typeof user.payments[number]) => payment.status === 'COMPLETED');
-      
+    const usersWithSubscriptions = users.map((user) => {
+      const activeSubscription = user.subscriptions.find((sub) => sub.status === 'ACTIVE');
+      const completedPayments = user.payments.filter((payment) => payment.status === 'COMPLETED');
+      const totalSecondsSpent = user.progress.reduce((acc, p) => acc + (p.timeSpent || 0), 0);
+      const totalTimeSpent = Math.floor(totalSecondsSpent / 60);
+
       return {
         uid: user.id,
         email: user.email || '',
@@ -30,28 +32,30 @@ export async function GET() {
         collegeName: user.collegeName || null,
         phone: user.phone || null,
         creationTime: user.created_at,
-        lastSignInTime: user.updatedAt, // Using updatedAt as proxy for last login
-        role: user.role || 'USER',
+        lastSignInTime: user.updatedAt,
+        role: user.role || 'STUDENT',
         isActive: user.isActive !== undefined ? user.isActive : true,
-        subscription: activeSubscription ? {
-          id: activeSubscription.id,
-          status: activeSubscription.status,
-          amount: activeSubscription.amount,
-          planType: activeSubscription.planType,
-          startDate: activeSubscription.startDate,
-          endDate: activeSubscription.endDate,
-          created_at: activeSubscription.created_at
-        } : null,
+        subscription: activeSubscription
+          ? {
+              id: activeSubscription.id,
+              status: activeSubscription.status,
+              amount: activeSubscription.amount,
+              planType: activeSubscription.planType,
+              startDate: activeSubscription.startDate,
+              endDate: activeSubscription.endDate,
+              created_at: activeSubscription.created_at,
+            }
+          : null,
         hasActiveSubscription: !!activeSubscription,
         totalPayments: user.payments.length,
-        totalAmountPaid: completedPayments.reduce((sum: number, payment: { amount: number; status: string }) => sum + payment.amount, 0)
+        totalAmountPaid: completedPayments.reduce((sum, payment) => sum + payment.amount, 0),
+        totalTimeSpent,
+        batchId: user.batchId,
+        batch: user.batch,
       };
     });
 
-    // Filter out any invalid entries
-    const validUsers = usersWithSubscriptions.filter(u => u && u.uid && u.email);
-
-    return NextResponse.json(validUsers);
+    return NextResponse.json(usersWithSubscriptions.filter((u) => u && u.uid && u.email));
   } catch (error) {
     console.error('Error fetching users:', error);
     return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
@@ -59,19 +63,27 @@ export async function GET() {
 }
 
 export async function DELETE(request: Request) {
+  const [authOk, authVal] = await isAdminOrModerator();
+  if (!authOk) return authVal;
+
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('id');
-    
+
     if (!userId) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }
 
-    // Delete user (cascade will handle related records)
-    await prisma.user.delete({
-      where: { id: userId }
+    const targetUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
     });
 
+    if (targetUser?.role === 'ADMIN' && authVal.role === 'MODERATOR') {
+      return NextResponse.json({ error: 'Moderators cannot delete administrator users' }, { status: 403 });
+    }
+
+    await prisma.user.delete({ where: { id: userId } });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting user:', error);
@@ -80,48 +92,50 @@ export async function DELETE(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const [authOk, authVal] = await isAdminOrModerator();
+  if (!authOk) return authVal;
+
   try {
-    const { email, displayName, password, role, isActive, collegeName, phone } = await request.json();
-    
+    const { email, displayName, password, role, isActive, collegeName, phone, batchId } = await request.json();
+
     if (!email || !displayName || !password) {
       return NextResponse.json({ error: 'Email, display name, and password are required' }, { status: 400 });
     }
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
-    });
-
+    const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return NextResponse.json({ error: 'User with this email already exists' }, { status: 400 });
     }
 
-    // Hash the password
+    if (role === 'ADMIN' && authVal.role === 'MODERATOR') {
+      return NextResponse.json({ error: 'Moderators cannot create administrator users' }, { status: 403 });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user record in database
     const user = await prisma.user.create({
       data: {
-        email: email,
+        email,
         name: displayName,
         password: hashedPassword,
-        role: role || 'USER',
+        role: role || 'STUDENT',
         isActive: isActive !== undefined ? isActive : true,
         collegeName: collegeName || null,
         phone: phone || null,
-        emailVerified: new Date(), // Mark as verified for admin-created users
-      }
+        batchId: batchId || null,
+        emailVerified: new Date(),
+      },
     });
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       user: {
         id: user.id,
         email: user.email,
         displayName: user.name,
         role: user.role,
         isActive: user.isActive,
-      }
+      },
     });
   } catch (error) {
     console.error('Error creating user:', error);
@@ -130,37 +144,49 @@ export async function POST(request: Request) {
 }
 
 export async function PATCH(request: Request) {
+  const [authOk, authVal] = await isAdminOrModerator();
+  if (!authOk) return authVal;
+
   try {
-    const { userId, displayName, role, isActive, collegeName, phone } = await request.json();
-    
+    const { userId, displayName, role, isActive, collegeName, phone, batchId } = await request.json();
+
     if (!userId) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }
 
-    const updateData: { 
-      name?: string; 
-      role?: 'USER' | 'ADMIN' | 'TEACHER' | 'MODERATOR'; 
+    const updateData: {
+      name?: string;
+      role?: 'STUDENT' | 'ADMIN' | 'TEACHER' | 'MODERATOR';
       isActive?: boolean;
       collegeName?: string;
       phone?: string;
+      batchId?: string | null;
     } = {};
-    
+
     if (displayName !== undefined) updateData.name = displayName;
     if (role !== undefined) updateData.role = role;
     if (isActive !== undefined) updateData.isActive = isActive;
     if (collegeName !== undefined) updateData.collegeName = collegeName;
     if (phone !== undefined) updateData.phone = phone;
+    if (batchId !== undefined) updateData.batchId = batchId || null;
 
-    // Update user in database
-    await prisma.user.update({
+    if (role === 'ADMIN' && authVal.role === 'MODERATOR') {
+      return NextResponse.json({ error: 'Moderators cannot promote users to administrator' }, { status: 403 });
+    }
+
+    const targetUser = await prisma.user.findUnique({
       where: { id: userId },
-      data: updateData
+      select: { role: true },
     });
 
+    if (targetUser?.role === 'ADMIN' && authVal.role === 'MODERATOR') {
+      return NextResponse.json({ error: 'Moderators cannot modify administrator users' }, { status: 403 });
+    }
+
+    await prisma.user.update({ where: { id: userId }, data: updateData });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error updating user:', error);
     return NextResponse.json({ error: 'Failed to update user' }, { status: 500 });
   }
 }
-

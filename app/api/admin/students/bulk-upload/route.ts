@@ -127,7 +127,7 @@ export async function POST(request: Request) {
               name: studentData.name,
               collegeName: studentData.college_name,
               phone: studentData.phone,
-              role: 'USER',
+              role: 'STUDENT',
               isActive: true,
             }
           });
@@ -141,7 +141,7 @@ export async function POST(request: Request) {
             password: DEFAULT_PASSWORD,
             collegeName: studentData.college_name,
             phone: studentData.phone,
-            role: 'USER',
+            role: 'STUDENT',
             isActive: true,
           });
           

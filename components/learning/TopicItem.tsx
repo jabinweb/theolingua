@@ -18,15 +18,17 @@ const getTopicIcon = (contentType: string | undefined) => {
 interface TopicItemProps {
   topic: DbTopic;
   isCompleted: boolean;
-  isDisabled?: boolean; // Whether this topic is locked/disabled
+  isDisabled?: boolean;
+  accentColor?: string;
   onClick: (topic: DbTopic) => void;
-  onLockedClick?: () => void; // New prop for handling locked item clicks
+  onLockedClick?: () => void;
 }
 
 export function TopicItem({ 
   topic, 
   isCompleted, 
   isDisabled = false,
+  accentColor: _accentColor = 'from-blue-500 to-blue-600',
   onClick,
   onLockedClick
 }: TopicItemProps) {

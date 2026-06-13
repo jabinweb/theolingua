@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -54,7 +55,7 @@ interface UserFormData {
   email: string;
   displayName: string;
   password: string;
-  role: 'USER' | 'ADMIN' | 'MODERATOR' | 'TEACHER';
+  role: 'STUDENT' | 'ADMIN' | 'MODERATOR' | 'TEACHER';
   isActive: boolean;
   collegeName: string;
   phone: string;
@@ -74,7 +75,7 @@ export default function UsersPage() {
     email: '',
     displayName: '',
     password: '',
-    role: 'USER',
+    role: 'STUDENT',
     isActive: true,
     collegeName: '',
     phone: '',
@@ -211,7 +212,7 @@ export default function UsersPage() {
       email: '',
       displayName: '',
       password: '',
-      role: 'USER',
+      role: 'STUDENT',
       isActive: true,
       collegeName: '',
       phone: '',
@@ -224,7 +225,7 @@ export default function UsersPage() {
       email: user.email,
       displayName: user.displayName || '',
       password: '', // Don't populate password for editing
-      role: (user.role as 'USER' | 'ADMIN' | 'MODERATOR' | 'TEACHER') || 'USER',
+      role: (user.role as 'STUDENT' | 'ADMIN' | 'MODERATOR' | 'TEACHER') || 'STUDENT',
       isActive: user.isActive !== false,
       collegeName: user.collegeName || '',
       phone: user.phone || '',
@@ -545,7 +546,7 @@ export default function UsersPage() {
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl border-theo-black/5">
                     <SelectItem value="all">Every Role</SelectItem>
-                    <SelectItem value="USER">Students</SelectItem>
+                    <SelectItem value="STUDENT">Students</SelectItem>
                     <SelectItem value="TEACHER">Staff</SelectItem>
                     <SelectItem value="MODERATOR">Mentors</SelectItem>
                     <SelectItem value="ADMIN">Admins</SelectItem>
@@ -782,7 +783,9 @@ export default function UsersPage() {
                                 </AvatarFallback>
                               </Avatar>
                               <div>
-                                <div className="font-medium">{registeredUser.displayName || 'Anonymous'}</div>
+                                <Link href={`/admin/users/${registeredUser.uid}`} className="font-medium hover:text-theo-yellow hover:underline">
+                                  {registeredUser.displayName || 'Anonymous'}
+                                </Link>
                                 <div className="text-xs text-muted-foreground">{registeredUser.email}</div>
                                 {registeredUser.phone && (
                                   <div className="text-xs text-muted-foreground">📱 {registeredUser.phone}</div>
@@ -797,7 +800,7 @@ export default function UsersPage() {
                             <Badge 
                               variant={registeredUser.role === 'ADMIN' ? 'destructive' : registeredUser.role === 'TEACHER' ? 'default' : 'outline'}
                             >
-                              {registeredUser.role || 'USER'}
+                              {registeredUser.role || 'STUDENT'}
                             </Badge>
                           </td>
                           <td className="p-3">
@@ -1014,7 +1017,7 @@ export default function UsersPage() {
                   <Label htmlFor="role">Role</Label>
                   <Select
                     value={formData.role}
-                    onValueChange={(value: 'USER' | 'ADMIN' | 'MODERATOR' | 'TEACHER') => 
+                    onValueChange={(value: 'STUDENT' | 'ADMIN' | 'MODERATOR' | 'TEACHER') => 
                       setFormData(prev => ({ ...prev, role: value }))
                     }
                   >
@@ -1022,7 +1025,7 @@ export default function UsersPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="USER">User</SelectItem>
+                      <SelectItem value="STUDENT">Student</SelectItem>
                       <SelectItem value="TEACHER">Teacher</SelectItem>
                       <SelectItem value="MODERATOR">Moderator</SelectItem>
                       <SelectItem value="ADMIN">Admin</SelectItem>

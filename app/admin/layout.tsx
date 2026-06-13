@@ -5,7 +5,9 @@ import { LoadingScreen } from '@/components/ui/loading-screen';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Menu } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
 
 export default function AdminLayout({
   children,
@@ -20,10 +22,8 @@ export default function AdminLayout({
 
   useEffect(() => {
     if (status === 'unauthenticated') {
-      // Redirect to login page with admin redirect
       router.push('/auth/login?redirect=/admin');
-    } else if (user && userRole && userRole !== 'ADMIN') {
-      // Redirect non-admin users to home page
+    } else if (user && userRole && userRole !== 'ADMIN' && userRole !== 'TEACHER' && userRole !== 'MODERATOR') {
       router.push('/');
     }
   }, [status, router, user, userRole]);
@@ -33,11 +33,10 @@ export default function AdminLayout({
   }
 
   if (!user) {
-    return <LoadingScreen />; // Show loading while redirecting
+    return <LoadingScreen />;
   }
 
-  // Show access denied if user is not admin
-  if (userRole !== 'ADMIN') {
+  if (userRole !== 'ADMIN' && userRole !== 'TEACHER' && userRole !== 'MODERATOR') {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -51,13 +50,35 @@ export default function AdminLayout({
 
   return (
     <div className="h-screen bg-background flex overflow-hidden">
-      <div className="h-full overflow-y-auto">
+      <aside className="hidden md:flex h-full border-r bg-white overflow-y-auto w-72 shrink-0">
         <AdminSidebar />
-      </div>
-      <div className="flex-1 h-full overflow-y-auto">
-        {children}
+      </aside>
+
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+        <header className="md:hidden flex items-center justify-between px-4 py-3 border-b bg-white shrink-0">
+          <div className="flex items-center gap-2">
+            <AdminMobileNav />
+            <span className="font-bold text-slate-800">Admin Panel</span>
+          </div>
+        </header>
+
+        <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
   );
 }
- 
+
+function AdminMobileNav() {
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="ghost" size="icon" className="md:hidden">
+          <Menu className="h-5 w-5" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="p-0 w-72">
+        <AdminSidebar isMobile />
+      </SheetContent>
+    </Sheet>
+  );
+}

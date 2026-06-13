@@ -34,7 +34,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               email: user.email,
               name: user.name || profile?.name || user.email.split('@')[0],
               image: user.image || profile?.picture,
-              role: 'USER',
+              role: 'STUDENT',
               isActive: true,
               lastLoginAt: new Date(),
             },
@@ -61,7 +61,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.sub || ""
-        session.user.role = token.role ? String(token.role) as typeof session.user.role : 'USER'
+        session.user.role = token.role ? String(token.role) as typeof session.user.role : 'STUDENT'
       }
       return session
     },

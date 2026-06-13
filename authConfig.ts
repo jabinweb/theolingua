@@ -90,12 +90,19 @@ export default {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user
+      const role = auth?.user?.role
       const isOnDashboard = nextUrl.pathname.startsWith('/dashboard')
       const isOnAdmin = nextUrl.pathname.startsWith('/admin')
-      
-      if (isOnDashboard || isOnAdmin) {
+
+      if (isOnAdmin) {
+        if (!isLoggedIn) return false
+        if (role === 'ADMIN' || role === 'TEACHER' || role === 'MODERATOR') return true
+        return Response.redirect(new URL('/dashboard', nextUrl))
+      }
+
+      if (isOnDashboard) {
         if (isLoggedIn) return true
-        return false // Redirect unauthenticated users to login page
+        return false
       }
       return true
     },
@@ -108,7 +115,7 @@ export default {
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.sub || ""
-        session.user.role = token.role ? String(token.role) as typeof session.user.role : 'USER'
+        session.user.role = token.role ? String(token.role) as typeof session.user.role : 'STUDENT'
       }
       return session
     },

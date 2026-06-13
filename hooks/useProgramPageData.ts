@@ -11,6 +11,8 @@ interface UnitAccessData {
   hasAccess: boolean;
   accessType: string;
   accessibleChapters?: string[];
+  daysRemaining?: number;
+  dripLocked?: boolean;
 }
 
 interface ProgramAccessResponse {
@@ -26,6 +28,7 @@ interface UseProgramPageDataResult {
   markTopicComplete: (topicId: string, completed?: boolean) => Promise<void>;
   unitAccess: Record<string, boolean>;
   unitAccessTypes: Record<string, string>;
+  unitDaysRemaining: Record<string, number>;
   chapterAccess: Record<string, boolean>;
   accessType: string;
   accessMessage: string;
@@ -37,24 +40,27 @@ export function useProgramPageData(programId: string): UseProgramPageDataResult 
   const { data: session } = useSession();
   const user = session?.user;
   const router = useRouter();
-  
-  // Use the existing program data hook
-  const { currentProgram, userProgress, loading: programDataLoading, error: programDataError, markTopicComplete } = useProgramData(programId);
-  
-  // Access verification state
+
+  const {
+    currentProgram,
+    userProgress,
+    loading: programDataLoading,
+    error: programDataError,
+    markTopicComplete,
+  } = useProgramData(programId);
+
   const [unitAccess, setUnitAccess] = useState<Record<string, boolean>>({});
   const [unitAccessTypes, setUnitAccessTypes] = useState<Record<string, string>>({});
+  const [unitDaysRemaining, setUnitDaysRemaining] = useState<Record<string, number>>({});
   const [chapterAccess, setChapterAccess] = useState<Record<string, boolean>>({});
   const [accessType, setAccessType] = useState<string>('');
   const [accessMessage, setAccessMessage] = useState<string>('');
   const [accessLoading, setAccessLoading] = useState(true);
   const [accessError, setAccessError] = useState<string | null>(null);
 
-  // Combined loading state
   const loading = programDataLoading || accessLoading;
   const error = programDataError || accessError;
 
-  // Get unit-level access data when user and programId are available
   useEffect(() => {
     const getUnitAccess = async () => {
       if (!user?.id || !programId) {
@@ -68,44 +74,38 @@ export function useProgramPageData(programId: string): UseProgramPageDataResult 
         const data: ProgramAccessResponse = await response.json();
 
         if (response.ok) {
-          // With free trial, all logged-in users have access to at least the first unit
-          // No need to redirect - let the program page handle showing locked/unlocked units
-          
           setAccessType(data.accessType);
           setAccessMessage(
-            data.hasFullAccess 
+            data.hasFullAccess
               ? 'Full Access'
-              : data.unitAccess.some((s: UnitAccessData) => s.hasAccess)
-              ? 'Partial access - some units available'
-              : 'Limited access'
+              : data.unitAccess.some((s) => s.hasAccess)
+                ? 'Partial access - some units available'
+                : 'Limited access'
           );
 
-          // Set unit-level access
           const unitAccessMap: Record<string, boolean> = {};
           const unitAccessTypesMap: Record<string, string> = {};
+          const unitDaysRemainingMap: Record<string, number> = {};
           const chapterAccessMap: Record<string, boolean> = {};
-          
-          data.unitAccess.forEach((unit: UnitAccessData) => {
+
+          data.unitAccess.forEach((unit) => {
             unitAccessMap[unit.id] = unit.hasAccess;
             unitAccessTypesMap[unit.id] = unit.accessType;
-            
-            // Build chapter-level access map
-            if (unit.accessibleChapters) {
-              unit.accessibleChapters.forEach(chapterId => {
-                chapterAccessMap[chapterId] = true;
-              });
-            }
+            unitDaysRemainingMap[unit.id] = unit.daysRemaining ?? 0;
+
+            unit.accessibleChapters?.forEach((chapterId) => {
+              chapterAccessMap[chapterId] = true;
+            });
           });
-          
+
           setUnitAccess(unitAccessMap);
           setUnitAccessTypes(unitAccessTypesMap);
+          setUnitDaysRemaining(unitDaysRemainingMap);
           setChapterAccess(chapterAccessMap);
         } else {
-          console.error('Error checking access:', data.error);
           setAccessError(data.error || 'Failed to check access');
         }
-      } catch (error) {
-        console.error('Error getting unit access:', error);
+      } catch {
         setAccessError('Network error while checking access');
       } finally {
         setAccessLoading(false);
@@ -121,6 +121,7 @@ export function useProgramPageData(programId: string): UseProgramPageDataResult 
     markTopicComplete,
     unitAccess,
     unitAccessTypes,
+    unitDaysRemaining,
     chapterAccess,
     accessType,
     accessMessage,

@@ -33,7 +33,7 @@ export async function GET(request: Request) {
 
     const students = await prisma.user.findMany({
       where: {
-        role: 'USER',
+        role: 'STUDENT',
         ...(schoolId && { schoolId })
       },
       include: {
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
       data: {
         name,
         email,
-        role: 'USER',
+        role: 'STUDENT',
         schoolId,
         grade,
         section,
