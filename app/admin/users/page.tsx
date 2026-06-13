@@ -499,26 +499,26 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="p-8 bg-theo-white/30 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-12">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+    <div className="min-w-0">
+      <div className="min-w-0 w-full">
+        <div className="mb-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <h1 className="text-5xl font-bold text-theo-black tracking-tight mb-2">
+              <h1 className="text-xl font-bold tracking-tighter text-theo-black sm:text-2xl mb-1">
                 User Directory
               </h1>
-              <p className="text-gray-500 font-medium text-lg">Manage registered students, faculty and administrative roles</p>
+              <p className="text-sm text-gray-600 sm:text-base">Manage registered students, faculty and administrative roles</p>
             </div>
-            <div className="flex gap-4">
-              <Button onClick={refreshData} variant="outline" disabled={dataLoading} className="rounded-2xl h-11 px-6">
+            <div className="page-toolbar-actions">
+              <Button onClick={refreshData} variant="outline" disabled={dataLoading} className="h-9 px-4">
                 <RefreshCw className={`h-4 w-4 mr-2 ${dataLoading ? 'animate-spin' : ''}`} />
                 Refresh
               </Button>
-              <Button onClick={() => setBulkUploadOpen(true)} variant="theo-black" className="rounded-2xl h-11 px-6">
+              <Button onClick={() => setBulkUploadOpen(true)} variant="theo-black" className="h-9 px-4">
                 <Upload className="h-4 w-4 mr-2" />
                 Bulk Actions
               </Button>
-              <Button onClick={() => setFormOpen(true)} variant="theo" className="rounded-2xl h-11 px-6 shadow-lg shadow-theo-yellow/20">
+              <Button onClick={() => setFormOpen(true)} variant="theo" className="h-9 px-4 shadow-lg shadow-theo-yellow/20">
                 <Plus className="h-5 w-5 mr-2" />
                 Add User
               </Button>
@@ -536,12 +536,12 @@ export default function UsersPage() {
                   placeholder="Query students, faculty or institutions..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 h-12 rounded-2xl border-theo-black/5 bg-gray-50/50 focus:bg-white transition-all"
+                  className="h-9 rounded-lg border-theo-black/5 bg-gray-50/50 pl-10 focus:bg-white transition-all"
                 />
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-2 sm:gap-3">
                 <Select value={filterRole} onValueChange={setFilterRole}>
-                  <SelectTrigger className="w-[160px] h-12 rounded-2xl border-theo-black/5 bg-gray-50/50">
+                  <SelectTrigger className="h-9 w-full rounded-lg border-theo-black/5 bg-gray-50/50 sm:w-36">
                     <SelectValue placeholder="All Roles" />
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl border-theo-black/5">
@@ -553,7 +553,7 @@ export default function UsersPage() {
                   </SelectContent>
                 </Select>
                 <Select value={filterStatus} onValueChange={setFilterStatus}>
-                  <SelectTrigger className="w-[180px] h-12 rounded-2xl border-theo-black/5 bg-gray-50/50">
+                  <SelectTrigger className="h-9 w-full rounded-lg border-theo-black/5 bg-gray-50/50 sm:w-40">
                     <SelectValue placeholder="All Status" />
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl border-theo-black/5">

@@ -62,8 +62,8 @@ export default function AdminLayout({
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto bg-theo-white">
-          <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 md:py-8">{children}</div>
+        <main className="app-shell flex-1 overflow-x-hidden overflow-y-auto bg-theo-white">
+          <div className="mx-auto w-full min-w-0 max-w-7xl px-4 py-4 sm:px-6 md:py-5">{children}</div>
         </main>
       </div>
     </div>

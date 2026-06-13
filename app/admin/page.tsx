@@ -196,11 +196,11 @@ export default function AdminPage() {
               <p className="text-gray-600">Platform statistics and management</p>
             </div>
             <div className="flex gap-4">
-              <Button onClick={refreshData} disabled={dataLoading} variant="outline" className="rounded-2xl h-12 px-6">
+              <Button onClick={refreshData} disabled={dataLoading} variant="outline" className="h-9 px-4">
                 <RefreshCw className={`h-4 w-4 mr-2 ${dataLoading ? 'animate-spin' : ''}`} />
                 Refresh
               </Button>
-              <Button onClick={() => setTopicFormOpen(true)} variant="theo" className="rounded-2xl h-12 px-6">
+              <Button onClick={() => setTopicFormOpen(true)} variant="theo" className="h-9 px-4">
                 <Plus className="h-5 w-5 mr-2" />
                 Add Topic
               </Button>
@@ -209,7 +209,7 @@ export default function AdminPage() {
         </div>
 
         {/* Quick Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="admin-stats-grid">
           <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total Users</CardTitle>
@@ -283,11 +283,11 @@ export default function AdminPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <div className="flex justify-between items-center">
+                <div className="flex items-center justify-between gap-2">
                   <span className="text-sm text-gray-600">New Registrations</span>
                   <Badge variant="secondary">{weeklyRegistrations}</Badge>
                 </div>
-                <div className="flex justify-between items-center">
+                <div className="flex items-center justify-between gap-2">
                   <span className="text-sm text-gray-600">User Activities</span>
                   <Badge variant="secondary">{signups.filter(s => {
                     const weekAgo = new Date();
@@ -308,11 +308,11 @@ export default function AdminPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <div className="flex justify-between items-center">
+                <div className="flex items-center justify-between gap-2">
                   <span className="text-sm text-gray-600">Total Subscriptions</span>
                   <Badge variant="secondary">{subscriptions.length}</Badge>
                 </div>
-                <div className="flex justify-between items-center">
+                <div className="flex items-center justify-between gap-2">
                   <span className="text-sm text-gray-600">Avg. Subscription Value</span>
                   <Badge variant="secondary">₹{subscriptions.length > 0 ? (totalRevenue/subscriptions.length/100).toFixed(0) : 0}</Badge>
                 </div>
@@ -329,11 +329,11 @@ export default function AdminPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <div className="flex justify-between items-center">
+                <div className="flex items-center justify-between gap-2">
                   <span className="text-sm text-gray-600">New Users</span>
                   <Badge className="bg-green-100 text-green-700 hover:bg-green-100">{todayRegistrations}</Badge>
                 </div>
-                <div className="flex justify-between items-center">
+                <div className="flex items-center justify-between gap-2">
                   <span className="text-sm text-gray-600">New Subscriptions</span>
                   <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
                     {subscriptions.filter(s => 

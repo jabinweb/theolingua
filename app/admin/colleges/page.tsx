@@ -194,22 +194,22 @@ export default function CollegesPage() {
   }
 
   return (
-    <div className="p-8 bg-theo-white/30 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-12">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+    <div className="space-y-4">
+      <div className="min-w-0 w-full">
+        <div className="mb-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <h1 className="text-5xl font-bold text-theo-black tracking-tight mb-2">
+              <h1 className="text-xl font-bold tracking-tighter text-theo-black sm:text-2xl mb-1">
                 College Management
               </h1>
-              <p className="text-gray-500 font-medium text-lg">Manage partner institutions and student distribution</p>
+              <p className="text-sm text-gray-600 sm:text-base">Manage partner institutions and student distribution</p>
             </div>
             <div className="flex gap-4">
-              <Button onClick={fetchColleges} variant="outline" disabled={loading} className="rounded-2xl h-11 px-6">
+              <Button onClick={fetchColleges} variant="outline" disabled={loading} className="h-9 px-4">
                 <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                 Refresh
               </Button>
-              <Button onClick={() => setFormOpen(true)} variant="theo" className="rounded-2xl h-11 px-6 shadow-lg shadow-theo-yellow/20">
+              <Button onClick={() => setFormOpen(true)} variant="theo" className="h-9 px-4 shadow-lg shadow-theo-yellow/20">
                 <Plus className="h-5 w-5 mr-2" />
                 Add College
               </Button>
@@ -222,10 +222,10 @@ export default function CollegesPage() {
             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="admin-card-grid">
             {colleges.map((school) => (
-              <Card key={school.id} className="border-0 shadow-sm rounded-[32px] overflow-hidden group hover:shadow-xl transition-all duration-300">
-                <CardHeader className="p-8">
+              <Card key={school.id} className="border-0 shadow-sm rounded-xl overflow-hidden group hover:shadow-xl transition-all duration-300">
+                <CardHeader className="">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-2xl font-bold text-theo-black flex items-center gap-3">
                       <div className="h-12 w-12 rounded-2xl bg-theo-yellow/10 flex items-center justify-center group-hover:scale-110 transition-transform">

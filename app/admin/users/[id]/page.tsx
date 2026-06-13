@@ -47,7 +47,7 @@ export default async function UserAnalyticsPage({ params }: { params: Promise<{ 
   const formattedTimeSpent = `${Math.floor(totalTimeSpent / 3600)}h ${Math.floor((totalTimeSpent % 3600) / 60)}m`;
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8 fade-in animate-in">
+    <div className="min-w-0 w-full min-w-0 w-full space-y-8 fade-in animate-in">
       {/* Header Navigation */}
       <div className="flex items-center gap-4">
         <Link href="/admin/users" className="h-10 w-10 flex items-center justify-center rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-colors shadow-sm">
@@ -168,7 +168,7 @@ export default async function UserAnalyticsPage({ params }: { params: Promise<{ 
              <div className="max-h-[500px] overflow-y-auto p-6 space-y-3">
                 {user.progress.length > 0 ? (
                   user.progress.map((prog) => (
-                    <div key={prog.id} className="flex justify-between items-center p-4 rounded-xl border border-slate-100 bg-white hover:bg-slate-50 transition-colors">
+                    <div key={prog.id} className="flex flex-col gap-2 rounded-xl border border-slate-100 bg-white p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
                       <div>
                         <p className="text-sm font-bold text-slate-800 line-clamp-1">{prog.topic.name}</p>
                         <p className="text-xs font-medium text-slate-500 mt-0.5">{prog.topic.chapter.subject.name} • {prog.topic.chapter.name}</p>

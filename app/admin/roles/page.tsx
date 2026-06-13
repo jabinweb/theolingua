@@ -193,7 +193,7 @@ export default function GlobalRBACPage() {
   return (
     <div className="p-6">
       <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+        <div className="page-toolbar mb-8">
           <div>
             <h1 className="text-3xl font-bold mb-2">Global RBAC Settings</h1>
             <p className="text-muted-foreground">Manage system-wide roles and access levels</p>
@@ -351,8 +351,8 @@ export default function GlobalRBACPage() {
             <ShieldCheck className="h-5 w-5 text-indigo-500" />
             Access Control Policy (Dynamic)
           </h2>
-          <div className="bg-white border rounded-xl overflow-hidden shadow-sm">
-            <table className="w-full text-sm text-left">
+          <div className="overflow-x-auto bg-white border rounded-xl shadow-sm">
+            <table className="w-full min-w-[640px] text-sm text-left">
               <thead className="bg-slate-50 text-slate-500 font-black text-[10px] uppercase tracking-widest">
                 <tr>
                   <th className="px-6 py-3">Module</th>

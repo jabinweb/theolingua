@@ -177,7 +177,7 @@ export default function ProgramsPage() {
   return (
     <div className="p-6">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-6 flex justify-between items-center">
+        <div className="mb-6 page-toolbar">
           <div>
             <h1 className="text-3xl font-bold mb-2">Program Management</h1>
             <p className="text-muted-foreground">Manage programs and their content structure</p>
@@ -199,7 +199,7 @@ export default function ProgramsPage() {
             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="admin-card-grid">
             {classes.map((classItem) => {
               // Ensure price is a number for arithmetic
               const priceNum = typeof classItem.price === 'string' ? parseInt(classItem.price) : classItem.price;

@@ -124,16 +124,16 @@ export default function SubscriptionAnalyticsPage() {
   const COLORS = ['#FFD700', '#1A1A1A', '#333333', '#666666', '#E5E5E5']; // Theo Yellow, Black, Dark Gray, Mid Gray, Light Gray
 
   return (
-    <div className="p-8 bg-theo-white/30 min-h-screen">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-w-0">
+      <div className="min-w-0 w-full">
         {/* Header */}
-        <div className="mb-12">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="mb-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <h1 className="text-5xl font-bold text-theo-black tracking-tight mb-2">
+              <h1 className="text-xl font-bold tracking-tighter text-theo-black sm:text-2xl mb-1">
                 Subscription Analytics
               </h1>
-              <p className="text-gray-500 font-medium text-lg">Monitor growth, churn and revenue velocity</p>
+              <p className="text-sm text-gray-600 sm:text-base">Monitor growth, churn and revenue velocity</p>
             </div>
             <div className="flex items-center gap-4">
               <Select value={timePeriod} onValueChange={setTimePeriod}>
@@ -147,7 +147,7 @@ export default function SubscriptionAnalyticsPage() {
                   <SelectItem value="month">This Month</SelectItem>
                 </SelectContent>
               </Select>
-              <Button onClick={fetchAnalytics} variant="outline" disabled={isLoading} className="rounded-2xl h-11 px-6">
+              <Button onClick={fetchAnalytics} variant="outline" disabled={isLoading} className="h-9 px-4">
                 <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                 Refresh
               </Button>
@@ -174,7 +174,7 @@ export default function SubscriptionAnalyticsPage() {
         ) : analyticsData ? (
           <div className="space-y-6">
             {/* Overview Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div className="admin-stats-grid">
               <Card className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-xs font-medium text-gray-500">

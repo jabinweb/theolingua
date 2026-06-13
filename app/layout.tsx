@@ -82,7 +82,7 @@ export default function RootLayout({
         {/* Font Awesome CDN */}
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossOrigin="anonymous" referrerPolicy="no-referrer" />
       </head>
-      <body className={`${inter.variable} ${poppins.variable} font-body antialiased min-h-screen flex flex-col bg-white text-gray-900`}>
+      <body className={`${inter.variable} ${poppins.variable} font-body antialiased min-h-screen flex flex-col overflow-x-hidden bg-white text-gray-900`}>
         <SessionProvider>
           <DynamicFavicon />
           <main className="flex-1">

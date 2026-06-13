@@ -91,12 +91,12 @@ export const EmptyUnitContent: React.FC<EmptyUnitContentProps> = ({
   title = "Select a Unit",
   description = "Pick a unit from the list (or swipe the unit bar on your phone) to start exploring"
 }) => (
-  <Card className="p-8 sm:p-12 text-center">
-    <BookOpen className="h-12 w-12 sm:h-16 sm:w-16 text-gray-300 mx-auto mb-4" />
-    <h3 className="text-base sm:text-lg font-medium text-gray-600 mb-2">{title}</h3>
-    <p className="text-sm sm:text-base text-muted-foreground">
-      {description}
-    </p>
+  <Card className="py-0 text-center shadow-sm">
+    <CardContent className="px-4 py-8">
+    <BookOpen className="mx-auto mb-3 h-10 w-10 text-gray-300" />
+    <h3 className="mb-1 text-base font-medium text-gray-600">{title}</h3>
+    <p className="text-sm text-muted-foreground">{description}</p>
+    </CardContent>
   </Card>
 );
 
@@ -145,10 +145,10 @@ export const UnitContent: React.FC<UnitContentProps> = ({
   };
 
   return (
-    <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-4 lg:gap-6">
-      {/* Mobile / tablet: sticky horizontal unit picker (always reachable while scrolling) */}
+    <div className="grid min-w-0 grid-cols-1 gap-4 xl:grid-cols-12 xl:gap-5">
+      {/* Mobile / tablet: horizontal unit picker until xl sidebar */}
       <div
-        className="sticky top-16 z-40 -mx-1 rounded-xl border border-gray-200/90 bg-white/95 px-2 py-2 shadow-sm backdrop-blur-md supports-[backdrop-filter]:bg-white/85 lg:hidden"
+        className="sticky top-14 z-30 -mx-1 rounded-lg border border-gray-200 bg-white/95 px-2 py-2 shadow-sm backdrop-blur-sm xl:hidden"
         role="region"
         aria-label="Units"
       >
@@ -236,62 +236,55 @@ export const UnitContent: React.FC<UnitContentProps> = ({
         </div>
       </div>
 
-      {/* Unit sidebar — desktop only (mobile uses sticky strip above) */}
-      <div className="order-1 hidden min-w-0 lg:col-span-1 lg:block">
-        <Card className="gap-0 lg:sticky lg:top-6">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base sm:text-lg">Units</CardTitle>
+      {/* Unit sidebar — xl+ only; below that use horizontal picker */}
+      <div className="order-1 hidden min-w-0 xl:col-span-4 xl:block 2xl:col-span-3">
+        <Card className="gap-0 py-0 xl:sticky xl:top-20 xl:max-h-[calc(100vh-6rem)] xl:overflow-y-auto">
+          <CardHeader className="border-b border-gray-100 pb-2 pt-4">
+            <CardTitle className="text-sm font-semibold">Units</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2 sm:space-y-3">
+          <CardContent className="space-y-1.5 pb-4">
             {units.map((unit) => {
               const daysRemaining = unit.daysRemaining ?? 0;
               const isDripLocked = unit.isLocked && daysRemaining > 0;
+              const isSelected = selectedUnit === unit.id;
               return (
               <div
                 key={unit.id}
-                className={`p-3 sm:p-4 rounded-lg sm:rounded-xl cursor-pointer transition-all ${
-                  selectedUnit === unit.id 
-                    ? `bg-gradient-to-r ${getColorGradient(unit.color)} text-white shadow-lg` 
-                    : 'bg-gray-50 hover:bg-gray-100'
-                } ${unit.isLocked ? 'opacity-60 cursor-not-allowed' : ''}`}
+                className={`cursor-pointer rounded-lg border px-2.5 py-2 transition-colors ${
+                  isSelected
+                    ? 'border-theo-black bg-theo-black text-white shadow-sm'
+                    : 'border-transparent bg-gray-50 hover:bg-gray-100'
+                } ${unit.isLocked ? 'cursor-not-allowed opacity-60' : ''}`}
                 onClick={() => !unit.isLocked && onUnitSelect(unit.id)}
               >
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="w-5 h-5 sm:w-6 sm:h-6">{getUnitIcon(unit.icon)}</div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-bold text-base sm:text-lg break-words leading-snug flex flex-wrap items-center gap-2">
-                      {unit.name}
+                <div className="flex items-center gap-2">
+                  <div className="h-4 w-4 shrink-0">{getUnitIcon(unit.icon)}</div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="line-clamp-2 text-sm font-semibold leading-snug">{unit.name}</span>
                       {unit.isFreeTrialUnit && (
-                        <Badge variant="secondary" className="text-xs px-1.5 py-0 bg-green-500 text-white hover:bg-green-600">
-                          Free Trial
+                        <Badge variant="secondary" className="h-5 px-1.5 py-0 text-[10px]">
+                          Trial
                         </Badge>
                       )}
                     </div>
-                    <div className={`text-sm ${selectedUnit === unit.id ? 'text-white/90 font-medium' : 'text-muted-foreground'}`}>
-                      {unit.isLocked && isDripLocked
-                        ? <span className="flex items-center gap-1 text-amber-600 font-bold"><Clock className="h-3 w-3" />In {daysRemaining}d</span>
-                        : `${unit.chapters.length} chapters`
-                      }
+                    <div className={`text-xs ${isSelected ? 'text-white/80' : 'text-muted-foreground'}`}>
+                      {unit.isLocked && isDripLocked ? (
+                        <span className="flex items-center gap-1 font-medium text-amber-500">
+                          <Clock className="h-3 w-3" />
+                          In {daysRemaining}d
+                        </span>
+                      ) : (
+                        `${unit.chapters.length} lessons`
+                      )}
                     </div>
                   </div>
                   {unit.isLocked ? (
-                    isDripLocked ? (
-                      <div className="flex flex-col items-center gap-0.5">
-                        <Lock className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0 text-amber-500" />
-                      </div>
-                    ) : (
-                      <Lock className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                    )
+                    <Lock className="h-3.5 w-3.5 shrink-0" />
                   ) : (
-                    <div className="text-right flex-shrink-0">
-                      <div className="text-xs font-medium">{getUnitProgress(unit.id)}%</div>
-                      <div className="w-6 sm:w-8 h-1 bg-white/30 rounded-full mt-1">
-                        <div 
-                          className="h-full bg-white rounded-full transition-all shadow-[0_0_8px_rgba(255,255,255,0.5)]"
-                          style={{ width: `${getUnitProgress(unit.id)}%` }}
-                        />
-                      </div>
-                    </div>
+                    <span className={`shrink-0 text-xs font-semibold tabular-nums ${isSelected ? 'text-theo-yellow' : 'text-gray-600'}`}>
+                      {getUnitProgress(unit.id)}%
+                    </span>
                   )}
                 </div>
               </div>
@@ -300,17 +293,11 @@ export const UnitContent: React.FC<UnitContentProps> = ({
             
             {/* Upgrade Now Button */}
             {showUpgradeButton && onUpgradeClick && (
-              <div className="mt-3 lg:mt-4 pt-3 lg:pt-4 border-t border-gray-200">
-                <Button
-                  onClick={onUpgradeClick}
-                  className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-2 lg:py-3 px-3 lg:px-4 rounded-lg lg:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-xs lg:text-sm"
-                >
-                  <Star className="h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2" />
-                  Upgrade Now
+              <div className="mt-2 border-t border-gray-200 pt-2">
+                <Button onClick={onUpgradeClick} variant="theo" size="sm" className="w-full">
+                  <Star className="mr-1.5 h-3.5 w-3.5" />
+                  Upgrade
                 </Button>
-                <p className="text-xs text-gray-500 text-center mt-1 lg:mt-2">
-                  Unlock all units & chapters
-                </p>
               </div>
             )}
           </CardContent>
@@ -318,99 +305,81 @@ export const UnitContent: React.FC<UnitContentProps> = ({
       </div>
 
       {/* Main Content Area */}
-      <div className="order-2 min-w-0 lg:col-span-3">
+      <div className="order-2 min-w-0 xl:col-span-8 2xl:col-span-9">
         {selectedUnitData ? (
-          <Card className="overflow-hidden p-0 shadow-sm sm:shadow-md">
-            <CardHeader className={`bg-gradient-to-r ${getColorGradient(selectedUnitData.color)} px-3 py-2.5 text-white shadow-md sm:px-6 sm:py-4`}>
-              <CardTitle className="flex w-full flex-col gap-2 text-left font-semibold tracking-normal text-white sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                <div className="flex min-w-0 flex-1 items-center gap-2 sm:items-start sm:gap-4">
-                  <div className="h-7 w-7 shrink-0 text-white drop-shadow-md sm:mt-0.5 sm:h-10 sm:w-10">
+          <Card className="overflow-hidden py-0 shadow-sm">
+            <CardHeader className="border-b border-gray-200 bg-theo-black px-4 py-3 text-white">
+              <CardTitle className="flex w-full flex-col gap-2 text-left text-base font-semibold tracking-normal text-white sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <div className="h-8 w-8 shrink-0 text-theo-yellow">
                     {getUnitIcon(selectedUnitData.icon)}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-end justify-between gap-x-2 gap-y-0.5 sm:block">
-                      <h2 className="text-base font-bold leading-snug break-words sm:text-2xl">{selectedUnitData.name}</h2>
-                      <div className="flex shrink-0 items-baseline gap-1 sm:hidden">
-                        <span className="text-lg font-bold tabular-nums">{getUnitProgress(selectedUnitData.id)}%</span>
-                        <span className="text-[10px] font-medium text-white/85">done</span>
-                      </div>
-                    </div>
-                    <p className="mt-0.5 text-xs text-white/85 sm:mt-1 sm:text-base">{selectedUnitData.chapters.length} chapters to explore</p>
+                    <h2 className="truncate text-base font-bold sm:text-lg">{selectedUnitData.name}</h2>
+                    <p className="text-xs text-white/75 sm:text-sm">
+                      {selectedUnitData.chapters.length} lessons · {getUnitProgress(selectedUnitData.id)}% complete
+                    </p>
                   </div>
-                </div>
-                <div className="hidden shrink-0 flex-col items-end gap-0 text-right sm:flex">
-                  <div className="text-2xl font-bold tabular-nums">{getUnitProgress(selectedUnitData.id)}%</div>
-                  <div className="text-sm text-white/80">Complete</div>
                 </div>
               </CardTitle>
             </CardHeader>
 
             <CardContent className="p-0">
-              {/* Chapters */}
-              <div className="space-y-2 px-2 py-3 sm:space-y-6 sm:p-6">
+              <div className="space-y-2 p-3 sm:p-4">
                 {selectedUnitData.chapters.map((chapter, chapterIndex) => {
                   const chapterProgress = getChapterProgress(chapter);
                   const isExpanded = useAccordion ? expandedChapters.has(chapter.id) : true;
                   
                   return (
-                    <div key={chapter.id} className="overflow-hidden rounded-lg border border-gray-200 sm:rounded-xl lg:rounded-2xl">
-                      <div 
-                        className={`border-b bg-gray-50 px-2 py-2.5 transition-colors sm:px-6 sm:py-4 ${
-                          useAccordion ? 'cursor-pointer hover:bg-gray-100 active:bg-gray-100/80' : ''
+                    <div key={chapter.id} className="overflow-hidden rounded-lg border border-gray-200">
+                      <div
+                        className={`border-b bg-gray-50 px-3 py-2.5 transition-colors ${
+                          useAccordion ? 'cursor-pointer hover:bg-gray-100' : ''
                         }`}
                         onClick={() => useAccordion && toggleChapter(chapter.id)}
                       >
-                        <div className="flex gap-2 sm:items-center sm:gap-3">
-                          <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br text-xs font-bold text-white shadow-sm sm:h-10 sm:w-10 sm:rounded-xl sm:text-base ${getColorGradient(selectedUnitData.color)}`}>
+                        <div className="flex items-center gap-2.5">
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-theo-black text-xs font-bold text-theo-yellow">
                             {chapterIndex + 1}
                           </div>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-start justify-between gap-2">
-                              <div className="min-w-0 flex-1 space-y-1">
-                                <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
-                                  <h3 className="text-sm font-bold leading-snug break-words sm:text-xl">{chapter.name}</h3>
+                              <div className="min-w-0 flex-1">
+                                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                                  <h3 className="text-sm font-semibold leading-snug break-words">{chapter.name}</h3>
                                   {chapter.isLocked && (
-                                    <Badge variant="secondary" className="h-5 gap-0.5 px-1.5 py-0 text-[10px] sm:gap-1 sm:text-xs">
-                                      <Lock className="h-3 w-3 sm:h-4 sm:w-4" />
+                                    <Badge variant="secondary" className="h-5 px-1.5 py-0 text-[10px]">
+                                      <Lock className="mr-1 h-3 w-3" />
                                       Locked
                                     </Badge>
                                   )}
                                   {showFreeBadge && chapterIndex === 0 && (
-                                    <Badge variant="default" className="h-5 bg-green-600 px-1.5 py-0 text-[10px] sm:text-xs">
+                                    <Badge variant="default" className="h-5 bg-green-600 px-1.5 py-0 text-[10px]">
                                       Free
                                     </Badge>
                                   )}
                                 </div>
-                                <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground sm:hidden">
-                                  <span>{chapter.topics.length} activities</span>
-                                  <span className="font-semibold tabular-nums text-foreground">{chapterProgress}%</span>
-                                </div>
-                                <Progress value={chapterProgress} className="h-1.5 w-full sm:hidden" />
-                                <p className="hidden text-sm text-muted-foreground sm:block">{chapter.topics.length} activities</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {chapter.topics.length} activities · {chapterProgress}%
+                                </p>
                               </div>
-                              <div className="flex shrink-0 items-start gap-2 sm:items-center">
-                                <div className="hidden text-right sm:block">
-                                  <div className="text-sm font-medium tabular-nums">{chapterProgress}%</div>
-                                  <Progress value={chapterProgress} className="mt-1 ml-auto h-2 w-20 sm:ml-0" />
+                              {useAccordion && (
+                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md hover:bg-gray-200/80">
+                                  {isExpanded ? (
+                                    <ChevronDown className="h-4 w-4 text-gray-600" />
+                                  ) : (
+                                    <ChevronRight className="h-4 w-4 text-gray-600" />
+                                  )}
                                 </div>
-                                {useAccordion && (
-                                  <div className="flex h-10 w-10 touch-manipulation items-center justify-center rounded-full hover:bg-gray-200/90 active:bg-gray-200 sm:h-9 sm:w-9">
-                                    {isExpanded ? (
-                                      <ChevronDown className="h-5 w-5 text-gray-600 sm:h-4 sm:w-4" />
-                                    ) : (
-                                      <ChevronRight className="h-5 w-5 text-gray-600 sm:h-4 sm:w-4" />
-                                    )}
-                                  </div>
-                                )}
-                              </div>
+                              )}
                             </div>
+                            <Progress value={chapterProgress} className="mt-2 h-1.5 w-full" />
                           </div>
                         </div>
                       </div>
 
-                      {/* Topics Grid - Show when expanded or when accordion is disabled */}
                       {isExpanded && (
-                        <div className="grid grid-cols-1 gap-2 p-2 pt-1.5 sm:grid-cols-2 sm:gap-3 sm:p-4 sm:pt-2">
+                        <div className="grid grid-cols-1 gap-2 p-2 sm:grid-cols-2">
                           {[...chapter.topics]
                             .sort((a, b) => {
                               const order = { 'BEGINNER': 0, 'INTERMEDIATE': 1, 'ADVANCED': 2 };

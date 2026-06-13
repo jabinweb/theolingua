@@ -122,7 +122,7 @@ export function DashboardContent() {
   return (
     <>
       <div className="border-b border-gray-200 bg-white">
-        <div className="container mx-auto max-w-6xl px-4 py-8 sm:px-6 md:py-10">
+        <div className="container mx-auto min-w-0 max-w-6xl px-4 py-5 sm:px-6">
           <h1 className="text-2xl font-bold tracking-tighter text-theo-black md:text-3xl">
             Welcome back, {user?.name || user?.email?.split('@')[0] || 'Student'}
           </h1>
@@ -188,7 +188,7 @@ export function DashboardContent() {
         </div>
       </div>
 
-      <div className="container mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <div className="container mx-auto min-w-0 max-w-6xl px-4 py-5 sm:px-6">
         <div className="mb-6">
           <h2 className="text-xl font-bold tracking-tighter text-theo-black md:text-2xl">
             Your programs {userProfile?.grade && `(Grade ${userProfile.grade})`}

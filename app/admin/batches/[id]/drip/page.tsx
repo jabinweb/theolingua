@@ -152,7 +152,7 @@ export default function BatchDripConfigPage({ params }: { params: Promise<{ id: 
   }
 
   return (
-    <div className="p-6 md:p-10 max-w-5xl mx-auto space-y-8">
+    <div className="min-w-0 w-full max-w-5xl mx-auto space-y-8">
       {/* Navigation & Breadcrumbs */}
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400">

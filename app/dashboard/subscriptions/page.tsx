@@ -133,12 +133,11 @@ export default function SubscriptionsPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Subscriptions</h1>
-          <p className="text-gray-600">Manage your active subscriptions and view payment history</p>
-        </div>
+    <div className="container mx-auto min-w-0 max-w-4xl px-4 py-5 sm:px-6">
+      <div className="mb-5">
+        <h1 className="text-xl font-bold tracking-tighter text-theo-black sm:text-2xl">My Subscriptions</h1>
+        <p className="mt-1 text-sm text-gray-600">Manage your active subscriptions and view payment history</p>
+      </div>
 
         {error && (
           <Card className="border-red-200 bg-red-50 mb-6">
@@ -171,9 +170,9 @@ export default function SubscriptionsPage() {
               
               return (
                 <Card key={subscription.id} className={`overflow-hidden ${expiryInfo.urgent ? 'border-orange-300 bg-orange-50' : ''}`}>
-                  <CardHeader className="pb-4">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg font-semibold">
+                  <CardHeader className="pb-3">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <CardTitle className="min-w-0 text-base font-semibold">
                         {subscription.className || subscription.subjectName || 'Subscription'}
                       </CardTitle>
                       <div className="flex items-center gap-2">
@@ -337,7 +336,6 @@ export default function SubscriptionsPage() {
             })}
           </div>
         )}
-      </div>
     </div>
   );
 }

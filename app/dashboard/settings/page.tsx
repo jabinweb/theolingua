@@ -8,132 +8,109 @@ import { Settings, Bell, Shield, Palette } from 'lucide-react';
 
 export default function SettingsPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-2xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Settings</h1>
-          <p className="text-gray-600">Customize your learning experience and account preferences</p>
-        </div>
+    <div className="container mx-auto min-w-0 max-w-2xl px-4 py-5 sm:px-6">
+      <div className="mb-5">
+        <h1 className="text-xl font-bold tracking-tighter text-theo-black sm:text-2xl">Settings</h1>
+        <p className="mt-1 text-sm text-gray-600">Customize your learning experience and account preferences</p>
+      </div>
 
-        <div className="space-y-6">
-          {/* Notification Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5" />
-                Notification Preferences
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="email-notifications">Email Notifications</Label>
-                  <p className="text-sm text-gray-600">Receive updates about your progress via email</p>
+      <div className="space-y-4">
+        <Card className="py-0">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Bell className="h-4 w-4" />
+              Notification preferences
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {(
+              [
+                { id: 'email-notifications', title: 'Email notifications', desc: 'Receive updates about your progress via email', checked: true },
+                { id: 'push-notifications', title: 'Push notifications', desc: 'Get notified about new content and reminders', checked: true },
+                { id: 'marketing-emails', title: 'Marketing emails', desc: 'Receive information about new features and offers', checked: false },
+              ] as const
+            ).map(({ id, title, desc, checked }) => (
+              <div key={id} className="flex items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  <Label htmlFor={id}>{title}</Label>
+                  <p className="text-sm text-gray-600">{desc}</p>
                 </div>
-                <Switch id="email-notifications" defaultChecked />
+                <Switch id={id} defaultChecked={checked} className="shrink-0" />
               </div>
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="push-notifications">Push Notifications</Label>
-                  <p className="text-sm text-gray-600">Get notified about new content and reminders</p>
-                </div>
-                <Switch id="push-notifications" defaultChecked />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="marketing-emails">Marketing Emails</Label>
-                  <p className="text-sm text-gray-600">Receive information about new features and offers</p>
-                </div>
-                <Switch id="marketing-emails" />
-              </div>
-            </CardContent>
-          </Card>
+            ))}
+          </CardContent>
+        </Card>
 
-          {/* Privacy Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Privacy & Security
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="profile-visibility">Public Profile</Label>
-                  <p className="text-sm text-gray-600">Allow others to view your learning progress</p>
+        <Card className="py-0">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Shield className="h-4 w-4" />
+              Privacy & security
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {(
+              [
+                { id: 'profile-visibility', title: 'Public profile', desc: 'Allow others to view your learning progress', checked: false },
+                { id: 'analytics', title: 'Usage analytics', desc: 'Help us improve by sharing anonymous usage data', checked: true },
+              ] as const
+            ).map(({ id, title, desc, checked }) => (
+              <div key={id} className="flex items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  <Label htmlFor={id}>{title}</Label>
+                  <p className="text-sm text-gray-600">{desc}</p>
                 </div>
-                <Switch id="profile-visibility" />
+                <Switch id={id} defaultChecked={checked} className="shrink-0" />
               </div>
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="analytics">Usage Analytics</Label>
-                  <p className="text-sm text-gray-600">Help us improve by sharing anonymous usage data</p>
-                </div>
-                <Switch id="analytics" defaultChecked />
-              </div>
-            </CardContent>
-          </Card>
+            ))}
+          </CardContent>
+        </Card>
 
-          {/* Learning Preferences */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Palette className="h-5 w-5" />
-                Learning Preferences
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="dark-mode">Dark Mode</Label>
-                  <p className="text-sm text-gray-600">Switch to dark theme for better viewing</p>
+        <Card className="py-0">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Palette className="h-4 w-4" />
+              Learning preferences
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {(
+              [
+                { id: 'dark-mode', title: 'Dark mode', desc: 'Switch to dark theme for better viewing', checked: false },
+                { id: 'auto-play', title: 'Auto-play videos', desc: 'Automatically play video content', checked: true },
+                { id: 'sound-effects', title: 'Sound effects', desc: 'Play sounds for interactions and achievements', checked: true },
+              ] as const
+            ).map(({ id, title, desc, checked }) => (
+              <div key={id} className="flex items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  <Label htmlFor={id}>{title}</Label>
+                  <p className="text-sm text-gray-600">{desc}</p>
                 </div>
-                <Switch id="dark-mode" />
+                <Switch id={id} defaultChecked={checked} className="shrink-0" />
               </div>
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="auto-play">Auto-play Videos</Label>
-                  <p className="text-sm text-gray-600">Automatically play video content</p>
-                </div>
-                <Switch id="auto-play" defaultChecked />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="sound-effects">Sound Effects</Label>
-                  <p className="text-sm text-gray-600">Play sounds for interactions and achievements</p>
-                </div>
-                <Switch id="sound-effects" defaultChecked />
-              </div>
-            </CardContent>
-          </Card>
+            ))}
+          </CardContent>
+        </Card>
 
-          {/* Account Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5" />
-                Account Actions
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Button variant="outline" className="w-full">
-                Download My Data
-              </Button>
-              <Button variant="outline" className="w-full">
-                Reset Password
-              </Button>
-              <Button variant="destructive" className="w-full">
-                Delete Account
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+        <Card className="py-0">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Settings className="h-4 w-4" />
+              Account actions
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Button variant="outline" className="w-full" size="sm">
+              Download my data
+            </Button>
+            <Button variant="outline" className="w-full" size="sm">
+              Reset password
+            </Button>
+            <Button variant="destructive" className="w-full" size="sm">
+              Delete account
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

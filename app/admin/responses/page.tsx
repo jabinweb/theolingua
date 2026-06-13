@@ -270,7 +270,7 @@ export default function ResponsesPage() {
   return (
     <div className="p-6">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-6 flex justify-between items-center">
+        <div className="mb-6 page-toolbar">
           <div>
             <h1 className="text-3xl font-bold mb-2">Form Responses</h1>
             <p className="text-muted-foreground">Manage demo request form submissions</p>

@@ -125,7 +125,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-8 sm:px-6">
+    <div className="container mx-auto min-w-0 max-w-4xl px-4 py-5 sm:px-6">
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tighter text-theo-black md:text-3xl">My Profile</h1>
         <p className="mt-1 text-gray-600">Manage your account information</p>

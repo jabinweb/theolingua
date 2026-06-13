@@ -29,7 +29,7 @@ export default function DashboardLayout({
   return (
     <div className="min-h-screen bg-theo-white text-theo-black">
       <AppShellHeader backHref="/" backLabel="Home" />
-      <main>{children}</main>
+      <main className="app-shell min-w-0 w-full overflow-x-hidden">{children}</main>
     </div>
   );
 }

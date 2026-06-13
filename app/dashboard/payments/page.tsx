@@ -158,7 +158,7 @@ export default function PaymentsPage() {
   };
 
   return (
-    <div className="container mx-auto max-w-6xl px-4 py-8 sm:px-6">
+    <div className="container mx-auto min-w-0 max-w-6xl px-4 py-5 sm:px-6">
       <div className="mb-8">
         <div className="mb-4 flex items-center gap-3">
           <div className="rounded-xl bg-theo-yellow/20 p-3">

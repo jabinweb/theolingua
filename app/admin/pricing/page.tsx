@@ -293,22 +293,22 @@ export default function PricingPage() {
   }
 
   return (
-    <div className="p-8 bg-theo-white/30 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-12">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+    <div className="min-w-0">
+      <div className="min-w-0 w-full">
+        <div className="mb-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <h1 className="text-5xl font-bold text-theo-black tracking-tight mb-2">
+              <h1 className="text-xl font-bold tracking-tighter text-theo-black sm:text-2xl mb-1">
                 Pricing Plans
               </h1>
-              <p className="text-gray-500 font-medium text-lg">Manage subscription layouts and pricing strategy</p>
+              <p className="text-sm text-gray-600 sm:text-base">Manage subscription layouts and pricing strategy</p>
             </div>
             <div className="flex gap-4">
-              <Button onClick={fetchData} variant="outline" disabled={loading} className="rounded-2xl h-11 px-6">
+              <Button onClick={fetchData} variant="outline" disabled={loading} className="h-9 px-4">
                 <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                 Refresh
               </Button>
-              <Button onClick={openCreateDialog} variant="theo" className="rounded-2xl h-11 px-6 shadow-lg shadow-theo-yellow/20">
+              <Button onClick={openCreateDialog} variant="theo" className="h-9 px-4 shadow-lg shadow-theo-yellow/20">
                 <Plus className="h-5 w-5 mr-2" />
                 Add New Plan
               </Button>

@@ -257,21 +257,21 @@ export default function AdminNotificationsPage() {
   };
 
   return (
-    <div className="p-8 bg-theo-white/30 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-12">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+    <div className="min-w-0">
+      <div className="min-w-0 w-full">
+        <div className="mb-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <h1 className="text-5xl font-bold text-theo-black tracking-tight mb-2">
+              <h1 className="text-xl font-bold tracking-tighter text-theo-black sm:text-2xl mb-1">
                 Notifications
               </h1>
-              <p className="text-gray-500 font-medium text-lg">Create and manage system notifications</p>
+              <p className="text-sm text-gray-600 sm:text-base">Create and manage system notifications</p>
             </div>
           </div>
         </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+      <div className="admin-stats-grid">
         <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group bg-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total Notifications</CardTitle>
@@ -434,11 +434,11 @@ export default function AdminNotificationsPage() {
               Filters & Actions
             </span>
             <div className="flex gap-3">
-              <Button onClick={() => setShowCreateForm(true)} variant="theo" className="rounded-2xl h-11 px-6 shadow-lg shadow-theo-yellow/20">
+              <Button onClick={() => setShowCreateForm(true)} variant="theo" className="h-9 px-4 shadow-lg shadow-theo-yellow/20">
                 <Plus className="h-5 w-5 mr-2" />
                 Create Announcement
               </Button>
-              <Button onClick={loadNotifications} variant="outline" className="rounded-2xl h-11 px-6 bg-theo-black/20 border-theo-yellow/30 text-theo-yellow hover:bg-theo-yellow hover:text-theo-black">
+              <Button onClick={loadNotifications} variant="outline" className="h-9 px-4 bg-theo-black/20 border-theo-yellow/30 text-theo-yellow hover:bg-theo-yellow hover:text-theo-black">
                 <RefreshCw className="h-5 w-5 mr-2" />
                 Refresh
               </Button>

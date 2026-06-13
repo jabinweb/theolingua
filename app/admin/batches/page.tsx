@@ -243,7 +243,7 @@ export default function BatchesPage() {
   return (
     <div className="p-6">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-6 flex justify-between items-center">
+        <div className="mb-6 page-toolbar">
           <div>
             <h1 className="text-3xl font-bold mb-2">Batch Management</h1>
             <p className="text-muted-foreground">Manage student batches and teacher assignments</p>
@@ -271,7 +271,7 @@ export default function BatchesPage() {
             <RefreshCw className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="admin-card-grid">
             {batches.map((batch) => (
               <Card key={batch.id}>
                 <CardHeader>
@@ -433,7 +433,7 @@ export default function BatchesPage() {
 
             {editingBatch && (
               <div className="mt-8 border-t pt-6">
-                <div className="flex justify-between items-center mb-4">
+                <div className="page-toolbar mb-4">
                   <h3 className="text-lg font-bold flex items-center gap-2">
                     <Users className="h-5 w-5 text-indigo-500" />
                     Students in this Batch ({batchStudents.length})

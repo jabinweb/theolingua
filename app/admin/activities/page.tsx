@@ -183,21 +183,21 @@ export default function AdminActivitiesPage() {
   };
 
   return (
-    <div className="p-8 bg-theo-white/30 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-12">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+    <div className="min-w-0">
+      <div className="min-w-0 w-full">
+        <div className="mb-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <h1 className="text-5xl font-bold text-theo-black tracking-tight mb-2">
+              <h1 className="text-xl font-bold tracking-tighter text-theo-black sm:text-2xl mb-1">
                 User Activities
               </h1>
-              <p className="text-gray-500 font-medium text-lg">Monitor user actions and system engagement</p>
+              <p className="text-sm text-gray-600 sm:text-base">Monitor user actions and system engagement</p>
             </div>
           </div>
         </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+      <div className="admin-stats-grid">
         <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group bg-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total Activities</CardTitle>

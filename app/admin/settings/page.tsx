@@ -283,16 +283,16 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="p-8 bg-theo-white/30 min-h-screen">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-w-0">
+      <div className="min-w-0 w-full">
         {/* Header */}
-        <div className="mb-12">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="mb-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <h1 className="text-5xl font-bold text-theo-black tracking-tight mb-2">
+              <h1 className="text-xl font-bold tracking-tighter text-theo-black sm:text-2xl mb-1">
                 System Control
               </h1>
-              <p className="text-gray-500 font-medium text-lg">Infrastructure, gateways and enterprise parameters</p>
+              <p className="text-sm text-gray-600 sm:text-base">Infrastructure, gateways and enterprise parameters</p>
             </div>
             <div className="flex gap-4">
               <Button 
