@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { cn } from '@/lib/utils';
@@ -71,30 +72,27 @@ export function AdminSidebar({ isMobile }: AdminSidebarProps) {
     .filter((item) => item.roles.includes(userRole));
 
   const sidebarContent = (
-    <div className="flex flex-col flex-grow bg-white border-r border-theo-black/5 h-full overflow-y-auto">
-      <div className="flex items-center flex-shrink-0 px-6 py-8 mb-2 bg-theo-black">
-        <div className="w-11 h-11 bg-theo-yellow rounded-2xl flex items-center justify-center shadow-xl">
-          <BookOpen className="h-6 w-6 text-theo-black" />
-        </div>
-        <span className="ml-3 text-lg font-black tracking-tight text-white">
-          {userRole === 'TEACHER' ? 'Teacher Panel' : 'THEO'}
-          <span className="text-theo-yellow">{userRole === 'TEACHER' ? '' : 'LINGUA'}</span>
-        </span>
-      </div>
-
-      <div className="px-4 mb-4 mt-2">
+    <div className="flex h-full flex-col border-r border-gray-200 bg-white">
+      <div className="border-b border-gray-200 px-4 py-5">
+        <Link href="/" className="relative mb-4 block h-9 w-28">
+          <Image src="/logo.png" alt="TheoLingua" fill className="object-contain object-left" />
+        </Link>
+        <p className="text-xs font-medium text-gray-500">
+          {userRole === 'TEACHER' ? 'Teacher panel' : 'Admin panel'}
+        </p>
         <Button
+          type="button"
           variant="ghost"
           size="sm"
-          className="flex items-center gap-2 w-full justify-start rounded-xl h-10 text-gray-500 hover:bg-theo-yellow/10 hover:text-theo-black font-bold text-xs uppercase tracking-wider"
+          className="mt-3 h-9 w-full justify-start px-0 text-sm font-semibold text-gray-600 hover:text-theo-black"
           onClick={() => router.push('/')}
         >
-          <ChevronLeft className="h-4 w-4" />
-          Back to Home
+          <ChevronLeft className="mr-1 h-4 w-4" />
+          Back to site
         </Button>
       </div>
 
-      <nav className="flex-1 px-3 space-y-1 pb-4">
+      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
         {filteredNavigation.map((item) => {
           const isActive =
             pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
@@ -104,29 +102,28 @@ export function AdminSidebar({ isMobile }: AdminSidebarProps) {
               key={item.name}
               href={item.href}
               className={cn(
-                'group flex items-center px-4 py-3 text-xs font-bold rounded-xl transition-all uppercase tracking-widest',
+                'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors',
                 isActive
-                  ? 'bg-theo-black text-theo-yellow shadow-lg'
-                  : 'text-gray-500 hover:bg-theo-yellow/10 hover:text-theo-black'
+                  ? 'bg-theo-yellow/20 text-theo-black'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-theo-black'
               )}
             >
-              <item.icon
-                className={cn('mr-3 h-5 w-5 shrink-0', isActive ? 'text-theo-yellow' : 'text-gray-400')}
-              />
+              <item.icon className={cn('h-4 w-4 shrink-0', isActive ? 'text-theo-black' : 'text-gray-400')} />
               {item.name}
             </Link>
           );
         })}
       </nav>
 
-      <div className="p-4 mt-auto border-t border-theo-black/5">
+      <div className="border-t border-gray-200 p-3">
         <Button
+          type="button"
           variant="ghost"
-          className="flex items-center gap-2 w-full justify-start text-gray-500 hover:bg-red-50 hover:text-red-600 rounded-xl h-11 font-bold text-xs uppercase tracking-wider"
+          className="h-10 w-full justify-start text-sm font-semibold text-gray-600 hover:bg-red-50 hover:text-red-600"
           onClick={() => signOut({ callbackUrl: '/' })}
         >
-          <LogOut className="h-4 w-4" />
-          Logout
+          <LogOut className="mr-2 h-4 w-4" />
+          Sign out
         </Button>
       </div>
     </div>

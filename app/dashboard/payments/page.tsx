@@ -158,82 +158,77 @@ export default function PaymentsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          {/* Header Section */}
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-3 bg-blue-100 rounded-xl">
-                <CreditCard className="h-8 w-8 text-blue-600" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Payment History</h1>
-                <p className="text-gray-600">Track all your transactions and payment details</p>
-              </div>
-            </div>
-            
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-              <Card className="bg-gradient-to-r from-green-500 to-green-600 border-0 text-white">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-green-100 text-sm">Total Spent</p>
-                      <p className="text-2xl font-bold">
-                        ₹{payments.filter(p => p.status === 'SUCCESS')
-                          .reduce((sum, p) => sum + p.amount, 0) / 100}
-                      </p>
-                    </div>
-                    <CheckCircle className="h-8 w-8 text-green-200" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-gradient-to-r from-blue-500 to-blue-600 border-0 text-white">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-blue-100 text-sm">Total Payments</p>
-                      <p className="text-2xl font-bold">{payments.length}</p>
-                    </div>
-                    <CreditCard className="h-8 w-8 text-blue-200" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-gradient-to-r from-purple-500 to-purple-600 border-0 text-white">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-purple-100 text-sm">Successful</p>
-                      <p className="text-2xl font-bold">
-                        {payments.filter(p => p.status === 'SUCCESS').length}
-                      </p>
-                    </div>
-                    <CheckCircle className="h-8 w-8 text-purple-200" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-gradient-to-r from-orange-500 to-orange-600 border-0 text-white">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-orange-100 text-sm">Pending</p>
-                      <p className="text-2xl font-bold">
-                        {payments.filter(p => p.status === 'PENDING').length}
-                      </p>
-                    </div>
-                    <Clock className="h-8 w-8 text-orange-200" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+    <div className="container mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <div className="mb-8">
+        <div className="mb-4 flex items-center gap-3">
+          <div className="rounded-xl bg-theo-yellow/20 p-3">
+            <CreditCard className="h-7 w-7 text-theo-black" />
           </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tighter text-theo-black md:text-3xl">Payment History</h1>
+            <p className="text-gray-600">Track all your transactions and payment details</p>
+          </div>
+        </div>
 
-          {/* Filters and Actions */}
-          <Card className="mb-6 border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4">
+          <Card className="border border-gray-200 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">Total spent</p>
+                  <p className="text-2xl font-bold text-theo-black">
+                    ₹{payments.filter(p => p.status === 'SUCCESS')
+                      .reduce((sum, p) => sum + p.amount, 0) / 100}
+                  </p>
+                </div>
+                <CheckCircle className="h-7 w-7 text-green-600" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border border-gray-200 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">Total payments</p>
+                  <p className="text-2xl font-bold text-theo-black">{payments.length}</p>
+                </div>
+                <CreditCard className="h-7 w-7 text-gray-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border border-gray-200 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">Successful</p>
+                  <p className="text-2xl font-bold text-theo-black">
+                    {payments.filter(p => p.status === 'SUCCESS').length}
+                  </p>
+                </div>
+                <CheckCircle className="h-7 w-7 text-theo-black" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border border-gray-200 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">Pending</p>
+                  <p className="text-2xl font-bold text-theo-black">
+                    {payments.filter(p => p.status === 'PENDING').length}
+                  </p>
+                </div>
+                <Clock className="h-7 w-7 text-amber-600" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      <Card className="mb-6 border border-gray-200 shadow-sm">
             <CardContent className="p-6">
               <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
                 <div className="flex items-center gap-4">
@@ -472,8 +467,6 @@ export default function PaymentsPage() {
             )}
           </>
         )}
-      </div>
-    </div>
     </div>
   );
 }

@@ -175,64 +175,64 @@ export default function SubscriptionAnalyticsPage() {
           <div className="space-y-6">
             {/* Overview Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-              <Card className="bg-theo-black border-0 shadow-xl rounded-[32px] overflow-hidden group">
+              <Card className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-theo-yellow/70 flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-xs font-medium text-gray-500">
                     <Users className="h-4 w-4" />
-                    Total Base
+                    Total subscriptions
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-4xl font-bold text-theo-yellow tracking-tighter">{analyticsData.overview.totalSubscriptions.toLocaleString()}</div>
-                  <div className="flex items-center gap-1 text-theo-yellow/50 text-xs font-bold mt-2 uppercase">
+                  <div className="text-3xl font-bold tracking-tighter text-theo-black">{analyticsData.overview.totalSubscriptions.toLocaleString()}</div>
+                  <div className="mt-2 flex items-center gap-1 text-xs text-gray-500">
                     {analyticsData.overview.growthRate >= 0 ? (
                       <TrendingUp className="h-3 w-3" />
                     ) : (
                       <TrendingDown className="h-3 w-3" />
                     )}
-                    {Math.abs(analyticsData.overview.growthRate)}% Growth Rate
+                    {Math.abs(analyticsData.overview.growthRate)}% growth rate
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-theo-yellow border-0 shadow-xl rounded-[32px] overflow-hidden group">
+              <Card className="overflow-hidden rounded-2xl border border-theo-yellow/40 bg-theo-yellow/10 shadow-sm">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-theo-black/50 flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-xs font-medium text-gray-600">
                     <UserCheck className="h-4 w-4" />
-                    Active Pulse
+                    Active subscriptions
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-4xl font-bold text-theo-black tracking-tighter">{analyticsData.overview.activeSubscriptions.toLocaleString()}</div>
-                  <div className="text-theo-black/50 text-xs font-bold mt-2 uppercase">
-                    {((analyticsData.overview.activeSubscriptions / analyticsData.overview.totalSubscriptions) * 100).toFixed(1)}% Conversion
+                  <div className="text-3xl font-bold tracking-tighter text-theo-black">{analyticsData.overview.activeSubscriptions.toLocaleString()}</div>
+                  <div className="mt-2 text-xs text-gray-600">
+                    {((analyticsData.overview.activeSubscriptions / analyticsData.overview.totalSubscriptions) * 100).toFixed(1)}% conversion
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-white border-0 shadow-sm rounded-[32px] overflow-hidden group">
+              <Card className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-theo-yellow" />
-                    Renewal Risk
+                  <CardTitle className="flex items-center gap-2 text-xs font-medium text-gray-500">
+                    <Clock className="h-4 w-4 text-theo-black" />
+                    Expiring soon
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-4xl font-bold text-theo-black tracking-tighter">{analyticsData.overview.expiringSubscriptions.toLocaleString()}</div>
-                  <div className="text-gray-400 text-xs font-bold mt-2 uppercase tracking-widest">Next 7 days</div>
+                  <div className="text-3xl font-bold tracking-tighter text-theo-black">{analyticsData.overview.expiringSubscriptions.toLocaleString()}</div>
+                  <div className="mt-2 text-xs text-gray-500">Next 7 days</div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-theo-black border-0 shadow-xl rounded-[32px] overflow-hidden group">
+              <Card className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-theo-yellow/70 flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-xs font-medium text-gray-500">
                     <DollarSign className="h-4 w-4" />
-                    Total Revenue
+                    Total revenue
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-4xl font-bold text-theo-yellow tracking-tighter">₹{analyticsData.overview.totalRevenue.toLocaleString()}</div>
-                  <div className="text-theo-yellow/50 text-xs font-bold mt-2 uppercase">ARPU: ₹{analyticsData.overview.arpu}</div>
+                  <div className="text-3xl font-bold tracking-tighter text-theo-black">₹{analyticsData.overview.totalRevenue.toLocaleString()}</div>
+                  <div className="mt-2 text-xs text-gray-500">ARPU: ₹{analyticsData.overview.arpu}</div>
                 </CardContent>
               </Card>
             </div>

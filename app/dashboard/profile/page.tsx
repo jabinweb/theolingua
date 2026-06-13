@@ -125,57 +125,52 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-8">
-      <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
-          {/* Page Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">My Profile</h1>
-            <p className="text-gray-600">Manage your account information</p>
-          </div>
+    <div className="container mx-auto max-w-4xl px-4 py-8 sm:px-6">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold tracking-tighter text-theo-black md:text-3xl">My Profile</h1>
+        <p className="mt-1 text-gray-600">Manage your account information</p>
+      </div>
 
-          {/* Profile Card */}
-          <Card className="shadow-lg border-0 mb-6 overflow-hidden p-0">
-            <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white pb-10 pt-8">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-4">
-                  <Avatar className="h-20 w-20 border-4 border-white shadow-lg">
-                    <AvatarImage src={user.image || ''} alt={displayName} />
-                    <AvatarFallback className="bg-white/20 text-white text-2xl font-bold">
-                      {initials}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h2 className="text-2xl font-bold mb-1">{displayName}</h2>
-                    <p className="text-blue-100 flex items-center gap-2">
-                      <Mail className="h-4 w-4" />
-                      {user.email}
-                    </p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <Calendar className="h-4 w-4" />
-                      <span className="text-sm text-blue-100">Member since {joinDate}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {/* Display user role from NextAuth session */}
-                  {user?.role && (
-                    <Badge variant="secondary" className="bg-white/20 text-white border-white/30 hover:bg-white/30">
-                      {user.role}
-                    </Badge>
-                  )}
+      <Card className="mb-6 overflow-hidden border border-gray-200 shadow-sm">
+        <CardHeader className="border-b border-gray-200 bg-white pb-6 pt-6">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-4">
+              <Avatar className="h-20 w-20 border-2 border-gray-200">
+                <AvatarImage src={user.image || ''} alt={displayName} />
+                <AvatarFallback className="bg-theo-yellow/30 text-theo-black text-2xl font-bold">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h2 className="mb-1 text-2xl font-bold text-theo-black">{displayName}</h2>
+                <p className="flex items-center gap-2 text-gray-600">
+                  <Mail className="h-4 w-4" />
+                  {user.email}
+                </p>
+                <div className="mt-2 flex items-center gap-2 text-sm text-gray-500">
+                  <Calendar className="h-4 w-4" />
+                  <span>Member since {joinDate}</span>
                 </div>
               </div>
-            </CardHeader>
-            
-            <CardContent className="p-0 -mt-12">
-              <div className="bg-white rounded-t-3xl shadow-xl">
+            </div>
+
+            <div className="flex items-center gap-2">
+              {user?.role && (
+                <Badge variant="secondary" className="border-gray-200 bg-gray-50 text-gray-700">
+                  {user.role}
+                </Badge>
+              )}
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent className="p-0">
+          <div className="bg-white">
                 {/* Action Buttons */}
                 <div className="px-8 pt-8 pb-4 flex justify-end border-b">
                   {isEditing ? (
                     <div className="flex gap-3">
-                      <Button onClick={handleSave} disabled={isLoading} className="bg-blue-600 hover:bg-blue-700">
+                      <Button onClick={handleSave} disabled={isLoading} variant="theo">
                         {isLoading ? 'Saving...' : 'Save Changes'}
                       </Button>
                       <Button variant="outline" onClick={handleCancel} disabled={isLoading}>
@@ -183,10 +178,7 @@ export default function ProfilePage() {
                       </Button>
                     </div>
                   ) : (
-                    <Button 
-                      onClick={() => setIsEditing(true)}
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
+                    <Button onClick={() => setIsEditing(true)} variant="theo">
                       Edit Profile
                     </Button>
                   )}
@@ -290,18 +282,15 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
 
-          {/* Password Change Section */}
-          <Card className="shadow-lg border-0 overflow-hidden p-0">
-            <CardHeader className="bg-gradient-to-r from-slate-700 to-slate-800 text-white pb-10 pt-8">
-              <h3 className="text-xl font-bold">Security Settings</h3>
-              <p className="text-slate-300 text-sm">Change your password</p>
+          <Card className="overflow-hidden border border-gray-200 shadow-sm">
+            <CardHeader className="border-b border-gray-200 bg-white pb-4 pt-6">
+              <h3 className="text-lg font-bold text-theo-black">Security settings</h3>
+              <p className="text-sm text-gray-600">Change your password</p>
             </CardHeader>
-            <CardContent className="p-8">
+            <CardContent className="p-6">
               <ChangePasswordForm />
             </CardContent>
           </Card>
-        </div>
-      </div>
     </div>
   );
 }

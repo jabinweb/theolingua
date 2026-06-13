@@ -224,22 +224,22 @@ export default function AdminActivitiesPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group bg-theo-black">
+        <Card className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-theo-yellow/50">Top Dynamic</CardTitle>
-            <div className="h-12 w-12 rounded-2xl bg-theo-yellow/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <CheckCircle className="h-6 w-6 text-theo-yellow" />
+            <CardTitle className="text-xs font-medium text-gray-500">Top action</CardTitle>
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-theo-yellow/20">
+              <CheckCircle className="h-5 w-5 text-theo-black" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold text-theo-yellow uppercase tracking-tight">
-              {Object.keys(stats.activitiesByAction).length > 0 
+            <div className="text-lg font-bold text-theo-black">
+              {Object.keys(stats.activitiesByAction).length > 0
                 ? Object.entries(stats.activitiesByAction)
-                    .sort(([,a], [,b]) => b - a)[0][0]
+                    .sort(([, a], [, b]) => b - a)[0][0]
                     .replace('_', ' ')
                 : 'None'}
             </div>
-            <p className="text-xs text-theo-yellow/50 font-medium mt-1">Most frequent user action</p>
+            <p className="mt-1 text-xs text-gray-500">Most frequent user action</p>
           </CardContent>
         </Card>
 

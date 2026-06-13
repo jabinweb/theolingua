@@ -427,7 +427,7 @@ export default function AdminNotificationsPage() {
 
       {/* Filters and Actions */}
       <Card className="mb-12 border-0 shadow-sm rounded-[32px] overflow-hidden">
-        <CardHeader className="bg-theo-black text-theo-yellow p-8">
+        <CardHeader className="border-b border-gray-200 bg-white p-6 text-theo-black">
           <CardTitle className="flex items-center justify-between">
             <span className="flex items-center gap-3 text-2xl font-bold uppercase tracking-tight">
               <Filter className="h-6 w-6" />

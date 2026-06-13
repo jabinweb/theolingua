@@ -324,7 +324,7 @@ export default function PricingPage() {
           <div className="grid gap-6">
             {Object.values(plansByProgram).map(({ program, plans: programPlans }) => (
               <Card key={program.id} className="border-0 shadow-sm rounded-[32px] overflow-hidden hover:shadow-xl transition-all duration-300">
-                <CardHeader className="bg-theo-black text-theo-yellow p-8 flex flex-row items-center justify-between">
+                <CardHeader className="border-b border-gray-200 bg-white p-6 text-theo-black flex flex-row items-center justify-between">
                   <div>
                     <CardTitle className="flex items-center gap-3 text-2xl font-bold uppercase tracking-tight">
                       <Tag className="h-6 w-6" />

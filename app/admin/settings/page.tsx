@@ -357,7 +357,7 @@ export default function SettingsPage() {
           {/* General Settings */}
           <TabsContent value="general" className="space-y-6">
             <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden bg-white">
-              <CardHeader className="bg-theo-black text-theo-yellow p-10 pb-6">
+              <CardHeader className="border-b border-gray-200 bg-white p-6 text-theo-black">
                 <CardTitle className="flex items-center gap-3 text-3xl font-bold">
                   <Globe className="h-8 w-8" />
                   General Configuration
@@ -443,7 +443,7 @@ export default function SettingsPage() {
           <TabsContent value="payment" className="space-y-6">
             {/* Payment Gateway Selection */}
             <Card className="shadow-xl border border-gray-100 bg-white overflow-hidden">
-              <CardHeader className="bg-theo-black text-theo-yellow">
+              <CardHeader className="border-b border-gray-200 bg-white p-6 text-theo-black">
                 <CardTitle className="flex items-center gap-3 text-xl">
                   <CreditCard className="h-6 w-6" />
                   Payment Gateway Configuration
@@ -542,7 +542,7 @@ export default function SettingsPage() {
             {/* Razorpay Configuration */}
             {settings.payment_default_gateway === 'RAZORPAY' && (
               <Card className="shadow-xl border border-gray-100 bg-white overflow-hidden">
-                <CardHeader className="bg-theo-black text-theo-yellow">
+                <CardHeader className="border-b border-gray-200 bg-white p-6 text-theo-black">
                   <CardTitle className="flex items-center gap-3 text-xl">
                     <CreditCard className="h-6 w-6" />
                     Razorpay Configuration
@@ -719,7 +719,7 @@ export default function SettingsPage() {
             {/* Cashfree Configuration */}
             {settings.payment_default_gateway === 'CASHFREE' && (
               <Card className="shadow-xl border border-gray-100 bg-white overflow-hidden">
-                <CardHeader className="bg-theo-black text-theo-yellow">
+                <CardHeader className="border-b border-gray-200 bg-white p-6 text-theo-black">
                   <CardTitle className="flex items-center gap-3 text-xl">
                     <CreditCard className="h-6 w-6" />
                     Cashfree Configuration
@@ -859,7 +859,7 @@ export default function SettingsPage() {
           {/* Email Settings */}
           <TabsContent value="email" className="space-y-6">
             <Card className="shadow-xl border border-gray-100 bg-white overflow-hidden">
-              <CardHeader className="bg-theo-black text-theo-yellow">
+              <CardHeader className="border-b border-gray-200 bg-white p-6 text-theo-black">
                 <CardTitle className="flex items-center gap-3 text-xl">
                   <Mail className="h-6 w-6" />
                   Email Configuration
@@ -996,7 +996,7 @@ export default function SettingsPage() {
           {/* System Settings */}
           <TabsContent value="system" className="space-y-6">
             <Card className="shadow-xl border border-gray-100 bg-white overflow-hidden">
-              <CardHeader className="bg-theo-black text-theo-yellow">
+              <CardHeader className="border-b border-gray-200 bg-white p-6 text-theo-black">
                 <CardTitle className="flex items-center gap-3 text-xl">
                   <Server className="h-6 w-6" />
                   System Settings

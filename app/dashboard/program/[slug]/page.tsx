@@ -236,11 +236,10 @@ export default function ProgramPage() {
   const selectedUnitData = currentProgram.units.find(s => s.id === selectedUnit);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="container mx-auto max-w-6xl px-4 py-8 sm:px-6">
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Hero Header Section */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+      <div className="max-w-7xl mx-auto py-8">
+        <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-6">
           <div className="flex items-center gap-4">
             <Button 
               variant="outline" 

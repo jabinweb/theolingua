@@ -49,20 +49,22 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="h-screen bg-background flex overflow-hidden">
-      <aside className="hidden md:flex h-full border-r bg-white overflow-y-auto w-72 shrink-0">
+    <div className="flex h-screen overflow-hidden bg-theo-white text-theo-black">
+      <aside className="hidden h-full w-64 shrink-0 overflow-y-auto md:flex">
         <AdminSidebar />
       </aside>
 
-      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        <header className="md:hidden flex items-center justify-between px-4 py-3 border-b bg-white shrink-0">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <header className="flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 py-3 md:hidden">
           <div className="flex items-center gap-2">
             <AdminMobileNav />
-            <span className="font-bold text-slate-800">Admin Panel</span>
+            <span className="text-sm font-semibold text-theo-black">Admin</span>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto">{children}</main>
+        <main className="flex-1 overflow-y-auto bg-theo-white">
+          <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 md:py-8">{children}</div>
+        </main>
       </div>
     </div>
   );

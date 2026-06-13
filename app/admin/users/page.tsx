@@ -638,16 +638,16 @@ export default function UsersPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group bg-theo-black">
+          <Card className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-theo-yellow/50">Pulse Rate</CardTitle>
-              <UserCheck className="h-5 w-5 text-theo-yellow/20" />
+              <CardTitle className="text-xs font-medium text-gray-500">Active subscribers</CardTitle>
+              <UserCheck className="h-5 w-5 text-gray-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold text-theo-yellow tracking-tighter">
+              <div className="text-3xl font-bold tracking-tighter text-theo-black">
                 {registeredUsers.filter(u => u.hasActiveSubscription).length}
               </div>
-              <p className="text-xs text-theo-yellow/30 font-bold mt-1">Active Subscribers</p>
+              <p className="mt-1 text-xs text-gray-500">With active subscription</p>
             </CardContent>
           </Card>
 

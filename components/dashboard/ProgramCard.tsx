@@ -281,76 +281,35 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
 
   const { subjectCount, chapterCount } = getStats();
 
-  const cardProgrames = `
-    group relative overflow-hidden border-0 shadow-md hover:shadow-2xl 
-    transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 cursor-pointer
-    ${isDashboard ? 'bg-white/80 backdrop-blur-sm' : 'bg-white'}
+  const cardClasses = `
+    group relative overflow-hidden border border-gray-200 bg-white shadow-sm
+    transition-shadow duration-200 hover:shadow-md cursor-pointer rounded-2xl
     ${className}
   `;
 
-  const iconSectionProgrames = isDashboard 
-    ? "w-full h-32 bg-theo-black rounded-[20px] shadow-inner"
-    : "w-full h-32 bg-theo-black rounded-[20px] shadow-inner";
+  const iconSectionClasses = 'w-full h-28 bg-theo-black rounded-xl flex items-center justify-center relative overflow-hidden';
 
-  const iconProgrames = isDashboard 
-    ? "text-5xl z-10 filter drop-shadow-[0_0_15px_rgba(200,216,50,0.4)]" 
-    : "text-5xl z-10 filter drop-shadow-[0_0_15px_rgba(200,216,50,0.4)]";
-
-  const headerPadding = isDashboard ? "relative z-1 pb-4" : "relative z-1 pb-4";
-  
-  const contentPadding = isDashboard 
-    ? "relative z-10 space-y-4 pt-4" 
-    : "relative z-10 space-y-4 pt-4";
-
-  const titleProgrames = isDashboard 
-    ? "text-xl font-bold text-theo-black group-hover:text-theo-black transition-colors line-clamp-1"
-    : "text-xl font-bold text-theo-black group-hover:text-theo-black transition-colors line-clamp-1";
-
-  const descriptionProgrames = isDashboard
-    ? "text-sm text-gray-500 leading-relaxed line-clamp-2 group-hover:text-gray-600 transition-colors"
-    : "text-sm text-gray-500 leading-relaxed line-clamp-2 group-hover:text-gray-600 transition-colors";
-
-  const statCardProgrames = isDashboard
-    ? "flex items-center gap-2 p-3 bg-theo-white/50 rounded-2xl border border-gray-100 group-hover:bg-theo-white transition-colors"
-    : "flex items-center gap-2 p-3 bg-theo-white/50 rounded-2xl border border-gray-100 group-hover:bg-theo-white transition-colors";
-
-  const statIconProgrames = isDashboard
-    ? "p-1.5 bg-theo-yellow/20 rounded-xl"
-    : "p-1.5 bg-theo-yellow/20 rounded-xl";
-
-  const iconSize = isDashboard ? "h-3.5 w-3.5" : "h-3.5 w-3.5";
+  const iconClasses = 'text-4xl z-10';
 
   const progressLabel = isDemo ? "Demo Progress" : "Learning Progress";
   const progressBarHeight = isDashboard ? "h-2.5" : "h-2.5";
 
   return (
-    <Card className={cardProgrames} onClick={onClick}>
-      {/* Access Type Badge - Dashboard only */}
+    <Card className={cardClasses} onClick={onClick}>
       {isDashboard && (
         <div className="absolute top-4 right-4 z-10">
           <AccessBadge programData={programData as DashboardProgramData} />
         </div>
       )}
 
-      <CardHeader className={headerPadding}>
-        {/* Icon Section */}
-        <div className={`relative ${isDashboard ? 'mb-6' : 'mb-6'}`}>
-          <div className={`${iconSectionProgrames} flex items-center justify-center relative overflow-hidden group-hover:scale-105 transition-transform duration-500 shadow-lg`}>
-            <span className={iconProgrames}>{getProgramIcon(programData.name)}</span>
-            
-            {/* Animated background elements */}
-            <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent" />
-            <div className={`absolute ${isDashboard ? 'top-2 right-2 w-3 h-3' : 'top-2 right-2 w-3 h-3'} bg-white/20 rounded-full animate-pulse`} />
-            <div className={`absolute ${isDashboard ? 'bottom-3 left-3 w-2 h-2' : 'bottom-3 left-3 w-2 h-2'} bg-white/30 rounded-full animate-pulse delay-300`} />
-            {(isDashboard || isDemo) && (
-              <div className="absolute top-1/2 left-2 w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse delay-700" />
-            )}
-
-            {/* Progress indicator */}
-            <div className={`absolute ${isDashboard ? 'bottom-2 left-2 right-2' : 'bottom-2 left-2 right-2'}`}>
-              <div className={`w-full ${isDashboard ? 'h-1' : 'h-1'} bg-white/20 rounded-full overflow-hidden`}>
-                <div 
-                  className="h-full bg-white/60 rounded-full transition-all duration-1000 ease-out"
+      <CardHeader className="relative pb-4">
+        <div className="relative mb-4">
+          <div className={iconSectionClasses}>
+            <span className={iconClasses}>{getProgramIcon(programData.name)}</span>
+            <div className="absolute bottom-2 left-2 right-2">
+              <div className="h-1 w-full overflow-hidden rounded-full bg-white/20">
+                <div
+                  className="h-full rounded-full bg-theo-yellow transition-all duration-700"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -358,72 +317,65 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
           </div>
         </div>
 
-        {/* Title and Description */}
-        <div className={`space-y-${isDashboard ? '2' : '2'}`}>
-          <CardTitle className={titleProgrames}>
+        <div className="space-y-2">
+          <CardTitle className="line-clamp-1 text-lg font-bold text-theo-black">
             {programData.name}
           </CardTitle>
-          <p className={descriptionProgrames}>
+          <p className="line-clamp-2 text-sm leading-relaxed text-gray-500">
             {programData.description}
           </p>
         </div>
       </CardHeader>
 
-      <CardContent className={contentPadding}>
-        {/* Stats Grid */}
-        <div className={`grid grid-cols-2 gap-${isDashboard ? '3' : '3'}`}>
-          <div className={statCardProgrames}>
-            <div className={statIconProgrames}>
-              <Users className={`${iconSize} text-blue-600`} />
+      <CardContent className="relative space-y-4 pt-0">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex items-center gap-2 rounded-xl border border-gray-100 p-3">
+            <div className="rounded-lg bg-theo-yellow/20 p-1.5">
+              <Users className="h-3.5 w-3.5 text-theo-black" />
             </div>
             <div>
-              <div className="text-xs text-gray-500 font-medium">Subjects</div>
+              <div className="text-xs font-medium text-gray-500">Subjects</div>
               <div className="text-sm font-bold text-gray-900">{subjectCount}</div>
             </div>
           </div>
-          <div className={statCardProgrames}>
-            <div className={`${statIconProgrames.replace('bg-blue-100', 'bg-purple-100')}`}>
-              <Clock className={`${iconSize} text-purple-600`} />
+          <div className="flex items-center gap-2 rounded-xl border border-gray-100 p-3">
+            <div className="rounded-lg bg-gray-100 p-1.5">
+              <Clock className="h-3.5 w-3.5 text-gray-600" />
             </div>
             <div>
-              <div className="text-xs text-gray-500 font-medium">Lessons</div>
+              <div className="text-xs font-medium text-gray-500">Lessons</div>
               <div className="text-sm font-bold text-gray-900">{chapterCount}</div>
             </div>
           </div>
         </div>
 
-        {/* Progress Section */}
-        <div className={`space-y-${isDashboard ? '3' : '3'}`}>
-          <div className="flex justify-between items-center">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-gray-600">{progressLabel}</span>
             <span className="text-xs font-bold text-gray-900">{progress}%</span>
           </div>
-          <div className={`w-full bg-gray-100 rounded-full ${progressBarHeight} overflow-hidden`}>
-            <div 
-              className="h-full bg-theo-yellow rounded-full transition-all duration-1000 ease-out shadow-sm"
+          <div className={`w-full overflow-hidden rounded-full bg-gray-100 ${progressBarHeight}`}>
+            <div
+              className="h-full rounded-full bg-theo-yellow transition-all duration-700"
               style={{ width: `${progress}%` }}
             />
           </div>
         </div>
 
-        {/* Action Buttons */}
         {isDashboard && (
-          <div className="pt-2">
+          <div className="pt-1">
             <DashboardActionButton programData={programData as DashboardProgramData} />
           </div>
         )}
 
         {isDemo && onUpgrade && (
-          <DemoActionButtons 
+          <DemoActionButtons
             onDemo={onClick}
             onUpgrade={onUpgrade}
             programData={programData as DashboardProgramData}
           />
         )}
       </CardContent>
-
-      {/* Hover overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg" />
     </Card>
   );
 };

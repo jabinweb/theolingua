@@ -186,16 +186,14 @@ export default function AdminPage() {
   }).length;
 
   return (
-    <div className="p-8 bg-theo-white/30 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-12">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+    <div>
+        <div className="mb-8">
+          <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
             <div>
-              <h1 className="text-5xl font-bold text-theo-black tracking-tight mb-2">
+              <h1 className="mb-2 text-2xl font-bold tracking-tighter text-theo-black md:text-3xl">
                 Admin Dashboard
               </h1>
-              <p className="text-gray-500 font-medium text-lg">Platform statistics and management</p>
+              <p className="text-gray-600">Platform statistics and management</p>
             </div>
             <div className="flex gap-4">
               <Button onClick={refreshData} disabled={dataLoading} variant="outline" className="rounded-2xl h-12 px-6">
@@ -228,15 +226,15 @@ export default function AdminPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden group bg-theo-black">
+          <Card className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-theo-yellow/50">Active Subs</CardTitle>
-              <div className="h-12 w-12 rounded-2xl bg-theo-yellow flex items-center justify-center group-hover:scale-110 transition-transform">
-                <UserCheck className="h-6 w-6 text-theo-black" />
+              <CardTitle className="text-xs font-medium text-gray-500">Active subscriptions</CardTitle>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-theo-yellow/20">
+                <UserCheck className="h-5 w-5 text-theo-black" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold text-theo-yellow tracking-tighter">{activeSubscriptions.length}</div>
+              <div className="text-3xl font-bold tracking-tighter text-theo-black">{activeSubscriptions.length}</div>
               <p className="text-[10px] text-theo-yellow/50 font-bold mt-2 uppercase tracking-tighter">
                 {((activeSubscriptions.length / (registeredUsers.length || 1)) * 100).toFixed(1)}% conversion
               </p>
@@ -351,7 +349,7 @@ export default function AdminPage() {
         {/* Recent Activity Tables */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="hover:shadow-lg transition-shadow overflow-hidden border-0 shadow-sm rounded-[32px]">
-            <CardHeader className="border-b bg-theo-black text-theo-yellow p-6">
+            <CardHeader className="border-b border-gray-200 bg-white p-6 text-theo-black">
               <CardTitle className="flex items-center text-lg font-bold uppercase tracking-tight">
                 <Users className="h-5 w-5 mr-3" />
                 Recent Registrations
@@ -392,7 +390,7 @@ export default function AdminPage() {
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow overflow-hidden border-0 shadow-sm rounded-[32px]">
-            <CardHeader className="border-b bg-theo-black text-theo-yellow p-6">
+            <CardHeader className="border-b border-gray-200 bg-white p-6 text-theo-black">
               <CardTitle className="flex items-center text-lg font-bold uppercase tracking-tight">
                 <CreditCard className="h-5 w-5 mr-3" />
                 Recent Subscriptions
@@ -438,7 +436,6 @@ export default function AdminPage() {
           onClose={() => setTopicFormOpen(false)}
           onSubmit={handleUniversalTopicSubmit}
         />
-      </div>
     </div>
   );
 }

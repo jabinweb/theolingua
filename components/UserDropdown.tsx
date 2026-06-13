@@ -67,7 +67,7 @@ export const UserDropdown = () => {
               src={user?.image || undefined} 
               alt={displayName}
             />
-            <AvatarFallback className="bg-blue-100 text-blue-700 text-sm font-medium">
+            <AvatarFallback className="bg-theo-yellow/30 text-theo-black text-sm font-semibold">
               {initials}
             </AvatarFallback>
           </Avatar>

@@ -60,21 +60,23 @@ export default async function UserAnalyticsPage({ params }: { params: Promise<{ 
       </div>
 
       {/* Main Profile Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20 px-4"></div>
-        <div className="flex flex-col md:flex-row gap-6 items-start md:items-center relative z-10">
-          <div className="h-20 w-20 rounded-2xl bg-white/20 backdrop-blur border border-white/20 flex items-center justify-center text-3xl font-black shadow-inner">
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 md:p-8">
+        <div className="flex flex-col items-start gap-6 md:flex-row md:items-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-theo-yellow/20 text-2xl font-bold text-theo-black">
             {user.name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || 'U'}
           </div>
           <div className="flex-1">
-            <div className="flex flex-wrap items-center gap-3 mb-2">
-              <h2 className="text-3xl font-black">{user.name || 'Unnamed Student'}</h2>
-              <Badge className="bg-white/20 text-white hover:bg-white/30 border-none shadow-none uppercase tracking-widest text-[10px] font-black">
+            <div className="mb-2 flex flex-wrap items-center gap-3">
+              <h2 className="text-2xl font-bold text-theo-black">{user.name || 'Unnamed Student'}</h2>
+              <Badge variant="secondary" className="border-gray-200 bg-gray-50 text-gray-700">
                 {user.role}
               </Badge>
             </div>
-            <p className="text-blue-100 font-medium mb-1">{user.email}</p>
-            <p className="text-indigo-200 text-sm">{user.batch ? `Assigned to ${user.batch.name} (${user.batch.class.name})` : 'No Batch Assigned'} • Joined {new Date(user.created_at).toLocaleDateString()}</p>
+            <p className="mb-1 font-medium text-gray-700">{user.email}</p>
+            <p className="text-sm text-gray-500">
+              {user.batch ? `Assigned to ${user.batch.name} (${user.batch.class.name})` : 'No batch assigned'} • Joined{' '}
+              {new Date(user.created_at).toLocaleDateString()}
+            </p>
           </div>
         </div>
       </div>
