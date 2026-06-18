@@ -19,7 +19,8 @@ export async function GET(request: Request) {
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
-        school: true
+        school: true,
+        batch: { select: { classId: true } },
       }
     });
 
@@ -59,6 +60,8 @@ export async function GET(request: Request) {
       console.error('Error fetching classes');
       return NextResponse.json({ error: 'Failed to fetch classes' }, { status: 500 });
     }
+
+    const isAdmin = user.role === 'ADMIN';
 
     // Check user's paid subscriptions (both class-wide and subject-specific)
     const subscriptions = await prisma.subscription.findMany({
@@ -143,6 +146,8 @@ export async function GET(request: Request) {
       const hasSchoolAccess = user.school?.isActive && user.grade && 
         (gradeToClassMap[user.grade] || []).includes(cls.id);
       const hasClassSubscription = classSubscriptions.has(cls.id);
+      const hasBatchAccess = user.batch?.classId === cls.id;
+      const hasFullAccess = isAdmin || hasSchoolAccess || hasClassSubscription || hasBatchAccess;
       
       // Check which subjects have individual subscriptions
       const subjectAccess = new Map();
@@ -150,9 +155,10 @@ export async function GET(request: Request) {
         cls.subjects.forEach((subject: Subject) => {
           const hasSubjectSubscription = subjectSubscriptions.has(subject.id);
           subjectAccess.set(subject.id, {
-            hasAccess: hasSchoolAccess || hasClassSubscription || hasSubjectSubscription,
-            accessType: hasSchoolAccess ? 'school' : 
-                       hasClassSubscription ? 'class_subscription' :
+            hasAccess: hasFullAccess || hasSubjectSubscription,
+            accessType: isAdmin ? 'class_subscription' :
+                       hasSchoolAccess ? 'school' : 
+                       hasClassSubscription || hasBatchAccess ? 'class_subscription' :
                        hasSubjectSubscription ? 'subject_subscription' : 'none'
           });
         });
@@ -160,11 +166,11 @@ export async function GET(request: Request) {
 
       return {
         ...cls,
-        accessType: hasSchoolAccess ? 'school' : hasClassSubscription ? 'subscription' : 'none',
+        accessType: isAdmin ? 'subscription' : hasSchoolAccess ? 'school' : hasClassSubscription || hasBatchAccess ? 'subscription' : 'none',
         schoolAccess: hasSchoolAccess,
-        subscriptionAccess: hasClassSubscription,
+        subscriptionAccess: hasClassSubscription || hasBatchAccess || isAdmin,
         subjectAccess: Object.fromEntries(subjectAccess),
-        hasPartialAccess: !hasSchoolAccess && !hasClassSubscription && 
+        hasPartialAccess: !hasFullAccess && 
           Array.from(subjectAccess.values()).some(access => access.hasAccess)
       };
     });

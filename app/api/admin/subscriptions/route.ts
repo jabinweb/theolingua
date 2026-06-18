@@ -1,8 +1,20 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { isAdmin } from '@/lib/auth-utils';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const distinct = searchParams.get('distinct');
+
+    if (distinct === 'planType') {
+      const planTypes = await prisma.subscription.findMany({
+        distinct: ['planType'],
+        select: { planType: true },
+      });
+      return NextResponse.json(planTypes);
+    }
+
     const subscriptions = await prisma.subscription.findMany({
       include: {
         user: {
@@ -27,12 +39,11 @@ export async function GET() {
       orderBy: { created_at: 'desc' }
     });
 
-    // Transform the data to match expected format
     const transformedSubscriptions = subscriptions.map((sub: typeof subscriptions[number]) => ({
       ...sub,
       amount: sub.amount || 0,
-      paymentId: sub.id, // Use subscription ID as payment ID for now
-      created_at: sub.created_at, // Map for frontend compatibility
+      paymentId: sub.id,
+      created_at: sub.created_at,
       user: {
         email: sub.user?.email,
         display_name: sub.user?.name
@@ -48,6 +59,9 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   try {
+    const [authOk, authVal] = await isAdmin();
+    if (!authOk) return authVal;
+
     const { subscriptionId, status } = await request.json();
     
     if (!subscriptionId || !status) {
@@ -71,6 +85,9 @@ export async function PATCH(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
+    const [authOk, authVal] = await isAdmin();
+    if (!authOk) return authVal;
+
     const { searchParams } = new URL(request.url);
     const subscriptionId = searchParams.get('id');
     
@@ -91,34 +108,94 @@ export async function DELETE(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const { userId, classId, subjectId, amount, status, planType } = await request.json();
+    const [authOk, authVal] = await isAdmin();
+    if (!authOk) return authVal;
 
-    if (!userId || !amount || !status || !planType || !classId) {
-      return NextResponse.json({ error: 'userId, amount, status, planType, and classId are required' }, { status: 400 });
+    const body = await request.json();
+    const {
+      userId,
+      classId,
+      classIds,
+      batchId,
+      amount = 0,
+      status = 'ACTIVE',
+      planType = 'CLASS',
+    } = body;
+
+    if (!userId) {
+      return NextResponse.json({ error: 'userId is required' }, { status: 400 });
     }
-    
-    // Set subscription to expire 1 year from now
+
+    const programIds: number[] = Array.isArray(classIds) && classIds.length > 0
+      ? classIds.map((id: number) => Number(id)).filter((id: number) => !Number.isNaN(id))
+      : classId
+        ? [Number(classId)]
+        : [];
+
+    if (!batchId && programIds.length === 0) {
+      return NextResponse.json(
+        { error: 'Select at least one program or assign a batch' },
+        { status: 400 }
+      );
+    }
+
     const endDate = new Date();
     endDate.setFullYear(endDate.getFullYear() + 1);
-    
-    const data = {
-      user: { connect: { id: userId } },
-      class: { connect: { id: classId } },
-      amount,
-      status,
-      planType,
-      currency: 'INR',
-      startDate: new Date(),
-      endDate: endDate,
-      ...(subjectId && { subject: { connect: { id: subjectId } } }),
-    };
+    const startDate = new Date();
 
-    const subscription = await prisma.subscription.create({ data });
-    return NextResponse.json(subscription);
+    const result = await prisma.$transaction(async (tx) => {
+      if (batchId) {
+        await tx.user.update({
+          where: { id: userId },
+          data: { batchId },
+        });
+      }
+
+      const created: string[] = [];
+      const skipped: number[] = [];
+
+      for (const cid of programIds) {
+        const existing = await tx.subscription.findFirst({
+          where: {
+            userId,
+            classId: cid,
+            subjectId: null,
+            status: 'ACTIVE',
+            endDate: { gte: new Date() },
+          },
+        });
+
+        if (existing) {
+          skipped.push(cid);
+          continue;
+        }
+
+        const subscription = await tx.subscription.create({
+          data: {
+            user: { connect: { id: userId } },
+            class: { connect: { id: cid } },
+            amount: Number(amount) || 0,
+            status,
+            planType,
+            currency: 'INR',
+            startDate,
+            endDate,
+          },
+        });
+        created.push(subscription.id);
+      }
+
+      return { created, skipped };
+    });
+
+    return NextResponse.json({
+      success: true,
+      createdCount: result.created.length,
+      skippedCount: result.skipped.length,
+      batchAssigned: Boolean(batchId),
+    });
   } catch (error) {
     console.error('Error creating subscription:', error);
     return NextResponse.json({ error: 'Failed to create subscription' }, { status: 500 });
   }
 }
-
-

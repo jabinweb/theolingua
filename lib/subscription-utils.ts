@@ -15,6 +15,30 @@ export async function checkUserAccess(
   subjectId?: string
 ): Promise<UserAccess> {
   try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        role: true,
+        batch: { select: { classId: true } },
+      },
+    });
+
+    if (user?.role === 'ADMIN') {
+      return {
+        hasClassAccess: true,
+        hasSubjectAccess: true,
+        accessType: 'class',
+      };
+    }
+
+    if (user?.batch?.classId === classId) {
+      return {
+        hasClassAccess: true,
+        hasSubjectAccess: true,
+        accessType: 'class',
+      };
+    }
+
     // Check for active class subscription (full access)
     const classSubscription = await prisma.subscription.findFirst({
       where: {

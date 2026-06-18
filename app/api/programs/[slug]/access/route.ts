@@ -55,6 +55,8 @@ export async function GET(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    const isAdmin = user.role === 'ADMIN';
+
     const isNumeric = /^\d+$/.test(slug);
 
     const programData = await prisma.class.findUnique({
@@ -118,6 +120,7 @@ export async function GET(
 
     const hasBatchAccess = user.batch?.classId === programData.id;
     const isFreeProgram = programData.price === 0 || programData.price === null;
+    const hasFullAccess = isAdmin || isFreeProgram || hasSchoolAccess || !!classSubscription || hasBatchAccess;
 
     let dripAccessMap = new Map<string, { isUnlocked: boolean; daysRemaining: number }>();
     let isDripActive = false;
@@ -144,7 +147,7 @@ export async function GET(
       const allChapters = subject.chapters.map((ch) => ch.id);
 
       let accessibleChapters: string[] = [];
-      if (isFreeProgram || hasSchoolAccess || !!classSubscription || hasSubjectSubscription || hasBatchAccess) {
+      if (hasFullAccess || hasSubjectSubscription) {
         accessibleChapters = allChapters;
       } else if (subject.chapters.length > 0) {
         const firstChapter = [...subject.chapters].sort((a, b) => a.orderIndex - b.orderIndex)[0];
@@ -152,14 +155,15 @@ export async function GET(
       }
 
       let accessType: UnitAccess['accessType'] = 'none';
-      if (hasSchoolAccess) accessType = 'school';
+      if (isAdmin) accessType = 'class_subscription';
+      else if (hasSchoolAccess) accessType = 'school';
       else if (classSubscription || hasBatchAccess) accessType = 'class_subscription';
       else if (hasSubjectSubscription) accessType = 'subject_subscription';
       else if (accessibleChapters.length > 0 && accessibleChapters.length < subject.chapters.length) {
         accessType = 'free_trial';
       }
 
-      if (isDripActive && dripAccessMap.size > 0) {
+      if (isDripActive && dripAccessMap.size > 0 && !isAdmin) {
         const dripResult = dripAccessMap.get(subject.id);
         if (dripResult && !dripResult.isUnlocked) {
           return {
@@ -186,7 +190,7 @@ export async function GET(
         accessType,
         price: subject.price || undefined,
         currency: subject.currency,
-        canUpgrade: hasSubjectSubscription && !classSubscription && !hasBatchAccess,
+        canUpgrade: hasSubjectSubscription && !hasFullAccess,
         accessibleChapters,
         dripLocked: false,
         daysRemaining: 0,
@@ -197,8 +201,10 @@ export async function GET(
       classId: programData.id,
       className: programData.name,
       classPrice: programData.price,
-      hasFullAccess: isFreeProgram || hasSchoolAccess || !!classSubscription || hasBatchAccess,
-      accessType: hasSchoolAccess
+      hasFullAccess,
+      accessType: isAdmin
+        ? 'class_subscription'
+        : hasSchoolAccess
         ? 'school'
         : classSubscription || hasBatchAccess
           ? 'class_subscription'
@@ -206,9 +212,9 @@ export async function GET(
             ? 'drip'
             : 'partial',
       unitAccess,
-      canUpgradeToClass: subjectSubscriptions.size > 0 && !classSubscription && !hasBatchAccess,
+      canUpgradeToClass: subjectSubscriptions.size > 0 && !hasFullAccess,
       upgradeOptions:
-        subjectSubscriptions.size > 0 && !classSubscription && !hasBatchAccess && programData.price
+        subjectSubscriptions.size > 0 && !hasFullAccess && programData.price
           ? {
               currentSubjects: Array.from(subjectSubscriptions.keys()),
               classPrice: programData.price,

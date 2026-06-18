@@ -5,12 +5,27 @@ import { useSession } from 'next-auth/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, RefreshCw, AlertCircle, Search } from 'lucide-react';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Trash2, RefreshCw, AlertCircle, Search, Crown, Calendar, DollarSign } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import { Crown, Calendar, DollarSign } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { AvatarImage } from '@radix-ui/react-avatar';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
+
+interface Program {
+  id: number;
+  name: string;
+}
+
+interface Batch {
+  id: string;
+  name: string;
+  classId: number;
+  class: { id: number; name: string };
+}
 
 interface Subscription {
   id: string;
@@ -21,14 +36,8 @@ interface Subscription {
   created_at: string;
   planType: string;
   planName?: string;
-  class?: {
-    id: number;
-    name: string;
-  } | null;
-  subject?: {
-    id: string;
-    name: string;
-  } | null;
+  class?: { id: number; name: string } | null;
+  subject?: { id: string; name: string } | null;
 }
 
 interface RegisteredUser {
@@ -42,88 +51,68 @@ interface RegisteredUser {
   photoUrl?: string;
 }
 
+function resetGrantForm() {
+  return {
+    userId: '',
+    batchId: '',
+    selectedProgramIds: [] as number[],
+    status: 'ACTIVE',
+  };
+}
+
 export default function SubscriptionsPage() {
-  // State for classes and subjects
-  const [classes, setClasses] = useState<{ id: number; name: string }[]>([]);
-  const [subjects, setSubjects] = useState<{ id: string; name: string }[]>([]);
-  const [formProgramId, setformProgramId] = useState('');
-  const [formSubjectId, setFormSubjectId] = useState('');
+  const [programs, setPrograms] = useState<Program[]>([]);
+  const [batches, setBatches] = useState<Batch[]>([]);
   const { data: session, status } = useSession();
   const user = session?.user;
-  const userRole = user?.role; // Get actual role from session
+  const userRole = user?.role;
   const loading = status === 'loading';
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [registeredUsers, setRegisteredUsers] = useState<RegisteredUser[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [dataFetched, setDataFetched] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [formUserId, setFormUserId] = useState('');
-  const [formAmount, setFormAmount] = useState('');
-  const [formStatus, setFormStatus] = useState('ACTIVE');
+  const [form, setForm] = useState(resetGrantForm());
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [formPlanType, setFormPlanType] = useState('CLASS');
-  const [planTypes, setPlanTypes] = useState<string[]>(["CLASS", "SUBJECT", "CUSTOM"]);
 
-  // Enhanced admin check - wait for userRole to be loaded
   const isAdmin = user && userRole === 'ADMIN';
   const isLoadingAuth = loading || (user && userRole === null);
+  const allProgramIds = programs.map((p) => p.id);
+  const allSelected =
+    allProgramIds.length > 0 && allProgramIds.every((id) => form.selectedProgramIds.includes(id));
 
-// Fetch classes for dropdown
-useEffect(() => {
-  if (showCreateModal) {
-    fetch('/api/admin/programs')
-      .then(res => res.json())
-      .then(data => setClasses(Array.isArray(data) ? data : []));
-  }
-}, [showCreateModal]);
-
-// Fetch subjects for selected program
-useEffect(() => {
-  if (showCreateModal && formProgramId) {
-    fetch(`/api/admin/units?classId=${formProgramId}`)
-      .then(res => res.json())
-      .then(data => setSubjects(Array.isArray(data) ? data : []));
-  } else if (showCreateModal) {
-    setSubjects([]);
-  }
-}, [showCreateModal, formProgramId]);
-  // Fetch unique plan types from the backend
   useEffect(() => {
-    if (showCreateModal) {
-      fetch('/api/admin/subscriptions?distinct=planType')
-        .then(res => res.json())
-        .then(data => {
-          if (Array.isArray(data) && data.length > 0) {
-            setPlanTypes(Array.from(new Set(["CLASS", "SUBJECT", "CUSTOM", ...data.map((s: { planType: string }) => s.planType).filter(Boolean)])));
-          }
-        });
-    }
+    if (!showCreateModal) return;
+
+    Promise.all([
+      fetch('/api/admin/programs').then((res) => res.json()),
+      fetch('/api/admin/batches').then((res) => res.json()),
+    ]).then(([programsData, batchesData]) => {
+      setPrograms(Array.isArray(programsData) ? programsData : []);
+      setBatches(Array.isArray(batchesData) ? batchesData : []);
+    });
   }, [showCreateModal]);
 
   useEffect(() => {
-    // Only redirect if we're sure the user is not an admin and auth is fully loaded
     if (!isLoadingAuth && user && userRole !== 'ADMIN') {
-      console.log('Redirecting non-admin user to home');
       window.location.href = '/';
       return;
     }
 
-    // Only fetch data once when user is confirmed admin and data hasn't been fetched yet
     if (isAdmin && !dataFetched) {
       const fetchData = async () => {
         setDataLoading(true);
         try {
           const [subscriptionsResponse, usersResponse] = await Promise.all([
             fetch('/api/admin/subscriptions'),
-            fetch('/api/admin/users')
+            fetch('/api/admin/users'),
           ]);
-          
+
           const subscriptionsData = await subscriptionsResponse.json();
           const usersData = await usersResponse.json();
 
-          // Ensure arrays are returned
           setSubscriptions(Array.isArray(subscriptionsData) ? subscriptionsData : []);
           setRegisteredUsers(Array.isArray(usersData) ? usersData : []);
           setDataFetched(true);
@@ -145,6 +134,33 @@ useEffect(() => {
     }
   }, [isAdmin, isLoadingAuth, dataFetched, user, userRole]);
 
+  const toggleProgram = (programId: number, checked: boolean) => {
+    setForm((prev) => ({
+      ...prev,
+      selectedProgramIds: checked
+        ? [...new Set([...prev.selectedProgramIds, programId])]
+        : prev.selectedProgramIds.filter((id) => id !== programId),
+    }));
+  };
+
+  const toggleAllPrograms = (checked: boolean) => {
+    setForm((prev) => ({
+      ...prev,
+      selectedProgramIds: checked ? [...allProgramIds] : [],
+    }));
+  };
+
+  const handleBatchChange = (batchId: string) => {
+    const batch = batches.find((b) => b.id === batchId);
+    setForm((prev) => {
+      const next = { ...prev, batchId: batchId === 'none' ? '' : batchId };
+      if (batch && batchId !== 'none') {
+        next.selectedProgramIds = [...new Set([...prev.selectedProgramIds, batch.classId])];
+      }
+      return next;
+    });
+  };
+
   const updateSubscriptionStatus = async (subscriptionId: string, newStatus: string) => {
     try {
       const response = await fetch('/api/admin/subscriptions', {
@@ -152,17 +168,11 @@ useEffect(() => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ subscriptionId, status: newStatus }),
       });
-      
+
       if (response.ok) {
-        setSubscriptions(subscriptions.map(sub => 
-          sub.id === subscriptionId ? { ...sub, status: newStatus } : sub
-        ));
-        // Also update the users list
-        setRegisteredUsers(registeredUsers.map(user => 
-          user.subscription?.id === subscriptionId 
-            ? { ...user, subscription: { ...user.subscription, status: newStatus }, hasActiveSubscription: newStatus === 'active' }
-            : user
-        ));
+        setSubscriptions((prev) =>
+          prev.map((sub) => (sub.id === subscriptionId ? { ...sub, status: newStatus } : sub))
+        );
       }
     } catch (error) {
       console.error('Error updating subscription:', error);
@@ -171,14 +181,14 @@ useEffect(() => {
 
   const deleteSubscription = async (subscriptionId: string) => {
     if (!confirm('Are you sure you want to delete this subscription?')) return;
-    
+
     try {
       const response = await fetch(`/api/admin/subscriptions?id=${subscriptionId}`, {
         method: 'DELETE',
       });
-      
+
       if (response.ok) {
-        setSubscriptions(subscriptions.filter(sub => sub.id !== subscriptionId));
+        setSubscriptions((prev) => prev.filter((sub) => sub.id !== subscriptionId));
       }
     } catch (error) {
       console.error('Error deleting subscription:', error);
@@ -190,12 +200,12 @@ useEffect(() => {
     try {
       const [subscriptionsResponse, usersResponse] = await Promise.all([
         fetch('/api/admin/subscriptions'),
-        fetch('/api/admin/users')
+        fetch('/api/admin/users'),
       ]);
-      
+
       const subscriptionsData = await subscriptionsResponse.json();
       const usersData = await usersResponse.json();
-      
+
       setSubscriptions(Array.isArray(subscriptionsData) ? subscriptionsData : []);
       setRegisteredUsers(Array.isArray(usersData) ? usersData : []);
     } catch (error) {
@@ -207,16 +217,56 @@ useEffect(() => {
     }
   };
 
-  // Filter subscriptions based on search term
+  const handleGrantAccess = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormLoading(true);
+    setFormError('');
+
+    try {
+      if (!form.userId) {
+        throw new Error('Select a user');
+      }
+      if (!form.batchId && form.selectedProgramIds.length === 0) {
+        throw new Error('Select at least one program or assign a batch');
+      }
+
+      const res = await fetch('/api/admin/subscriptions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: form.userId,
+          classIds: form.selectedProgramIds,
+          batchId: form.batchId || undefined,
+          amount: 0,
+          status: form.status,
+          planType: 'CLASS',
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to grant access');
+      }
+
+      setShowCreateModal(false);
+      setForm(resetGrantForm());
+      refreshData();
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : 'Failed to grant access');
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
   const filteredSubscriptions = useMemo(() => {
     if (!searchTerm.trim()) return subscriptions;
-    
+
     const searchLower = searchTerm.toLowerCase();
-    return subscriptions.filter(subscription => {
-      const user = registeredUsers.find(user => user.uid === subscription.userId);
+    return subscriptions.filter((subscription) => {
+      const subUser = registeredUsers.find((u) => u.uid === subscription.userId);
       return (
-        user?.displayName?.toLowerCase().includes(searchLower) ||
-        user?.email?.toLowerCase().includes(searchLower) ||
+        subUser?.displayName?.toLowerCase().includes(searchLower) ||
+        subUser?.email?.toLowerCase().includes(searchLower) ||
         subscription.status.toLowerCase().includes(searchLower) ||
         subscription.paymentId.toLowerCase().includes(searchLower) ||
         subscription.class?.name?.toLowerCase().includes(searchLower) ||
@@ -226,21 +276,20 @@ useEffect(() => {
     });
   }, [subscriptions, searchTerm, registeredUsers]);
 
-  // Show loading while checking auth and role
   if (isLoadingAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-theo-black border-t-transparent" />
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-[40vh] items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-2">Authentication Required</h1>
-          <p className="text-muted-foreground">Please sign in to access the admin panel.</p>
+          <h1 className="mb-2 text-xl font-bold">Authentication Required</h1>
+          <p className="text-sm text-muted-foreground">Please sign in to access the admin panel.</p>
         </div>
       </div>
     );
@@ -248,11 +297,11 @@ useEffect(() => {
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-[40vh] items-center justify-center">
         <div className="text-center">
-          <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
-          <p className="text-muted-foreground">You don&apos;t have permission to access this page.</p>
+          <AlertCircle className="mx-auto mb-4 h-12 w-12 text-red-500" />
+          <h1 className="mb-2 text-xl font-bold">Access Denied</h1>
+          <p className="text-sm text-muted-foreground">You don&apos;t have permission to access this page.</p>
         </div>
       </div>
     );
@@ -260,343 +309,289 @@ useEffect(() => {
 
   if (dataLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-theo-black border-t-transparent" />
       </div>
     );
   }
 
-  const activeSubscriptions = Array.isArray(subscriptions) ? subscriptions.filter(s => s.status === 'ACTIVE') : [];
-  const totalRevenue = Array.isArray(subscriptions) ? subscriptions.reduce((sum, s) => sum + (s.amount || 0), 0) : 0;
-
+  const activeSubscriptions = subscriptions.filter((s) => s.status === 'ACTIVE');
+  const totalRevenue = subscriptions.reduce((sum, s) => sum + (s.amount || 0), 0);
 
   return (
-    <div className="p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-0">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Subscription Management</h1>
-            <p className="text-muted-foreground">Manage user subscriptions and payments</p>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={() => setShowCreateModal(true)} variant="theo" className="font-bold">
-              + Create Subscription
+    <div className="min-w-0">
+      <AdminPageHeader
+        title="Subscription Management"
+        description="Grant program access, assign batches, and manage subscriptions."
+        actions={
+          <>
+            <Button onClick={() => setShowCreateModal(true)} variant="theo" size="sm" className="font-semibold">
+              Grant Access
             </Button>
-            <Button onClick={refreshData} disabled={dataLoading} variant="outline">
-              <RefreshCw className="h-4 w-4 mr-2" />
+            <Button onClick={refreshData} disabled={dataLoading} variant="outline" size="sm">
+              <RefreshCw className="mr-2 h-4 w-4" />
               Refresh
             </Button>
-          </div>
-        </div>
+          </>
+        }
+      />
 
-        {/* Create Subscription Modal */}
-        {showCreateModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
-              <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-600" onClick={() => setShowCreateModal(false)}>&times;</button>
-              <h2 className="text-xl font-bold mb-4">Create Subscription</h2>
-              {formError && <div className="text-red-600 text-sm mb-2">{formError}</div>}
-              <form onSubmit={async (e) => {
-                e.preventDefault();
-                setFormLoading(true);
-                setFormError('');
-                try {
-                  const res = await fetch('/api/admin/subscriptions', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      userId: formUserId,
-                      planType: formPlanType,
-                      classId: Number(formProgramId),
-                      subjectId: formSubjectId || undefined,
-                      amount: Number(formAmount),
-                      status: formStatus
-                    })
-                  });
-                  if (!res.ok) {
-                    const err = await res.json().catch(() => ({}));
-                    throw new Error(err.error || 'Failed to create subscription');
-                  }
-                  setShowCreateModal(false);
-                  setFormUserId('');
-                  setformProgramId('');
-                  setFormSubjectId('');
-                  setFormAmount('');
-                  setFormStatus('ACTIVE');
-                  setFormPlanType('CLASS');
-                  refreshData();
-                } catch (err) {
-                  if (err instanceof Error) {
-                    setFormError(err.message || 'Failed to create subscription');
-                  } else {
-                    setFormError('Failed to create subscription');
-                  }
-                } finally {
-                  setFormLoading(false);
-                }
-              }}>
-                <div className="mb-3">
-                  <label className="block text-sm font-medium mb-1">User</label>
-                  <select value={formUserId} onChange={e => setFormUserId(e.target.value)} required className="w-full border rounded px-2 py-1">
-                    <option value="">Select user...</option>
-                    {registeredUsers.map(u => (
-                      <option key={u.uid} value={u.uid}>{u.displayName || u.email}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="mb-3">
-                  <label className="block text-sm font-medium mb-1">Program <span className="text-red-500">*</span></label>
-                  <select value={formProgramId} onChange={e => { setformProgramId(e.target.value); setFormSubjectId(''); }} required className="w-full border rounded px-2 py-1">
-                    <option value="">Select program...</option>
-                    {classes.map(cls => (
-                      <option key={cls.id} value={cls.id}>{cls.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="mb-3">
-                  <label className="block text-sm font-medium mb-1">Unit (optional)</label>
-                  <select value={formSubjectId} onChange={e => setFormSubjectId(e.target.value)} className="w-full border rounded px-2 py-1" disabled={!formProgramId || subjects.length === 0}>
-                    <option value="">None</option>
-                    {subjects.map(sub => (
-                      <option key={sub.id} value={sub.id}>{sub.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="mb-3">
-                  <label className="block text-sm font-medium mb-1">Amount (in paise)</label>
-                  <input type="number" value={formAmount} onChange={e => setFormAmount(e.target.value)} required min="1" className="w-full border rounded px-2 py-1" placeholder="Amount in paise (e.g. 10000 for ₹100)" />
-                </div>
-                <div className="mb-3">
-                  <label className="block text-sm font-medium mb-1">Plan Type</label>
-                  <select value={formPlanType} onChange={e => setFormPlanType(e.target.value)} required className="w-full border rounded px-2 py-1">
-                    {planTypes.map((type) => (
-                      <option key={type} value={type}>{type}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1">Status</label>
-                  <select value={formStatus} onChange={e => setFormStatus(e.target.value)} required className="w-full border rounded px-2 py-1">
-                    <option value="ACTIVE">Active</option>
-                    <option value="INACTIVE">Inactive</option>
-                  </select>
-                </div>
-                <Button type="submit" className="w-full" disabled={formLoading}>
-                  {formLoading ? 'Creating...' : 'Create Subscription'}
-                </Button>
-              </form>
-            </div>
-          </div>
-        )}
+      <Dialog
+        open={showCreateModal}
+        onOpenChange={(open) => {
+          setShowCreateModal(open);
+          if (!open) {
+            setForm(resetGrantForm());
+            setFormError('');
+          }
+        }}
+      >
+        <DialogContent className="max-h-[90vh] max-w-md overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Grant Access</DialogTitle>
+          </DialogHeader>
 
-        {/* Search Bar */}
-        <Card className="mb-6">
-          <CardContent className="p-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Search by user name, email, status, program, unit, or payment ID..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-10"
-              />
+          {formError && (
+            <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              {formError}
             </div>
+          )}
+
+          <form onSubmit={handleGrantAccess} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="grant-user">User</Label>
+              <Select
+                value={form.userId}
+                onValueChange={(value) => setForm((prev) => ({ ...prev, userId: value }))}
+              >
+                <SelectTrigger id="grant-user">
+                  <SelectValue placeholder="Select user..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {registeredUsers.map((u) => (
+                    <SelectItem key={u.uid} value={u.uid}>
+                      {u.displayName || u.email}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="grant-batch">Batch (optional)</Label>
+              <Select value={form.batchId || 'none'} onValueChange={handleBatchChange}>
+                <SelectTrigger id="grant-batch">
+                  <SelectValue placeholder="No batch" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No batch</SelectItem>
+                  {batches.map((batch) => (
+                    <SelectItem key={batch.id} value={batch.id}>
+                      {batch.name} — {batch.class.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500">
+                Batch assignment enables drip scheduling for that program.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <Label>Programs</Label>
+                <label className="flex cursor-pointer items-center gap-2 text-xs text-gray-600">
+                  <Checkbox checked={allSelected} onCheckedChange={(checked) => toggleAllPrograms(checked === true)} />
+                  Select all
+                </label>
+              </div>
+              <div className="space-y-2 rounded-md border border-gray-200 p-3">
+                {programs.length === 0 ? (
+                  <p className="text-sm text-gray-500">No programs found.</p>
+                ) : (
+                  programs.map((program) => (
+                    <label key={program.id} className="flex cursor-pointer items-center gap-2 text-sm">
+                      <Checkbox
+                        checked={form.selectedProgramIds.includes(program.id)}
+                        onCheckedChange={(checked) => toggleProgram(program.id, checked === true)}
+                      />
+                      <span>{program.name}</span>
+                    </label>
+                  ))
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="grant-status">Status</Label>
+              <Select
+                value={form.status}
+                onValueChange={(value) => setForm((prev) => ({ ...prev, status: value }))}
+              >
+                <SelectTrigger id="grant-status">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ACTIVE">Active</SelectItem>
+                  <SelectItem value="INACTIVE">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Button type="submit" className="w-full" size="sm" disabled={formLoading}>
+              {formLoading ? 'Saving...' : 'Grant Access'}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Card className="mb-4 border-gray-200 shadow-sm">
+        <CardContent className="p-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <Input
+              placeholder="Search by user, email, program, or status..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="h-9 pl-9"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="admin-stats-grid">
+        <Card className="border-gray-200 shadow-sm">
+          <CardHeader className="pb-1 pt-3">
+            <CardTitle className="text-xs font-medium text-gray-600">Total</CardTitle>
+          </CardHeader>
+          <CardContent className="pb-3">
+            <div className="text-xl font-bold">{subscriptions.length}</div>
+            {searchTerm && (
+              <p className="text-xs text-muted-foreground">{filteredSubscriptions.length} matching</p>
+            )}
           </CardContent>
         </Card>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Subscriptions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{subscriptions.length}</div>
-              {searchTerm && (
-                <p className="text-xs text-muted-foreground">
-                  {filteredSubscriptions.length} matching search
-                </p>
-              )}
-            </CardContent>
-          </Card>
+        <Card className="border-gray-200 shadow-sm">
+          <CardHeader className="pb-1 pt-3">
+            <CardTitle className="text-xs font-medium text-gray-600">Active</CardTitle>
+          </CardHeader>
+          <CardContent className="pb-3">
+            <div className="text-xl font-bold">{activeSubscriptions.length}</div>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Subscriptions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{activeSubscriptions.length}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">₹{Math.round(totalRevenue / 100).toLocaleString()}</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Subscriptions List */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-          {filteredSubscriptions.map((subscription) => {
-            const subscriptionUser = registeredUsers.find(user => user.uid === subscription.userId);
-            const isActive = subscription.status === 'ACTIVE';
-            
-            return (
-              <Card key={subscription.id} className="group hover:shadow-xl transition-all duration-300 border border-gray-100 shadow-md">
-                <CardHeader className={`pb-4 ${isActive ? 'bg-theo-yellow/5' : 'bg-gray-50'}`}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`relative ${isActive ? 'ring-2 ring-green-200' : 'ring-2 ring-gray-200'} rounded-full`}>
-                        <Avatar className="h-10 w-10">
-                            {subscriptionUser?.photoUrl && (
-                              <AvatarImage src={subscriptionUser?.photoUrl} alt={subscriptionUser?.displayName || 'User'} />
-                            )}
-                          <AvatarFallback className={`${isActive ? 'bg-theo-black text-theo-yellow' : 'bg-gray-200 text-gray-700'} font-bold text-sm`}>
-                            {subscriptionUser?.displayName?.[0] || subscriptionUser?.email?.[0].toUpperCase() || 'U'}
-                          </AvatarFallback>
-                        </Avatar>
-                        {isActive && (
-                          <div className="absolute top-0 right-1 bg-green-500 text-white rounded-full p-1">
-                            <Crown className="h-2 w-2" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 text-sm line-clamp-1">
-                          {subscriptionUser?.displayName || 'Anonymous User'}
-                        </h3>
-                        <p className="text-xs text-gray-500 line-clamp-1">
-                          {subscriptionUser?.email || subscription.userId.slice(0, 8) + '...'}
-                        </p>
-                      </div>
-                    </div>
-                    <Badge 
-                      variant={isActive ? 'theo' : 'secondary'}
-                      className="font-bold text-xs"
-                    >
-                      {subscription.status}
-                    </Badge>
-                  </div>
-                </CardHeader>
-
-                <CardContent className="space-y-4 p-4">
-                  {/* Subscription Details */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-xl border border-gray-100">
-                      <DollarSign className="h-3 w-3 text-theo-black" />
-                      <div>
-                        <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Amount</div>
-                        <div className="font-bold text-theo-black text-sm">₹{subscription.amount/100}</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-xl border border-gray-100">
-                      <Calendar className="h-3 w-3 text-theo-black" />
-                      <div>
-                        <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Date</div>
-                        <div className="font-bold text-theo-black text-xs">
-                          {new Date(subscription.created_at).toLocaleDateString('en-US', { 
-                            month: 'short', 
-                            day: 'numeric',
-                            year: '2-digit' 
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Program/Unit Information */}
-                  <div className="space-y-2">
-                    {subscription.class && (
-                      <div className="flex items-center gap-2 p-2 bg-theo-black/5 rounded-xl border border-theo-black/10">
-                        <div className="w-2 h-2 bg-theo-black rounded-full"></div>
-                        <div className="flex-1 min-w-0">
-                          <div className="text-[10px] text-theo-black/60 font-bold uppercase tracking-wider">Program</div>
-                          <div className="font-bold text-theo-black text-sm line-clamp-1">{subscription.class.name}</div>
-                        </div>
-                      </div>
-                    )}
-                    {subscription.subject && (
-                      <div className="flex items-center gap-2 p-2 bg-theo-yellow/10 rounded-xl border border-theo-yellow/20">
-                        <div className="w-2 h-2 bg-theo-yellow rounded-full"></div>
-                        <div className="flex-1 min-w-0">
-                          <div className="text-[10px] text-theo-yellow font-bold uppercase tracking-wider">Unit</div>
-                          <div className="font-bold text-theo-black text-sm line-clamp-1">{subscription.subject.name}</div>
-                        </div>
-                      </div>
-                    )}
-                    {subscription.planName && !subscription.class && !subscription.subject && (
-                      <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-xl border border-gray-200">
-                        <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                        <div className="flex-1 min-w-0">
-                          <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Plan</div>
-                          <div className="font-bold text-gray-900 text-sm line-clamp-1">{subscription.planName}</div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <Separator />
-
-                  {/* Action Buttons */}
-                  <div className="space-y-3">
-                    <div className="flex gap-2">
-                      <Button
-                        variant={subscription.status === 'ACTIVE' ? 'theo' : 'outline'}
-                        size="sm"
-                        onClick={() => updateSubscriptionStatus(subscription.id, 'ACTIVE')}
-                        className="flex-1 text-xs h-8 font-bold"
-                        disabled={subscription.status === 'ACTIVE'}
-                      >
-                        {subscription.status === 'ACTIVE' ? 'Active' : 'Activate'}
-                      </Button>
-                      <Button
-                        variant={subscription.status === 'INACTIVE' ? 'theo-black' : 'outline'}
-                        size="sm"
-                        onClick={() => updateSubscriptionStatus(subscription.id, 'INACTIVE')}
-                        className="flex-1 text-xs h-8 font-bold"
-                        disabled={subscription.status === 'INACTIVE'}
-                      >
-                        {subscription.status === 'INACTIVE' ? 'Inactive' : 'Deactivate'}
-                      </Button>
-                    </div>
-                    
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => deleteSubscription(subscription.id)}
-                      className="w-full text-xs h-8"
-                    >
-                      <Trash2 className="h-3 w-3 mr-1" />
-                      Delete
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-
-        {filteredSubscriptions.length === 0 && searchTerm && (
-          <Card className="p-12 text-center">
-            <Crown className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-600 mb-2">No Subscriptions Found</h3>
-            <p className="text-muted-foreground">No subscriptions match your search for &quot;{searchTerm}&quot;</p>
-          </Card>
-        )}
-
-        {subscriptions.length === 0 && !searchTerm && (
-          <Card className="p-12 text-center">
-            <Crown className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-600 mb-2">No Subscriptions Found</h3>
-            <p className="text-muted-foreground">Subscription data will appear here once users start subscribing.</p>
-          </Card>
-        )}
+        <Card className="border-gray-200 shadow-sm">
+          <CardHeader className="pb-1 pt-3">
+            <CardTitle className="text-xs font-medium text-gray-600">Revenue</CardTitle>
+          </CardHeader>
+          <CardContent className="pb-3">
+            <div className="text-xl font-bold">₹{Math.round(totalRevenue / 100).toLocaleString()}</div>
+          </CardContent>
+        </Card>
       </div>
+
+      <div className="admin-card-grid">
+        {filteredSubscriptions.map((subscription) => {
+          const subscriptionUser = registeredUsers.find((u) => u.uid === subscription.userId);
+          const isActive = subscription.status === 'ACTIVE';
+
+          return (
+            <Card key={subscription.id} className="border border-gray-200 shadow-sm">
+              <CardHeader className={`px-3 py-3 ${isActive ? 'bg-theo-yellow/5' : 'bg-gray-50'}`}>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <Avatar className="h-8 w-8">
+                      {subscriptionUser?.photoUrl && (
+                        <AvatarImage src={subscriptionUser.photoUrl} alt={subscriptionUser.displayName || 'User'} />
+                      )}
+                      <AvatarFallback className="text-xs font-semibold">
+                        {subscriptionUser?.displayName?.[0] || subscriptionUser?.email?.[0]?.toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <h3 className="truncate text-sm font-semibold">
+                        {subscriptionUser?.displayName || 'Anonymous User'}
+                      </h3>
+                      <p className="truncate text-xs text-gray-500">{subscriptionUser?.email}</p>
+                    </div>
+                  </div>
+                  <Badge variant={isActive ? 'theo' : 'secondary'} className="shrink-0 text-[10px]">
+                    {subscription.status}
+                  </Badge>
+                </div>
+              </CardHeader>
+
+              <CardContent className="space-y-3 p-3">
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="flex items-center gap-1.5 rounded-md bg-gray-50 px-2 py-1.5">
+                    <DollarSign className="h-3 w-3" />
+                    <span className="font-semibold">₹{subscription.amount / 100}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 rounded-md bg-gray-50 px-2 py-1.5">
+                    <Calendar className="h-3 w-3" />
+                    <span>{new Date(subscription.created_at).toLocaleDateString()}</span>
+                  </div>
+                </div>
+
+                {subscription.class && (
+                  <div className="rounded-md border border-gray-100 bg-gray-50 px-2 py-1.5 text-xs">
+                    <span className="font-medium">{subscription.class.name}</span>
+                    {subscription.subject && (
+                      <span className="text-gray-500"> · {subscription.subject.name}</span>
+                    )}
+                  </div>
+                )}
+
+                <Separator />
+
+                <div className="flex gap-2">
+                  <Button
+                    variant={isActive ? 'theo' : 'outline'}
+                    size="sm"
+                    className="h-7 flex-1 text-xs"
+                    onClick={() => updateSubscriptionStatus(subscription.id, 'ACTIVE')}
+                    disabled={isActive}
+                  >
+                    Active
+                  </Button>
+                  <Button
+                    variant={subscription.status === 'INACTIVE' ? 'theo-black' : 'outline'}
+                    size="sm"
+                    className="h-7 flex-1 text-xs"
+                    onClick={() => updateSubscriptionStatus(subscription.id, 'INACTIVE')}
+                    disabled={subscription.status === 'INACTIVE'}
+                  >
+                    Inactive
+                  </Button>
+                </div>
+
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="h-7 w-full text-xs"
+                  onClick={() => deleteSubscription(subscription.id)}
+                >
+                  <Trash2 className="mr-1 h-3 w-3" />
+                  Delete
+                </Button>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {filteredSubscriptions.length === 0 && (
+        <Card className="mt-4 border-gray-200 p-8 text-center shadow-sm">
+          <Crown className="mx-auto mb-3 h-10 w-10 text-gray-300" />
+          <h3 className="text-base font-medium text-gray-600">
+            {searchTerm ? 'No matching subscriptions' : 'No subscriptions yet'}
+          </h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {searchTerm ? `Nothing matches "${searchTerm}"` : 'Use Grant Access to add program access for a user.'}
+          </p>
+        </Card>
+      )}
     </div>
   );
 }
-
