@@ -76,7 +76,7 @@ export async function GET(request: Request) {
               value: topic.content?.iframeHtml || topic.content?.textContent || topic.content?.url || '',
               url: topic.content?.url,
               videoUrl: topic.content?.videoUrl,
-              pdfUrl: topic.content?.pdfUrl,
+              pdfUrl: topic.content?.pdfUrl || (topic.content?.contentType === 'PDF' ? topic.content?.url : undefined),
               textContent: topic.content?.textContent,
               iframeHtml: topic.content?.iframeHtml,
               widgetConfig: topic.content?.widgetConfig

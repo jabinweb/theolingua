@@ -16,6 +16,29 @@ interface TopicContent {
   widgetConfig?: object;
 }
 
+function normalizeContentType(contentType?: string) {
+  return contentType?.toLowerCase() ?? '';
+}
+
+function resolvePdfUrl(content?: TopicContent | null) {
+  if (!content) return null;
+  return content.pdfUrl || content.url || null;
+}
+
+function isPdfContent(content?: TopicContent | null) {
+  return normalizeContentType(content?.contentType) === 'pdf' && !!resolvePdfUrl(content);
+}
+
+function PdfViewer({ url, title }: { url: string; title: string }) {
+  return (
+    <div className="absolute inset-0 h-full w-full overflow-hidden bg-gray-100">
+      <object data={url} type="application/pdf" className="h-full w-full" aria-label={title}>
+        <embed src={url} type="application/pdf" className="h-full w-full" title={title} />
+      </object>
+    </div>
+  );
+}
+
 interface ContentPlayerProps {
   topic: DbTopic | null;
   isOpen: boolean;
@@ -181,14 +204,10 @@ export function ContentPlayer({
         }
         break;
       case 'video':
-        // For video content, we'll embed it in the player instead of opening in new tab
-        console.log('Video will be embedded in player');
+        // Video is embedded inline in the player
         break;
       case 'pdf':
-        // Handle PDF viewing
-        if (topicContent.pdfUrl) {
-          window.open(topicContent.pdfUrl, '_blank');
-        }
+        // PDF is embedded inline in the player
         break;
       case 'text':
         // Text content is displayed inline
@@ -374,14 +393,8 @@ export function ContentPlayer({
                   </video>
                 )}
               </div>
-            ) : topicContent?.contentType?.toLowerCase() === 'pdf' && topicContent.pdfUrl ? (
-              <div className="w-full h-full bg-white overflow-hidden">
-                <iframe 
-                  src={topicContent.pdfUrl}
-                  className="w-full h-full"
-                  title="PDF Viewer"
-                />
-              </div>
+            ) : isPdfContent(topicContent) ? (
+              <PdfViewer url={resolvePdfUrl(topicContent)!} title={topic.name} />
             ) : topicContent?.contentType?.toLowerCase() === 'interactive_widget' ? (
               <div className="flex flex-col items-center justify-center h-full text-center p-4">
                 <div className="mb-4 p-4 bg-gray-800 rounded-full">

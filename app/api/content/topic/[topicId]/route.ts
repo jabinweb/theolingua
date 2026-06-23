@@ -116,6 +116,12 @@ export async function GET(
     await logTopicStarted(session.user.id, topicId, topic.name);
 
     // Return only the content data that the ContentPlayer needs
+    const content = topicWithContent.content;
+    const pdfUrl =
+      content.contentType === 'PDF'
+        ? content.pdfUrl || content.url
+        : content.pdfUrl;
+
     return NextResponse.json({
       id: topicWithContent.id,
       name: topicWithContent.name,
@@ -123,13 +129,13 @@ export async function GET(
       type: topicWithContent.type,
       duration: topicWithContent.duration,
       content: {
-        contentType: topicWithContent.content.contentType,
-        url: topicWithContent.content.url,
-        videoUrl: topicWithContent.content.videoUrl,
-        pdfUrl: topicWithContent.content.pdfUrl,
-        textContent: topicWithContent.content.textContent,
-        iframeHtml: topicWithContent.content.iframeHtml,
-        widgetConfig: topicWithContent.content.widgetConfig
+        contentType: content.contentType,
+        url: content.url,
+        videoUrl: content.videoUrl,
+        pdfUrl,
+        textContent: content.textContent,
+        iframeHtml: content.iframeHtml,
+        widgetConfig: content.widgetConfig
       }
     });
 

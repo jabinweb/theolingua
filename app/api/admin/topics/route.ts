@@ -116,7 +116,7 @@ export async function POST(request: Request) {
             contentType: convertContentType(content.contentType), // Convert to proper enum
             url: content.url || null,
             videoUrl: content.videoUrl || null,
-            pdfUrl: content.pdfUrl || null,
+            pdfUrl: content.pdfUrl || (convertContentType(content.contentType) === 'PDF' ? content.url : null) || null,
             textContent: content.textContent || null,
             iframeHtml: content.iframeHtml || null,
             widgetConfig: content.widgetConfig || null,
@@ -177,7 +177,7 @@ export async function PUT(request: Request) {
             contentType: convertContentType(content.contentType), // Convert to proper enum
             url: content.url || null,
             videoUrl: content.videoUrl || null,
-            pdfUrl: content.pdfUrl || null,
+            pdfUrl: content.pdfUrl || (convertContentType(content.contentType) === 'PDF' ? content.url : null) || null,
             textContent: content.textContent || null,
             iframeHtml: content.iframeHtml || null,
             widgetConfig: content.widgetConfig || null,
@@ -193,7 +193,7 @@ export async function PUT(request: Request) {
             contentType: convertContentType(content.contentType), // Convert to proper enum
             url: content.url || null,
             videoUrl: content.videoUrl || null,
-            pdfUrl: content.pdfUrl || null,
+            pdfUrl: content.pdfUrl || (convertContentType(content.contentType) === 'PDF' ? content.url : null) || null,
             textContent: content.textContent || null,
             iframeHtml: content.iframeHtml || null,
             widgetConfig: content.widgetConfig || null,
