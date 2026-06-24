@@ -6,7 +6,6 @@ import { logTopicStarted } from '@/lib/activity-logger';
 // Server-side function to verify topic access
 async function verifyTopicAccess(userId: string, topicId: string) {
   try {
-    // Get topic with subject and class info
     const topic = await prisma.topic.findUnique({
       where: { id: topicId },
       include: {
@@ -27,51 +26,100 @@ async function verifyTopicAccess(userId: string, topicId: string) {
 
     if (!topic) return { hasAccess: false, topic: null };
 
-    // Get user with school info
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      include: { school: true }
+      include: { school: true, batch: true }
     });
 
     if (!user) return { hasAccess: false, topic };
+
+    if (user.role === 'ADMIN') {
+      return { hasAccess: true, topic };
+    }
 
     const classId = topic.chapter.subject.classId;
     const subjectId = topic.chapter.subjectId;
     const classPrice = topic.chapter.subject.class.price;
     const chapterId = topic.chapter.id;
 
-    // Check if program is free (price = 0)
     const isFreeProgram = classPrice === 0 || classPrice === null;
     if (isFreeProgram) {
       return { hasAccess: true, topic };
     }
 
-    // Check if this chapter is the first chapter of its subject (free trial access)
-    const firstChapter = topic.chapter.subject.chapters.find(ch => ch.orderIndex === 0) || 
-                        topic.chapter.subject.chapters.sort((a, b) => a.orderIndex - b.orderIndex)[0];
-    
+    if (user.batch?.classId === classId) {
+      return { hasAccess: true, topic };
+    }
+
+    const gradeToClassMap: Record<string, number[]> = {
+      '5': [5],
+      '6': [6],
+      '7': [7],
+      '8': [8],
+      '9': [9],
+      '10': [10],
+    };
+    const hasSchoolAccess =
+      user.school?.isActive &&
+      user.grade &&
+      (gradeToClassMap[user.grade] || []).includes(classId);
+    if (hasSchoolAccess) {
+      return { hasAccess: true, topic };
+    }
+
+    const firstChapter =
+      topic.chapter.subject.chapters.find((ch) => ch.orderIndex === 0) ||
+      topic.chapter.subject.chapters.sort((a, b) => a.orderIndex - b.orderIndex)[0];
+
     if (firstChapter && firstChapter.id === chapterId) {
-      console.log('Free trial access granted for first chapter:', chapterId);
       return { hasAccess: true, topic, isFreeTrialAccess: true };
     }
 
-    // Check individual subscriptions
     const subscription = await prisma.subscription.findFirst({
       where: {
-        userId: userId,
+        userId,
         status: 'ACTIVE',
-        OR: [
-          { classId: classId },
-          { subjectId: subjectId }
-        ]
-      }
+        endDate: { gte: new Date() },
+        OR: [{ classId }, { subjectId }],
+      },
     });
 
-    return { hasAccess: !!subscription, topic };
+    if (subscription) {
+      return { hasAccess: true, topic };
+    }
+
+    return { hasAccess: false, topic };
   } catch (error) {
     console.error('Error verifying topic access:', error);
     return { hasAccess: false, topic: null };
   }
+}
+
+function normalizePlayerContent(content: {
+  contentType: string;
+  url: string | null;
+  videoUrl: string | null;
+  pdfUrl: string | null;
+  textContent: string | null;
+  iframeHtml: string | null;
+  widgetConfig: unknown;
+}) {
+  const fileUrl = content.pdfUrl || content.url || '';
+  const looksLikePdf = /\.pdf(\?|#|$)/i.test(fileUrl);
+  const contentType =
+    content.contentType === 'PDF' || looksLikePdf ? 'PDF' : content.contentType;
+  const pdfUrl =
+    contentType === 'PDF' ? content.pdfUrl || content.url : content.pdfUrl;
+
+  return {
+    contentType,
+    url: content.url,
+    videoUrl: content.videoUrl,
+    pdfUrl,
+    textContent: content.textContent,
+    iframeHtml: content.iframeHtml,
+    widgetConfig: content.widgetConfig,
+  };
 }
 
 export async function GET(
@@ -117,10 +165,6 @@ export async function GET(
 
     // Return only the content data that the ContentPlayer needs
     const content = topicWithContent.content;
-    const pdfUrl =
-      content.contentType === 'PDF'
-        ? content.pdfUrl || content.url
-        : content.pdfUrl;
 
     return NextResponse.json({
       id: topicWithContent.id,
@@ -128,15 +172,7 @@ export async function GET(
       description: topicWithContent.description,
       type: topicWithContent.type,
       duration: topicWithContent.duration,
-      content: {
-        contentType: content.contentType,
-        url: content.url,
-        videoUrl: content.videoUrl,
-        pdfUrl,
-        textContent: content.textContent,
-        iframeHtml: content.iframeHtml,
-        widgetConfig: content.widgetConfig
-      }
+      content: normalizePlayerContent(content),
     });
 
   } catch (error) {

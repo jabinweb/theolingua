@@ -25,16 +25,30 @@ function resolvePdfUrl(content?: TopicContent | null) {
   return content.pdfUrl || content.url || null;
 }
 
+function normalizeTopicContent(raw: TopicContent): TopicContent {
+  const fileUrl = raw.pdfUrl || raw.url || '';
+  const looksLikePdf = /\.pdf(\?|#|$)/i.test(fileUrl);
+  const isPdf = normalizeContentType(raw.contentType) === 'pdf' || looksLikePdf;
+  const pdfUrl = isPdf ? raw.pdfUrl || raw.url : raw.pdfUrl;
+
+  return {
+    ...raw,
+    contentType: isPdf ? 'PDF' : raw.contentType,
+    pdfUrl: pdfUrl || undefined,
+  };
+}
+
 function isPdfContent(content?: TopicContent | null) {
-  return normalizeContentType(content?.contentType) === 'pdf' && !!resolvePdfUrl(content);
+  const url = resolvePdfUrl(content);
+  if (!content || !url) return false;
+  const type = normalizeContentType(content.contentType);
+  return type === 'pdf' || /\.pdf(\?|#|$)/i.test(url);
 }
 
 function PdfViewer({ url, title }: { url: string; title: string }) {
   return (
-    <div className="absolute inset-0 h-full w-full overflow-hidden bg-gray-100">
-      <object data={url} type="application/pdf" className="h-full w-full" aria-label={title}>
-        <embed src={url} type="application/pdf" className="h-full w-full" title={title} />
-      </object>
+    <div className="absolute inset-0 h-full w-full overflow-hidden bg-white">
+      <iframe src={url} className="h-full w-full border-0" title={title} />
     </div>
   );
 }
@@ -68,54 +82,51 @@ export function ContentPlayer({
   const [hasCompleted, setHasCompleted] = useState(false);
   const [topicContent, setTopicContent] = useState<TopicContent | null>(null);
   const [contentLoading, setContentLoading] = useState(false);
+  const [contentError, setContentError] = useState<string | null>(null);
 
   // Fetch content from secure endpoint when topic opens
   useEffect(() => {
-    if (topic?.id && isOpen) {
-      // If demo mode and demo content is provided, use it directly
-      if (isDemo && demoContent) {
-        setTopicContent(demoContent);
-        return;
-      }
-      
-      // Otherwise fetch from API (for dashboard/authenticated users)
-      setContentLoading(true);
-      fetch(`/api/content/topic/${topic.id}`)
-        .then(async response => {
-          if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-            // For 403 errors (access denied), just set content to null - the UI will handle it
-            if (response.status === 403) {
-              console.warn('Access denied for topic:', topic.id);
-              setTopicContent(null);
-              setContentLoading(false);
-              return null;
-            }
-            throw new Error(`Failed to fetch content: ${response.status} - ${errorData.error || response.statusText}`);
-          }
-          return response.json();
-        })
-        .then(data => {
-          if (data) {
-            console.log('ContentPlayer: Fetched content from API:', data.content);
-            setTopicContent(data.content);
-          }
-          setContentLoading(false);
-        })
-        .catch(error => {
-          console.error('Error fetching topic content:', error);
-          setTopicContent(null);
-          setContentLoading(false);
-        });
+    if (!topic?.id || !isOpen) {
+      return;
     }
-  }, [topic?.id, isOpen, isDemo, demoContent]);
 
-  // Reset content when topic changes (but not in demo mode where content is passed directly)
-  useEffect(() => {
-    if (!isDemo) {
-      setTopicContent(null);
+    if (isDemo && demoContent) {
+      setTopicContent(normalizeTopicContent(demoContent));
+      setContentError(null);
+      return;
     }
-  }, [topic?.id, isDemo]);
+
+    setTopicContent(null);
+    setContentError(null);
+    setContentLoading(true);
+
+    fetch(`/api/content/topic/${topic.id}`)
+      .then(async (response) => {
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+          if (response.status === 403) {
+            setContentError('You need access to view this content.');
+            setTopicContent(null);
+            setContentLoading(false);
+            return null;
+          }
+          throw new Error(`Failed to fetch content: ${response.status} - ${errorData.error || response.statusText}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data?.content) {
+          setTopicContent(normalizeTopicContent(data.content));
+        }
+        setContentLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error fetching topic content:', error);
+        setContentError('Failed to load content. Please try again.');
+        setTopicContent(null);
+        setContentLoading(false);
+      });
+  }, [topic?.id, isOpen, isDemo, demoContent]);
 
   // Only reset state when topic actually changes (by ID), not when completion status changes
   useEffect(() => {
@@ -423,6 +434,14 @@ export function ContentPlayer({
                   }}
                   className="w-full h-full absolute inset-0"
                 />
+              </div>
+            ) : contentError ? (
+              <div className="flex flex-col items-center justify-center h-full text-center p-4 sm:p-8">
+                <div className="mb-4 p-3 sm:p-4 bg-gray-800 rounded-full">
+                  <FileText className="h-8 w-8 text-red-400" />
+                </div>
+                <h3 className="text-base sm:text-lg font-medium mb-2 text-white">{topic?.name}</h3>
+                <p className="text-sm sm:text-base text-red-300 mb-4">{contentError}</p>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-center p-4 sm:p-8">
