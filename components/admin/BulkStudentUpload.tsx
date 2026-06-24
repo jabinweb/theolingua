@@ -40,7 +40,7 @@ export function BulkStudentUpload({ isOpen, onClose, onComplete }: BulkUploadPro
   const downloadTemplate = () => {
     const csvContent = `name,email,college_name,phone
 John Doe,john.doe@example.com,MIT College,9876543210
-Jane Smith,jane.smith@example.com,Stanford University,9876543211
+Jane Smith,jane.smith@example.com,Stanford University,
 Mike Johnson,mike.johnson@example.com,Harvard College,9876543212`;
 
     const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -151,7 +151,7 @@ Mike Johnson,mike.johnson@example.com,Harvard College,9876543212`;
           {/* Instructions */}
           <Alert variant="default">
             <AlertDescription>
-              Upload a CSV file with student information (Name, Email, College Name, Phone). All students will be created with default password: <strong>Student@123</strong> which they can change in their profile.
+              Upload a CSV file with student information. Required: <strong>Name, Email, College Name</strong>. Phone is optional. All students will be created with default password: <strong>Student@123</strong> which they can change in their profile.
             </AlertDescription>
           </Alert>
 

@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     };
 
     const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase());
-    const requiredHeaders = ['name', 'email', 'college_name', 'phone'];
+    const requiredHeaders = ['name', 'email', 'college_name'];
     
     // Validate headers
     const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
@@ -62,6 +62,8 @@ export async function POST(request: Request) {
         error: `Missing required columns: ${missingHeaders.join(', ')}` 
       }, { status: 400 });
     }
+
+    const getPhone = (data: Record<string, string>) => (data.phone || '').replace(/\s+/g, '').trim();
 
     const result: ProcessResult = {
       success: true,
@@ -82,14 +84,16 @@ export async function POST(request: Request) {
 
       try {
         // Validate required fields
-        if (!studentData.name || !studentData.email || !studentData.college_name || !studentData.phone) {
+        if (!studentData.name || !studentData.email || !studentData.college_name) {
           result.errors.push({
             row: i + 1,
-            error: 'Name, email, college name, and phone are required',
+            error: 'Name, email, and college name are required',
             data: studentData
           });
           continue;
         }
+
+        const phone = getPhone(studentData);
 
         // Validate email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -102,15 +106,17 @@ export async function POST(request: Request) {
           continue;
         }
 
-        // Validate phone number (basic validation)
-        const phoneRegex = /^\d{10}$/;
-        if (!phoneRegex.test(studentData.phone.replace(/\s+/g, ''))) {
-          result.errors.push({
-            row: i + 1,
-            error: 'Phone number must be 10 digits',
-            data: studentData
-          });
-          continue;
+        // Validate phone number only when provided
+        if (phone) {
+          const phoneRegex = /^\d{10}$/;
+          if (!phoneRegex.test(phone)) {
+            result.errors.push({
+              row: i + 1,
+              error: 'Phone number must be 10 digits when provided',
+              data: studentData
+            });
+            continue;
+          }
         }
 
         // Check if user already exists
@@ -126,7 +132,7 @@ export async function POST(request: Request) {
             data: {
               name: studentData.name,
               collegeName: studentData.college_name,
-              phone: studentData.phone,
+              phone: phone || null,
               role: 'STUDENT',
               isActive: true,
             }
@@ -140,7 +146,7 @@ export async function POST(request: Request) {
             name: studentData.name,
             password: DEFAULT_PASSWORD,
             collegeName: studentData.college_name,
-            phone: studentData.phone,
+            phone: phone || undefined,
             role: 'STUDENT',
             isActive: true,
           });

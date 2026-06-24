@@ -511,7 +511,7 @@ export default function BatchesPage() {
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="text-sm text-muted-foreground bg-blue-50 p-3 rounded-lg border border-blue-100 italic">
-                CSV should have headers: name, email, college_name, phone
+                CSV should have headers: name, email, college_name (phone optional)
               </div>
               
               {!uploadResult ? (
