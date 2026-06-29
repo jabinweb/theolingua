@@ -94,10 +94,32 @@ Mike Johnson,mike.johnson@example.com,Harvard College,9876543212`;
       }, 200);
 
       const result: UploadResult = await response.json();
-      
+
       clearInterval(progressInterval);
       setProgress(100);
-      setResult(result);
+
+      if (!response.ok) {
+        setResult({
+          success: false,
+          total: 0,
+          created: 0,
+          updated: 0,
+          errors: [{
+            row: 0,
+            error: (result as { error?: string }).error || 'Upload failed',
+            data: { name: '', email: '', college_name: '', phone: '', errors: [] },
+          }],
+        });
+        return;
+      }
+
+      setResult({
+        success: Boolean(result.success),
+        total: result.total ?? 0,
+        created: result.created ?? 0,
+        updated: result.updated ?? 0,
+        errors: Array.isArray(result.errors) ? result.errors : [],
+      });
       
       if (result.success) {
         onComplete();

@@ -75,7 +75,14 @@ export default function BatchesPage() {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [uploadResult, setUploadResult] = useState<any>(null);
+  const [uploadResult, setUploadResult] = useState<{
+    success: boolean;
+    total: number;
+    created: number;
+    updated: number;
+    batchAssigned?: number;
+    errors: Array<{ row: number; error: string }>;
+  } | null>(null);
 
   useEffect(() => {
     fetchBatches();
@@ -90,7 +97,7 @@ export default function BatchesPage() {
       setLoading(true);
       const res = await fetch('/api/admin/batches');
       const data = await res.json();
-      setBatches(data);
+      setBatches(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching batches:', error);
     } finally {
@@ -231,10 +238,35 @@ export default function BatchesPage() {
       });
 
       const data = await res.json();
-      setUploadResult(data);
+
+      if (!res.ok) {
+        setUploadResult({
+          success: false,
+          total: 0,
+          created: 0,
+          updated: 0,
+          errors: [{ row: 0, error: data.error || data.details || 'Upload failed' }],
+        });
+        return;
+      }
+
+      setUploadResult({
+        success: Boolean(data.success),
+        total: data.total ?? 0,
+        created: data.created ?? 0,
+        updated: data.updated ?? 0,
+        batchAssigned: data.batchAssigned ?? 0,
+        errors: Array.isArray(data.errors) ? data.errors : [],
+      });
     } catch (error) {
       console.error('Error during bulk upload:', error);
-      setUploadResult({ success: false, total: 0, created: 0, updated: 0, errors: [{ row: 0, error: 'Failed to upload' }] });
+      setUploadResult({
+        success: false,
+        total: 0,
+        created: 0,
+        updated: 0,
+        errors: [{ row: 0, error: 'Failed to upload. Please try again.' }],
+      });
     } finally {
       setUploading(false);
     }
@@ -332,6 +364,8 @@ export default function BatchesPage() {
                           className="w-full"
                           onClick={() => {
                             setUploadingBatch(batch);
+                            setUploadResult(null);
+                            setFile(null);
                             setUploadDialogOpen(true);
                           }}
                         >
@@ -542,11 +576,22 @@ export default function BatchesPage() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="bg-green-50 p-4 rounded-lg border border-green-100 text-sm">
-                    <p className="font-bold text-green-700 mb-1">Upload Complete!</p>
-                    <p>Total processed: {uploadResult.total}</p>
-                    <p>Created: {uploadResult.created}</p>
-                    <p>Updated: {uploadResult.updated}</p>
+                  <div className={`p-4 rounded-lg border text-sm ${
+                    uploadResult.success
+                      ? 'bg-green-50 border-green-100'
+                      : 'bg-red-50 border-red-100'
+                  }`}>
+                    <p className={`font-bold mb-1 ${
+                      uploadResult.success ? 'text-green-700' : 'text-red-700'
+                    }`}>
+                      {uploadResult.success ? 'Upload Complete!' : 'Upload Failed'}
+                    </p>
+                    {uploadResult.total > 0 && <p>Total processed: {uploadResult.total}</p>}
+                    {uploadResult.created > 0 && <p>Created: {uploadResult.created}</p>}
+                    {uploadResult.updated > 0 && <p>Updated: {uploadResult.updated}</p>}
+                    {(uploadResult.batchAssigned ?? 0) > 0 && (
+                      <p>Assigned to batch: {uploadResult.batchAssigned}</p>
+                    )}
                   </div>
                   
                   {uploadResult.errors.length > 0 && (
