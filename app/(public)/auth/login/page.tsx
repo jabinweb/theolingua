@@ -69,10 +69,16 @@ function LoginForm() {
         />
 
         {/* Back to Home */}
-        <div className="text-center pt-2">
+        <div className="text-center pt-2 space-y-2">
+          <Link 
+            href="/auth/staff"
+            className="text-sm font-bold text-theo-black hover:text-theo-yellow transition-colors block"
+          >
+            Teacher / staff login (email & password)
+          </Link>
           <Link 
             href="/"
-            className="text-sm font-bold text-theo-black hover:text-theo-yellow transition-colors inline-flex items-center gap-2"
+            className="text-sm font-bold text-gray-500 hover:text-theo-black transition-colors inline-flex items-center gap-2"
           >
             <span className="text-lg">←</span> Back to homepage
           </Link>

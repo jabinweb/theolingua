@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { isStaffRole } from '@/lib/auth-utils';
 
 interface Subject {
   id: string;
@@ -61,7 +62,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Failed to fetch classes' }, { status: 500 });
     }
 
-    const isAdmin = user.role === 'ADMIN';
+    const isStaff = isStaffRole(user.role);
 
     // Check user's paid subscriptions (both class-wide and subject-specific)
     const subscriptions = await prisma.subscription.findMany({
@@ -147,7 +148,7 @@ export async function GET(request: Request) {
         (gradeToClassMap[user.grade] || []).includes(cls.id);
       const hasClassSubscription = classSubscriptions.has(cls.id);
       const hasBatchAccess = user.batch?.classId === cls.id;
-      const hasFullAccess = isAdmin || hasSchoolAccess || hasClassSubscription || hasBatchAccess;
+      const hasFullAccess = isStaff || hasSchoolAccess || hasClassSubscription || hasBatchAccess;
       
       // Check which subjects have individual subscriptions
       const subjectAccess = new Map();
@@ -156,7 +157,7 @@ export async function GET(request: Request) {
           const hasSubjectSubscription = subjectSubscriptions.has(subject.id);
           subjectAccess.set(subject.id, {
             hasAccess: hasFullAccess || hasSubjectSubscription,
-            accessType: isAdmin ? 'class_subscription' :
+            accessType: isStaff ? 'class_subscription' :
                        hasSchoolAccess ? 'school' : 
                        hasClassSubscription || hasBatchAccess ? 'class_subscription' :
                        hasSubjectSubscription ? 'subject_subscription' : 'none'
@@ -166,9 +167,9 @@ export async function GET(request: Request) {
 
       return {
         ...cls,
-        accessType: isAdmin ? 'subscription' : hasSchoolAccess ? 'school' : hasClassSubscription || hasBatchAccess ? 'subscription' : 'none',
+        accessType: isStaff ? 'subscription' : hasSchoolAccess ? 'school' : hasClassSubscription || hasBatchAccess ? 'subscription' : 'none',
         schoolAccess: hasSchoolAccess,
-        subscriptionAccess: hasClassSubscription || hasBatchAccess || isAdmin,
+        subscriptionAccess: hasClassSubscription || hasBatchAccess || isStaff,
         subjectAccess: Object.fromEntries(subjectAccess),
         hasPartialAccess: !hasFullAccess && 
           Array.from(subjectAccess.values()).some(access => access.hasAccess)

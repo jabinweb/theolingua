@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { isStaffRole } from '@/lib/auth-utils';
 
 export interface UserAccess {
   hasClassAccess: boolean;
@@ -23,7 +24,7 @@ export async function checkUserAccess(
       },
     });
 
-    if (user?.role === 'ADMIN') {
+    if (isStaffRole(user?.role)) {
       return {
         hasClassAccess: true,
         hasSubjectAccess: true,

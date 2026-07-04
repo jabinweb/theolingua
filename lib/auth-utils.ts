@@ -78,3 +78,8 @@ export async function isAdminOrModerator() {
 export async function isAdminTeacherOrModerator() {
   return checkRole([UserRole.ADMIN, UserRole.TEACHER, UserRole.MODERATOR]);
 }
+
+/** Admin, teacher, and moderator accounts get full LMS content preview access. */
+export function isStaffRole(role?: string | null): boolean {
+  return role === 'ADMIN' || role === 'TEACHER' || role === 'MODERATOR';
+}

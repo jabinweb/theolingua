@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { buildDripAccessMap } from '@/lib/drip-access';
+import { isStaffRole } from '@/lib/auth-utils';
 
 interface UnitAccess {
   id: string;
@@ -55,7 +56,7 @@ export async function GET(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const isAdmin = user.role === 'ADMIN';
+    const isStaff = isStaffRole(user.role);
 
     const isNumeric = /^\d+$/.test(slug);
 
@@ -120,7 +121,7 @@ export async function GET(
 
     const hasBatchAccess = user.batch?.classId === programData.id;
     const isFreeProgram = programData.price === 0 || programData.price === null;
-    const hasFullAccess = isAdmin || isFreeProgram || hasSchoolAccess || !!classSubscription || hasBatchAccess;
+    const hasFullAccess = isStaff || isFreeProgram || hasSchoolAccess || !!classSubscription || hasBatchAccess;
 
     let dripAccessMap = new Map<string, { isUnlocked: boolean; daysRemaining: number }>();
     let isDripActive = false;
@@ -155,7 +156,7 @@ export async function GET(
       }
 
       let accessType: UnitAccess['accessType'] = 'none';
-      if (isAdmin) accessType = 'class_subscription';
+      if (isStaff) accessType = 'class_subscription';
       else if (hasSchoolAccess) accessType = 'school';
       else if (classSubscription || hasBatchAccess) accessType = 'class_subscription';
       else if (hasSubjectSubscription) accessType = 'subject_subscription';
@@ -163,7 +164,7 @@ export async function GET(
         accessType = 'free_trial';
       }
 
-      if (isDripActive && dripAccessMap.size > 0 && !isAdmin) {
+      if (isDripActive && dripAccessMap.size > 0 && !isStaff) {
         const dripResult = dripAccessMap.get(subject.id);
         if (dripResult && !dripResult.isUnlocked) {
           return {
@@ -202,7 +203,7 @@ export async function GET(
       className: programData.name,
       classPrice: programData.price,
       hasFullAccess,
-      accessType: isAdmin
+      accessType: isStaff
         ? 'class_subscription'
         : hasSchoolAccess
         ? 'school'
