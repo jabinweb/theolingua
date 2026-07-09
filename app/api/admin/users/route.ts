@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { isAdminOrModerator } from '@/lib/auth-utils';
+import { syncUserProgramSubscriptions } from '@/lib/user-program-access';
 
 export async function GET() {
   const [authOk, authVal] = await isAdminOrModerator();
@@ -52,6 +53,9 @@ export async function GET() {
         totalTimeSpent,
         batchId: user.batchId,
         batch: user.batch,
+        programAccessIds: user.subscriptions
+          .filter((sub) => sub.status === 'ACTIVE' && sub.classId && !sub.subjectId)
+          .map((sub) => sub.classId as number),
       };
     });
 
@@ -96,10 +100,23 @@ export async function POST(request: Request) {
   if (!authOk) return authVal;
 
   try {
-    const { email, displayName, password, role, isActive, collegeName, phone, batchId } = await request.json();
+    const { email, displayName, password, role, isActive, collegeName, phone, batchId, programClassIds } =
+      await request.json();
 
     if (!email || !displayName || !password) {
       return NextResponse.json({ error: 'Email, display name, and password are required' }, { status: 400 });
+    }
+
+    const userRole = role || 'STUDENT';
+    const classIds: number[] = Array.isArray(programClassIds)
+      ? programClassIds.map((id: number) => Number(id)).filter((id: number) => !Number.isNaN(id))
+      : [];
+
+    if (userRole === 'TEACHER' && classIds.length === 0) {
+      return NextResponse.json(
+        { error: 'Select at least one program level for teachers' },
+        { status: 400 }
+      );
     }
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -118,7 +135,7 @@ export async function POST(request: Request) {
         email,
         name: displayName,
         password: hashedPassword,
-        role: role || 'STUDENT',
+        role: userRole,
         isActive: isActive !== undefined ? isActive : true,
         collegeName: collegeName || null,
         phone: phone || null,
@@ -126,6 +143,10 @@ export async function POST(request: Request) {
         emailVerified: new Date(),
       },
     });
+
+    if (userRole === 'TEACHER' && classIds.length > 0) {
+      await syncUserProgramSubscriptions(user.id, classIds);
+    }
 
     return NextResponse.json({
       success: true,
@@ -148,7 +169,8 @@ export async function PATCH(request: Request) {
   if (!authOk) return authVal;
 
   try {
-    const { userId, displayName, role, isActive, collegeName, phone, batchId } = await request.json();
+    const { userId, displayName, role, isActive, collegeName, phone, batchId, programClassIds } =
+      await request.json();
 
     if (!userId) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
@@ -184,6 +206,23 @@ export async function PATCH(request: Request) {
     }
 
     await prisma.user.update({ where: { id: userId }, data: updateData });
+
+    if (Array.isArray(programClassIds)) {
+      const targetRole = role ?? targetUser?.role;
+      if (targetRole === 'TEACHER') {
+        const classIds = programClassIds
+          .map((id: number) => Number(id))
+          .filter((id: number) => !Number.isNaN(id));
+        if (classIds.length === 0) {
+          return NextResponse.json(
+            { error: 'Teachers must have at least one program level selected' },
+            { status: 400 }
+          );
+        }
+        await syncUserProgramSubscriptions(userId, classIds);
+      }
+    }
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error updating user:', error);

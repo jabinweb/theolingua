@@ -49,6 +49,12 @@ interface RegisteredUser {
   totalAmountPaid: number;
   role?: string;
   isActive?: boolean;
+  programAccessIds?: number[];
+}
+
+interface Program {
+  id: number;
+  name: string;
 }
 
 interface UserFormData {
@@ -59,6 +65,7 @@ interface UserFormData {
   isActive: boolean;
   collegeName: string;
   phone: string;
+  programClassIds: number[];
 }
 
 export default function UsersPage() {
@@ -79,7 +86,9 @@ export default function UsersPage() {
     isActive: true,
     collegeName: '',
     phone: '',
+    programClassIds: [],
   });
+  const [programs, setPrograms] = useState<Program[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [bulkUploadOpen, setBulkUploadOpen] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
@@ -133,6 +142,23 @@ export default function UsersPage() {
       setDataLoading(false);
     }
   }, [isAdmin, isLoadingAuth, dataFetched, user, userRole]);
+
+  useEffect(() => {
+    if (!formOpen || !isAdmin) return;
+    fetch('/api/admin/programs')
+      .then((res) => res.json())
+      .then((data) => setPrograms(Array.isArray(data) ? data : []))
+      .catch(() => setPrograms([]));
+  }, [formOpen, isAdmin]);
+
+  const toggleProgramAccess = (programId: number, checked: boolean) => {
+    setFormData((prev) => ({
+      ...prev,
+      programClassIds: checked
+        ? [...new Set([...prev.programClassIds, programId])]
+        : prev.programClassIds.filter((id) => id !== programId),
+    }));
+  };
 
   const deleteUser = async (userId: string) => {
     if (!confirm('Are you sure you want to delete this user?')) return;
@@ -189,6 +215,7 @@ export default function UsersPage() {
           isActive: formData.isActive,
           collegeName: formData.collegeName,
           phone: formData.phone,
+          programClassIds: formData.role === 'TEACHER' ? formData.programClassIds : undefined,
         }),
       });
 
@@ -216,6 +243,7 @@ export default function UsersPage() {
       isActive: true,
       collegeName: '',
       phone: '',
+      programClassIds: [],
     });
   };
 
@@ -224,11 +252,12 @@ export default function UsersPage() {
     setFormData({
       email: user.email,
       displayName: user.displayName || '',
-      password: '', // Don't populate password for editing
+      password: '',
       role: (user.role as 'STUDENT' | 'ADMIN' | 'MODERATOR' | 'TEACHER') || 'STUDENT',
       isActive: user.isActive !== false,
       collegeName: user.collegeName || '',
       phone: user.phone || '',
+      programClassIds: user.programAccessIds || [],
     });
     setFormOpen(true);
   };
@@ -1018,7 +1047,11 @@ export default function UsersPage() {
                   <Select
                     value={formData.role}
                     onValueChange={(value: 'STUDENT' | 'ADMIN' | 'MODERATOR' | 'TEACHER') => 
-                      setFormData(prev => ({ ...prev, role: value }))
+                      setFormData(prev => ({
+                        ...prev,
+                        role: value,
+                        programClassIds: value === 'ADMIN' ? [] : prev.programClassIds,
+                      }))
                     }
                   >
                     <SelectTrigger>
@@ -1032,6 +1065,36 @@ export default function UsersPage() {
                     </SelectContent>
                   </Select>
                 </div>
+
+                {formData.role === 'ADMIN' && (
+                  <p className="text-xs text-gray-500 rounded-md border border-gray-200 bg-gray-50 px-3 py-2">
+                    Admins automatically have access to all programs.
+                  </p>
+                )}
+
+                {formData.role === 'TEACHER' && (
+                  <div className="space-y-2 rounded-md border border-gray-200 p-3">
+                    <Label>Program access</Label>
+                    <p className="text-xs text-gray-500">
+                      Select which TheoLingua levels this teacher can access.
+                    </p>
+                    {programs.length === 0 ? (
+                      <p className="text-sm text-gray-500">No programs found.</p>
+                    ) : (
+                      programs.map((program) => (
+                        <label key={program.id} className="flex cursor-pointer items-center gap-2 text-sm">
+                          <Checkbox
+                            checked={formData.programClassIds.includes(program.id)}
+                            onCheckedChange={(checked) =>
+                              toggleProgramAccess(program.id, checked === true)
+                            }
+                          />
+                          <span>{program.name}</span>
+                        </label>
+                      ))
+                    )}
+                  </div>
+                )}
 
                 <div className="flex items-center space-x-2">
                   <input

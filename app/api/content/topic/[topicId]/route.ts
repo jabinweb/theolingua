@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { logTopicStarted } from '@/lib/activity-logger';
-import { isStaffRole } from '@/lib/auth-utils';
+import { hasAllProgramAccess } from '@/lib/user-program-access';
 
 // Server-side function to verify topic access
 async function verifyTopicAccess(userId: string, topicId: string) {
@@ -34,7 +34,7 @@ async function verifyTopicAccess(userId: string, topicId: string) {
 
     if (!user) return { hasAccess: false, topic };
 
-    if (isStaffRole(user.role)) {
+    if (hasAllProgramAccess(user.role)) {
       return { hasAccess: true, topic };
     }
 
