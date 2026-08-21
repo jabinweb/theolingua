@@ -77,6 +77,7 @@ export default function UsersPage() {
   const [dataLoading, setDataLoading] = useState(true);
   const [dataFetched, setDataFetched] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
+  const [formSubmitting, setFormSubmitting] = useState(false);
   const [editingUser, setEditingUser] = useState<RegisteredUser | null>(null);
   const [formData, setFormData] = useState<UserFormData>({
     email: '',
@@ -160,24 +161,44 @@ export default function UsersPage() {
     }));
   };
 
+  const getErrorMessage = async (response: Response, fallback: string) => {
+    try {
+      const data = await response.json();
+      return data.error || data.message || fallback;
+    } catch {
+      return fallback;
+    }
+  };
+
   const deleteUser = async (userId: string) => {
     if (!confirm('Are you sure you want to delete this user?')) return;
-    
+
     try {
       const response = await fetch(`/api/admin/users?id=${userId}`, {
         method: 'DELETE',
       });
-      
+
       if (response.ok) {
         setRegisteredUsers(registeredUsers.filter(user => user.uid !== userId));
+      } else {
+        alert(await getErrorMessage(response, 'Failed to delete user'));
       }
     } catch (error) {
       console.error('Error deleting user:', error);
+      alert('Failed to delete user');
     }
   };
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (formSubmitting) return;
+
+    if (formData.role === 'TEACHER' && formData.programClassIds.length === 0) {
+      alert('Select at least one program level for teachers');
+      return;
+    }
+
+    setFormSubmitting(true);
     try {
       const response = await fetch('/api/admin/users', {
         method: 'POST',
@@ -190,18 +211,26 @@ export default function UsersPage() {
         setFormOpen(false);
         resetForm();
       } else {
-        const error = await response.json();
-        alert(error.message || 'Failed to create user');
+        alert(await getErrorMessage(response, 'Failed to create user'));
       }
     } catch (error) {
       console.error('Error creating user:', error);
       alert('Failed to create user');
+    } finally {
+      setFormSubmitting(false);
     }
   };
 
   const handleUpdateUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingUser) return;
+    if (!editingUser || formSubmitting) return;
+
+    if (formData.role === 'TEACHER' && formData.programClassIds.length === 0) {
+      alert('Teachers must have at least one program level selected');
+      return;
+    }
+
+    setFormSubmitting(true);
 
     try {
       const response = await fetch('/api/admin/users', {
@@ -225,12 +254,13 @@ export default function UsersPage() {
         setEditingUser(null);
         resetForm();
       } else {
-        const error = await response.json();
-        alert(error.message || 'Failed to update user');
+        alert(await getErrorMessage(response, 'Failed to update user'));
       }
     } catch (error) {
       console.error('Error updating user:', error);
       alert('Failed to update user');
+    } finally {
+      setFormSubmitting(false);
     }
   };
 
@@ -267,17 +297,20 @@ export default function UsersPage() {
       const response = await fetch('/api/admin/users', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          userId, 
-          isActive: !currentStatus 
+        body: JSON.stringify({
+          userId,
+          isActive: !currentStatus,
         }),
       });
-      
+
       if (response.ok) {
         refreshData();
+      } else {
+        alert(await getErrorMessage(response, 'Failed to update user status'));
       }
     } catch (error) {
       console.error('Error updating user status:', error);
+      alert('Failed to update user status');
     }
   };
 
@@ -321,16 +354,20 @@ export default function UsersPage() {
 
   const handleBulkDelete = async () => {
     if (selectedUsers.size === 0) return;
-    
+
     if (!confirm(`Are you sure you want to delete ${selectedUsers.size} user(s)?`)) return;
-    
+
     setBulkActionLoading(true);
     try {
-      const deletePromises = Array.from(selectedUsers).map(userId =>
-        fetch(`/api/admin/users?id=${userId}`, { method: 'DELETE' })
+      const results = await Promise.all(
+        Array.from(selectedUsers).map((userId) =>
+          fetch(`/api/admin/users?id=${userId}`, { method: 'DELETE' })
+        )
       );
-      
-      await Promise.all(deletePromises);
+      const failed = results.filter((res) => !res.ok).length;
+      if (failed > 0) {
+        alert(`${failed} of ${results.length} users could not be deleted`);
+      }
       setSelectedUsers(new Set());
       refreshData();
     } catch (error) {
@@ -343,18 +380,22 @@ export default function UsersPage() {
 
   const handleBulkActivate = async () => {
     if (selectedUsers.size === 0) return;
-    
+
     setBulkActionLoading(true);
     try {
-      const updatePromises = Array.from(selectedUsers).map(userId =>
-        fetch('/api/admin/users', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId, isActive: true }),
-        })
+      const results = await Promise.all(
+        Array.from(selectedUsers).map((userId) =>
+          fetch('/api/admin/users', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, isActive: true }),
+          })
+        )
       );
-      
-      await Promise.all(updatePromises);
+      const failed = results.filter((res) => !res.ok).length;
+      if (failed > 0) {
+        alert(`${failed} of ${results.length} users could not be activated`);
+      }
       setSelectedUsers(new Set());
       refreshData();
     } catch (error) {
@@ -367,20 +408,24 @@ export default function UsersPage() {
 
   const handleBulkDeactivate = async () => {
     if (selectedUsers.size === 0) return;
-    
+
     if (!confirm(`Are you sure you want to deactivate ${selectedUsers.size} user(s)?`)) return;
-    
+
     setBulkActionLoading(true);
     try {
-      const updatePromises = Array.from(selectedUsers).map(userId =>
-        fetch('/api/admin/users', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId, isActive: false }),
-        })
+      const results = await Promise.all(
+        Array.from(selectedUsers).map((userId) =>
+          fetch('/api/admin/users', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, isActive: false }),
+          })
+        )
       );
-      
-      await Promise.all(updatePromises);
+      const failed = results.filter((res) => !res.ok).length;
+      if (failed > 0) {
+        alert(`${failed} of ${results.length} users could not be deactivated`);
+      }
       setSelectedUsers(new Set());
       refreshData();
     } catch (error) {
@@ -1112,6 +1157,7 @@ export default function UsersPage() {
                 <Button
                   type="button"
                   variant="outline"
+                  disabled={formSubmitting}
                   onClick={() => {
                     setFormOpen(false);
                     setEditingUser(null);
@@ -1120,8 +1166,10 @@ export default function UsersPage() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit">
-                  {editingUser ? 'Update User' : 'Create User'}
+                <Button type="submit" disabled={formSubmitting}>
+                  {formSubmitting
+                    ? (editingUser ? 'Updating...' : 'Creating...')
+                    : (editingUser ? 'Update User' : 'Create User')}
                 </Button>
               </div>
             </form>

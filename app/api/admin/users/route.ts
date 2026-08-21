@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { isAdminOrModerator } from '@/lib/auth-utils';
@@ -83,13 +84,20 @@ export async function DELETE(request: Request) {
       select: { role: true },
     });
 
-    if (targetUser?.role === 'ADMIN' && authVal.role === 'MODERATOR') {
+    if (!targetUser) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    if (targetUser.role === 'ADMIN' && authVal.role === 'MODERATOR') {
       return NextResponse.json({ error: 'Moderators cannot delete administrator users' }, { status: 403 });
     }
 
     await prisma.user.delete({ where: { id: userId } });
     return NextResponse.json({ success: true });
   } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
     console.error('Error deleting user:', error);
     return NextResponse.json({ error: 'Failed to delete user' }, { status: 500 });
   }
@@ -159,6 +167,9 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return NextResponse.json({ error: 'User with this email already exists' }, { status: 400 });
+    }
     console.error('Error creating user:', error);
     return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
   }
@@ -201,14 +212,18 @@ export async function PATCH(request: Request) {
       select: { role: true },
     });
 
-    if (targetUser?.role === 'ADMIN' && authVal.role === 'MODERATOR') {
+    if (!targetUser) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    if (targetUser.role === 'ADMIN' && authVal.role === 'MODERATOR') {
       return NextResponse.json({ error: 'Moderators cannot modify administrator users' }, { status: 403 });
     }
 
     await prisma.user.update({ where: { id: userId }, data: updateData });
 
     if (Array.isArray(programClassIds)) {
-      const targetRole = role ?? targetUser?.role;
+      const targetRole = role ?? targetUser.role;
       if (targetRole === 'TEACHER') {
         const classIds = programClassIds
           .map((id: number) => Number(id))
@@ -225,6 +240,9 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
     console.error('Error updating user:', error);
     return NextResponse.json({ error: 'Failed to update user' }, { status: 500 });
   }
