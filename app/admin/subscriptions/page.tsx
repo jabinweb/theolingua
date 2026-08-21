@@ -582,7 +582,7 @@ export default function SubscriptionsPage() {
       </div>
 
       {filteredSubscriptions.length === 0 && (
-        <Card className="mt-4 border-gray-200 p-8 text-center shadow-sm">
+        <Card className="mt-4 border-gray-200 px-8 text-center shadow-sm">
           <Crown className="mx-auto mb-3 h-10 w-10 text-gray-300" />
           <h3 className="text-base font-medium text-gray-600">
             {searchTerm ? 'No matching subscriptions' : 'No subscriptions yet'}

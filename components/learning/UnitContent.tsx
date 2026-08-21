@@ -93,8 +93,8 @@ export const EmptyUnitContent: React.FC<EmptyUnitContentProps> = ({
   title = "Select a Unit",
   description = "Pick a unit from the list (or swipe the unit bar on your phone) to start exploring"
 }) => (
-  <Card className="py-0 text-center shadow-sm">
-    <CardContent className="px-4 py-8">
+  <Card className="text-center shadow-sm">
+    <CardContent className="px-4">
     <BookOpen className="mx-auto mb-3 h-10 w-10 text-gray-300" />
     <h3 className="mb-1 text-base font-medium text-gray-600">{title}</h3>
     <p className="text-sm text-muted-foreground">{description}</p>
@@ -273,7 +273,7 @@ export const UnitContent: React.FC<UnitContentProps> = ({
 
       {/* Unit sidebar — xl+ only; below that use horizontal picker */}
       <div className="order-1 hidden min-w-0 xl:col-span-4 xl:block 2xl:col-span-3">
-        <Card className="gap-0 py-0 xl:sticky xl:top-20 xl:max-h-[calc(100vh-6rem)] xl:overflow-y-auto">
+        <Card className="gap-0 xl:sticky xl:top-20 xl:max-h-[calc(100vh-6rem)] xl:overflow-y-auto">
           <CardHeader className="border-b border-gray-100 pb-2 pt-4">
             <CardTitle className="text-sm font-semibold">Units</CardTitle>
           </CardHeader>
@@ -367,7 +367,7 @@ export const UnitContent: React.FC<UnitContentProps> = ({
             </div>
           </Card>
         ) : selectedUnitData ? (
-          <Card className="overflow-hidden py-0 shadow-sm">
+          <Card className="overflow-hidden shadow-sm">
             <CardHeader className="border-b border-gray-200 bg-theo-black px-4 py-3 text-white">
               <CardTitle className="flex w-full flex-col gap-2 text-left text-base font-semibold tracking-normal text-white sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex min-w-0 flex-1 items-center gap-3">

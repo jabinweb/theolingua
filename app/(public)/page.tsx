@@ -463,7 +463,7 @@ function Pathway() {
                       : 'border border-gray-100 shadow-md hover:shadow-lg hover:border-gray-200'
                   }`}
                 >
-                  <CardContent className="p-8 md:p-10">
+                  <CardContent className="md:p-10">
                     <div className="flex flex-wrap items-center gap-3 mb-4">
                       <h3 className="text-xl font-bold md:text-2xl">{level.title}</h3>
                       <div className={`px-3 py-1 font-bold text-sm rounded-full ${level.badgeClass}`}>{level.badge}</div>
@@ -508,8 +508,8 @@ function DeliveryModels() {
         </div>
 
         <div className="grid items-stretch gap-6 pt-2 md:grid-cols-2 md:gap-8">
-          <Card className="flex flex-col overflow-hidden rounded-[2rem] border border-gray-200 bg-white py-0 shadow-lg transition-transform duration-300 hover:-translate-y-1">
-            <CardContent className="flex flex-1 flex-col p-8 md:p-10">
+          <Card className="flex flex-col overflow-hidden rounded-[2rem] border border-gray-200 bg-white shadow-lg transition-transform duration-300 hover:-translate-y-1">
+            <CardContent className="flex flex-1 flex-col md:p-10">
               <h3 className="mb-8 text-2xl font-bold md:text-3xl">Classroom model</h3>
               <ul className="flex-1 border-t border-b border-gray-200 divide-y divide-gray-200">
                 {classRows.map((row, i) => (
@@ -521,8 +521,8 @@ function DeliveryModels() {
             </CardContent>
           </Card>
 
-          <Card className="flex flex-col overflow-hidden rounded-[2rem] border border-gray-200 bg-white py-0 shadow-lg transition-transform duration-300 hover:-translate-y-1">
-            <CardContent className="flex flex-1 flex-col p-8 md:p-10">
+          <Card className="flex flex-col overflow-hidden rounded-[2rem] border border-gray-200 bg-white shadow-lg transition-transform duration-300 hover:-translate-y-1">
+            <CardContent className="flex flex-1 flex-col md:p-10">
               <h3 className="mb-8 text-2xl font-bold md:text-3xl">Self-learning model</h3>
               <ul className="flex-1 border-t border-b border-gray-200 divide-y divide-gray-200">
                 {selfRows.map((row, i) => (
@@ -817,8 +817,8 @@ function Institutions() {
               desc: 'Students on the portal & workbooks; teachers fully equipped.',
             },
           ].map((step, i) => (
-            <Card key={i} className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 py-0 text-white transition-colors hover:bg-white/10">
-              <CardContent className="flex flex-col items-start p-8 md:p-10">
+            <Card key={i} className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 text-white transition-colors hover:bg-white/10">
+              <CardContent className="flex flex-col items-start md:p-10">
                 <span className="mb-5 text-5xl font-bold tracking-tighter text-theo-yellow opacity-90 md:text-6xl">{step.num}</span>
                 <h3 className="mb-3 text-xl font-bold md:text-2xl">{step.title}</h3>
                 <p className="text-base leading-relaxed text-gray-300">{step.desc}</p>
@@ -853,7 +853,7 @@ function GetStartedCTA() {
 
         <div className="mb-12 grid gap-6 md:grid-cols-2 md:gap-8">
           <Card className="rounded-[2rem] border border-gray-200 bg-theo-white p-2 shadow-sm">
-            <CardContent className="flex h-full flex-col items-center p-8 text-center md:p-10">
+            <CardContent className="flex h-full flex-col items-center text-center md:p-10">
               <h3 className="mb-3 text-2xl font-bold">Already enrolled?</h3>
               <p className="mb-8 flex-1 text-gray-600">Open your learning portal.</p>
               <Link href="/auth/login" className="w-full">
@@ -865,7 +865,7 @@ function GetStartedCTA() {
           </Card>
 
           <Card className="rounded-[2rem] border-none bg-theo-black p-2 text-theo-white shadow-xl">
-            <CardContent className="flex h-full flex-col items-center p-8 text-center md:p-10">
+            <CardContent className="flex h-full flex-col items-center text-center md:p-10">
               <h3 className="mb-3 text-2xl font-bold">New here?</h3>
               <p className="mb-8 flex-1 text-gray-300">Create a free account to explore.</p>
               <Link href="/auth/login?mode=signup" className="w-full">

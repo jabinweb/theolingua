@@ -85,7 +85,7 @@ export default async function UserAnalyticsPage({ params }: { params: Promise<{ 
         {/* Metric 1 */}
         <Card className="rounded-2xl border-slate-100 shadow-sm relative overflow-hidden">
            <div className="absolute left-0 top-0 w-1.5 h-full bg-emerald-500"></div>
-           <CardContent className="p-6">
+           <CardContent>
               <div className="flex justify-between items-start mb-4">
                  <div className="h-10 w-10 rounded-xl bg-emerald-50 flex items-center justify-center">
                     <CheckCircle2 className="h-5 w-5 text-emerald-600" />
@@ -99,7 +99,7 @@ export default async function UserAnalyticsPage({ params }: { params: Promise<{ 
         {/* Metric 2 */}
         <Card className="rounded-2xl border-slate-100 shadow-sm relative overflow-hidden">
            <div className="absolute left-0 top-0 w-1.5 h-full bg-amber-500"></div>
-           <CardContent className="p-6">
+           <CardContent>
               <div className="flex justify-between items-start mb-4">
                  <div className="h-10 w-10 rounded-xl bg-amber-50 flex items-center justify-center">
                     <Clock className="h-5 w-5 text-amber-600" />
@@ -113,7 +113,7 @@ export default async function UserAnalyticsPage({ params }: { params: Promise<{ 
         {/* Metric 3 */}
         <Card className="rounded-2xl border-slate-100 shadow-sm relative overflow-hidden">
            <div className="absolute left-0 top-0 w-1.5 h-full bg-purple-500"></div>
-           <CardContent className="p-6">
+           <CardContent>
               <div className="flex justify-between items-start mb-4">
                  <div className="h-10 w-10 rounded-xl bg-purple-50 flex items-center justify-center">
                     <CreditCard className="h-5 w-5 text-purple-600" />

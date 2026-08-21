@@ -248,7 +248,7 @@ export default function AdminPage() {
         </div>
 
         <Card className="overflow-hidden rounded-[32px] border-0 bg-white shadow-sm">
-          <CardHeader className="border-b border-gray-200 p-6">
+          <CardHeader className="border-b border-gray-200">
             <CardTitle className="flex items-center text-lg font-bold uppercase tracking-tight text-theo-black">
               <Layers className="mr-3 h-5 w-5" />
               Recent Batches
@@ -257,7 +257,7 @@ export default function AdminPage() {
               Jump into a batch or its drip schedule
             </CardDescription>
           </CardHeader>
-          <CardContent className="pt-6">
+          <CardContent>
             {staffBatchesLoading ? (
               <ContentLoader variant="table" className="py-4" />
             ) : recentBatches.length === 0 ? (
@@ -538,7 +538,7 @@ export default function AdminPage() {
       {/* Recent Activity Tables */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="hover:shadow-lg transition-shadow overflow-hidden border-0 shadow-sm rounded-[32px]">
-          <CardHeader className="border-b border-gray-200 bg-white p-6 text-theo-black">
+          <CardHeader className="border-b border-gray-200 bg-white text-theo-black">
             <CardTitle className="flex items-center text-lg font-bold uppercase tracking-tight">
               <Users className="h-5 w-5 mr-3" />
               Recent Registrations
@@ -547,7 +547,7 @@ export default function AdminPage() {
               Latest users who joined the platform
             </CardDescription>
           </CardHeader>
-          <CardContent className="pt-6">
+          <CardContent>
             <div className="space-y-4">
               {registeredUsers.slice(0, 5).map((registeredUser) => (
                 <div
@@ -588,7 +588,7 @@ export default function AdminPage() {
         </Card>
 
         <Card className="hover:shadow-lg transition-shadow overflow-hidden border-0 shadow-sm rounded-[32px]">
-          <CardHeader className="border-b border-gray-200 bg-white p-6 text-theo-black">
+          <CardHeader className="border-b border-gray-200 bg-white text-theo-black">
             <CardTitle className="flex items-center text-lg font-bold uppercase tracking-tight">
               <CreditCard className="h-5 w-5 mr-3" />
               Recent Subscriptions
@@ -597,7 +597,7 @@ export default function AdminPage() {
               Latest subscription payments received
             </CardDescription>
           </CardHeader>
-          <CardContent className="pt-6">
+          <CardContent>
             <div className="space-y-4">
               {subscriptions.slice(0, 5).map((subscription) => (
                 <div

@@ -225,7 +225,7 @@ export default function CollegesPage() {
           <div className="admin-card-grid">
             {colleges.map((school) => (
               <Card key={school.id} className="border-0 shadow-sm rounded-xl overflow-hidden group hover:shadow-xl transition-all duration-300">
-                <CardHeader className="">
+                <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-2xl font-bold text-theo-black flex items-center gap-3">
                       <div className="h-12 w-12 rounded-2xl bg-theo-yellow/10 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -239,7 +239,7 @@ export default function CollegesPage() {
                   </div>
                 </CardHeader>
                 
-                <CardContent className="p-8 pt-0">
+                <CardContent className="pt-0">
                   <div className="space-y-6">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="bg-gray-50 p-4 rounded-2xl border border-theo-black/5">

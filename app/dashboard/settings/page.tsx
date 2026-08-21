@@ -15,7 +15,7 @@ export default function SettingsPage() {
       </div>
 
       <div className="space-y-4">
-        <Card className="py-0">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <Bell className="h-4 w-4" />
@@ -41,7 +41,7 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className="py-0">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <Shield className="h-4 w-4" />
@@ -66,7 +66,7 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className="py-0">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <Palette className="h-4 w-4" />
@@ -92,7 +92,7 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className="py-0">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <Settings className="h-4 w-4" />

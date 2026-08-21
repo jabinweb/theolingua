@@ -615,7 +615,7 @@ export default function UsersPage() {
 
         {/* Search Bar & Filters */}
         <Card className="mb-8 border-0 shadow-sm rounded-[32px] overflow-hidden bg-white">
-          <CardContent className="p-6">
+          <CardContent>
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />

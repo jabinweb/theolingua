@@ -380,7 +380,7 @@ export const ProgramSubscriptionManager: React.FC<ProgramSubscriptionManagerProp
                                 <Badge className="bg-green-600 text-white text-xs">Current Plan</Badge>
                               </div>
                             )}
-                            <CardContent className="p-4 pt-6">
+                            <CardContent className="p-4">
                               <div className="text-center space-y-2">
                                 <h5 className="font-semibold text-gray-900">{plan.name}</h5>
                                 <div className="flex items-center justify-center gap-1">

@@ -193,7 +193,7 @@ export default function ProgramDetailPage() {
       ) : (
         <div className="admin-card-grid">
           {subjects.map((subject) => (
-            <Card key={subject.id} className="min-w-0 overflow-hidden border border-gray-200 py-0 shadow-sm">
+            <Card key={subject.id} className="min-w-0 overflow-hidden border border-gray-200 shadow-sm">
               <CardHeader className="gap-2 pb-2">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex min-w-0 items-start gap-3">

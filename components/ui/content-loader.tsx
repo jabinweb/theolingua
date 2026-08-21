@@ -57,7 +57,7 @@ export function ContentLoader({
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Card key={i} className="overflow-hidden border border-gray-200 py-0 shadow-sm">
+            <Card key={i} className="overflow-hidden border border-gray-200 shadow-sm">
               <CardHeader className="space-y-2 pb-2">
                 <Skeleton className="h-5 w-3/4" />
                 <Skeleton className="h-3 w-1/2" />
@@ -93,7 +93,7 @@ export function ContentLoader({
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {[1, 2, 3, 4, 5, 6].map((i) => (
-          <Card key={i} className="border border-gray-200 py-0 shadow-sm">
+          <Card key={i} className="border border-gray-200 shadow-sm">
             <CardHeader className="pb-2">
               <Skeleton className="mb-3 h-20 w-full rounded-lg" />
               <Skeleton className="h-5 w-3/4" />

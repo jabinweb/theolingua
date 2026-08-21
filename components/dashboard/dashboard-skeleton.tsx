@@ -23,7 +23,7 @@ export function DashboardSkeleton() {
         <Skeleton className="mb-4 h-6 w-40 max-w-full" />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Card key={i} className="py-0">
+            <Card key={i}>
               <CardHeader className="pb-2">
                 <Skeleton className="mb-3 h-20 w-full rounded-lg" />
                 <Skeleton className="h-5 w-3/4 max-w-full" />

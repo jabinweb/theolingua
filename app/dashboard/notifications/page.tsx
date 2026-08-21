@@ -35,11 +35,11 @@ export default function NotificationsPage() {
       </div>
 
       {loading ? (
-        <Card className="py-0">
+        <Card>
           <CardContent className="py-10 text-center text-sm text-gray-500">Loading…</CardContent>
         </Card>
       ) : announcements.length === 0 ? (
-        <Card className="py-0">
+        <Card>
           <CardContent className="py-10 text-center">
             <Bell className="mx-auto mb-3 h-10 w-10 text-gray-400" />
             <h3 className="mb-1 text-base font-medium text-gray-900">No notifications</h3>
@@ -51,7 +51,7 @@ export default function NotificationsPage() {
       ) : (
         <div className="space-y-3">
           {announcements.map((item) => (
-            <Card key={item.id} className="py-0">
+            <Card key={item.id}>
               <CardContent className="flex gap-3 p-4">
                 <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-theo-yellow/20">
                   <Megaphone className="h-4 w-4 text-theo-black" />
