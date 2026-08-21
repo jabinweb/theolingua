@@ -50,6 +50,9 @@ export async function GET(
                     orderIndex: true,
                     description: true,
                     difficulty: true,
+                    requiresPass: true,
+                    masteryScore: true,
+                    maxAttempts: true,
                     // Exclude content - this protects the data
                   },
                   orderBy: { orderIndex: 'asc' },

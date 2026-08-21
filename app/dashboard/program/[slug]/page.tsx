@@ -15,6 +15,8 @@ import { UnitContent } from '@/components/learning/UnitContent';
 import { 
   getNextTopic, 
   isUnitCompleted,
+  isTopicEnabled,
+  canNavigateToNext,
   type UnitProgression 
 } from '@/lib/topic-progression';
 
@@ -205,13 +207,43 @@ function ProgramPageContent() {
       return;
     }
 
+    if (selectedUnitData) {
+      const unitProgress: UnitProgression = {
+        id: selectedUnitData.id,
+        name: selectedUnitData.name,
+        chapters: selectedUnitData.chapters.map((ch) => ({
+          id: ch.id,
+          name: ch.name,
+          topics: ch.topics.map((t) => ({
+            id: t.id,
+            name: t.name,
+            completed: userProgress.get(t.id) || false,
+          })),
+        })),
+      };
+      const completedTopicsSet = new Set<string>();
+      userProgress.forEach((completed, topicId) => {
+        if (completed) completedTopicsSet.add(topicId);
+      });
+
+      if (!isTopicEnabled({ id: topic.id, name: topic.name }, unitProgress, completedTopicsSet)) {
+        toast.message('Complete the previous topic to unlock this one');
+        return;
+      }
+    }
+
     // Drive player via URL so any topic is deep-linkable / refreshable
     setTopicInUrl(topic.id, 'push');
   };
 
   const handleTopicComplete = async () => {
     if (selectedTopic) {
-      await markTopicComplete(selectedTopic.id, true);
+      try {
+        await markTopicComplete(selectedTopic.id, true);
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : 'Could not mark topic complete');
+        return;
+      }
       
       // Check if unit is completed using shared utility
       if (selectedUnitData) {
@@ -240,10 +272,6 @@ function ProgramPageContent() {
           toast.success(`Unit complete: ${selectedUnitData.name}`);
         }
       }
-      
-      // Don't close the player dialog here for consistency with demo
-      // setIsPlayerOpen(false);
-      // setSelectedTopic(null);
     }
   };
 
@@ -279,7 +307,7 @@ function ProgramPageContent() {
     const currentTopicForProgression = {
       id: selectedTopic.id,
       name: selectedTopic.name,
-      completed: selectedTopic.completed
+      completed: userProgress.get(selectedTopic.id) || false
     };
 
     // Create a Set from userProgress for compatibility with shared functions
@@ -288,7 +316,15 @@ function ProgramPageContent() {
       if (completed) completedTopicsSet.add(topicId);
     });
 
-    // Game-based learning: Always allow moving to next topic without restrictions
+    if (!canNavigateToNext(currentTopicForProgression, unitProgress, completedTopicsSet)) {
+      toast.message(
+        selectedTopic.requiresPass
+          ? 'Pass this activity to unlock the next topic'
+          : 'Complete this topic before moving on'
+      );
+      return;
+    }
+
     const nextTopic = getNextTopic(currentTopicForProgression, unitProgress);
     
     if (nextTopic) {
@@ -480,6 +516,35 @@ function ProgramPageContent() {
         onIncomplete={handleTopicIncomplete}
         onNext={handleNextTopic}
         isCompleted={selectedTopic ? (userProgress.get(selectedTopic.id) || false) : false}
+        canGoNext={
+          selectedTopic && selectedUnitData
+            ? canNavigateToNext(
+                {
+                  id: selectedTopic.id,
+                  name: selectedTopic.name,
+                  completed: userProgress.get(selectedTopic.id) || false,
+                },
+                {
+                  id: selectedUnitData.id,
+                  name: selectedUnitData.name,
+                  chapters: selectedUnitData.chapters.map((ch) => ({
+                    id: ch.id,
+                    name: ch.name,
+                    topics: ch.topics.map((t) => ({
+                      id: t.id,
+                      name: t.name,
+                      completed: userProgress.get(t.id) || false,
+                    })),
+                  })),
+                },
+                new Set(
+                  Array.from(userProgress.entries())
+                    .filter(([, completed]) => completed)
+                    .map(([topicId]) => topicId)
+                )
+              )
+            : false
+        }
       />
     </div>
   );

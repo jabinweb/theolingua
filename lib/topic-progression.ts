@@ -1,13 +1,13 @@
 /**
- * Shared utilities for topic progression and sequential unlock logic
- * Used by both demo and dashboard program pages
+ * Shared helpers for sequential topic unlock and scoring gates.
  */
 
-// Generic topic type that works for both demo and dashboard
 export interface TopicProgression {
   id: string;
   name: string;
   completed?: boolean;
+  requiresPass?: boolean;
+  masteryScore?: number | null;
 }
 
 export interface ChapterProgression {
@@ -22,12 +22,12 @@ export interface UnitProgression {
   chapters: ChapterProgression[];
 }
 
+export function getOrderedTopics(unitData: UnitProgression): TopicProgression[] {
+  return unitData.chapters.flatMap((ch) => ch.topics);
+}
+
 /**
  * Check if a topic should be enabled based on sequential unlock logic
- * @param topic - The topic to check
- * @param unitData - The unit containing the topic
- * @param completedTopics - Set of completed topic IDs
- * @returns boolean indicating if the topic should be enabled
  */
 export function isTopicEnabled(
   topic: TopicProgression,
@@ -35,31 +35,23 @@ export function isTopicEnabled(
   completedTopics: Set<string>
 ): boolean {
   if (!unitData) return false;
-  
-  const allTopics = unitData.chapters.flatMap(ch => ch.topics);
-  const topicIndex = allTopics.findIndex(t => t.id === topic.id);
-  
-  if (topicIndex === 0) {
-    return true; // First topic is always enabled
-  }
-  
-  // Check if all previous topics are completed
+
+  const allTopics = getOrderedTopics(unitData);
+  const topicIndex = allTopics.findIndex((t) => t.id === topic.id);
+
+  if (topicIndex < 0) return false;
+  if (topicIndex === 0) return true;
+
   for (let i = 0; i < topicIndex; i++) {
     const previousTopic = allTopics[i];
     if (!completedTopics.has(previousTopic.id) && !previousTopic.completed) {
       return false;
     }
   }
-  
+
   return true;
 }
 
-/**
- * Check if a topic is completed
- * @param topicId - The topic ID to check
- * @param completedTopics - Set of completed topic IDs
- * @returns boolean indicating if the topic is completed
- */
 export function isTopicCompleted(
   topicId: string,
   completedTopics: Set<string>
@@ -67,13 +59,6 @@ export function isTopicCompleted(
   return completedTopics.has(topicId);
 }
 
-/**
- * Handle topic completion and update completion state
- * @param topicId - The topic ID to mark as completed
- * @param completedTopics - Current set of completed topics
- * @param setCompletedTopics - Function to update completed topics
- * @returns new Set of completed topics
- */
 export function handleTopicCompletion(
   topicId: string,
   completedTopics: Set<string>,
@@ -85,34 +70,24 @@ export function handleTopicCompletion(
   return newCompletedTopics;
 }
 
-/**
- * Get the next topic in the sequence
- * @param currentTopic - The current topic
- * @param unitData - The unit containing the topics
- * @returns next topic or null if no next topic
- */
 export function getNextTopic(
   currentTopic: TopicProgression,
   unitData: UnitProgression
 ): TopicProgression | null {
   if (!unitData) return null;
-  
-  const allTopics = unitData.chapters.flatMap(ch => ch.topics);
-  const currentIndex = allTopics.findIndex(topic => topic.id === currentTopic.id);
-  
+
+  const allTopics = getOrderedTopics(unitData);
+  const currentIndex = allTopics.findIndex((topic) => topic.id === currentTopic.id);
+
   if (currentIndex !== -1 && currentIndex < allTopics.length - 1) {
     return allTopics[currentIndex + 1];
   }
-  
-  return null; // No more topics
+
+  return null;
 }
 
 /**
- * Check if we can navigate to the next topic (current topic must be completed)
- * @param currentTopic - The current topic
- * @param unitData - The unit containing the topics
- * @param completedTopics - Set of completed topic IDs
- * @returns boolean indicating if we can move to next topic
+ * Next is allowed only when the current topic is completed (passed).
  */
 export function canNavigateToNext(
   currentTopic: TopicProgression,
@@ -120,55 +95,58 @@ export function canNavigateToNext(
   completedTopics: Set<string>
 ): boolean {
   if (!unitData || !currentTopic) return false;
-  
-  // Check if current topic is completed
-  const isCurrentCompleted = completedTopics.has(currentTopic.id) || currentTopic.completed;
-  
-  if (!isCurrentCompleted) {
-    return false; // Cannot proceed if current topic is not completed
-  }
-  
-  // Check if there's a next topic
-  const nextTopic = getNextTopic(currentTopic, unitData);
-  return nextTopic !== null;
+
+  const isCurrentCompleted =
+    completedTopics.has(currentTopic.id) || Boolean(currentTopic.completed);
+
+  if (!isCurrentCompleted) return false;
+
+  return getNextTopic(currentTopic, unitData) !== null;
 }
 
-/**
- * Check if unit is completed
- * @param unitData - The unit to check
- * @param completedTopics - Set of completed topic IDs
- * @returns boolean indicating if all topics in unit are completed
- */
 export function isUnitCompleted(
   unitData: UnitProgression,
   completedTopics: Set<string>
 ): boolean {
   if (!unitData) return false;
-  
-  const allTopics = unitData.chapters.flatMap(ch => ch.topics);
-  return allTopics.every(topic => 
-    topic.completed || completedTopics.has(topic.id)
+
+  const allTopics = getOrderedTopics(unitData);
+  return allTopics.every(
+    (topic) => topic.completed || completedTopics.has(topic.id)
   );
 }
 
-/**
- * Get completion progress for a unit
- * @param unitData - The unit to calculate progress for
- * @param completedTopics - Set of completed topic IDs
- * @returns progress percentage (0-100)
- */
 export function getUnitProgress(
   unitData: UnitProgression,
   completedTopics: Set<string>
 ): number {
   if (!unitData) return 0;
-  
-  const allTopics = unitData.chapters.flatMap(ch => ch.topics);
+
+  const allTopics = getOrderedTopics(unitData);
   if (allTopics.length === 0) return 0;
-  
-  const completedCount = allTopics.filter(topic => 
-    topic.completed || completedTopics.has(topic.id)
+
+  const completedCount = allTopics.filter(
+    (topic) => topic.completed || completedTopics.has(topic.id)
   ).length;
-  
+
   return Math.round((completedCount / allTopics.length) * 100);
+}
+
+/**
+ * Build a completed-id set from progress map / details.
+ */
+export function toCompletedTopicSet(
+  progress: Map<string, boolean> | Record<string, boolean>
+): Set<string> {
+  const set = new Set<string>();
+  if (progress instanceof Map) {
+    progress.forEach((completed, topicId) => {
+      if (completed) set.add(topicId);
+    });
+  } else {
+    Object.entries(progress).forEach(([topicId, completed]) => {
+      if (completed) set.add(topicId);
+    });
+  }
+  return set;
 }

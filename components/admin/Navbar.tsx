@@ -13,7 +13,7 @@ export function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link 
-            href="/admin/dashboard" 
+            href="/admin" 
             className="text-xl font-bold text-gray-900"
           >
             ScioLabs Admin

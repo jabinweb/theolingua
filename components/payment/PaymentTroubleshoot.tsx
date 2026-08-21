@@ -358,7 +358,7 @@ export default function PaymentTroubleshoot({ paymentId }: { paymentId?: string 
           </p>
           <div className="flex gap-3">
             <Button variant="outline" asChild>
-              <a href="/support" target="_blank">
+              <a href="mailto:contact@sciolabs.in">
                 <ExternalLink className="h-4 w-4 mr-2" />
                 Contact Support
               </a>

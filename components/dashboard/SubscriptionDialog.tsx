@@ -427,7 +427,9 @@ Would you like to refresh the page now?`;
             // Handle redirect after success message is shown (if not disabled)
             if (!disableAutoRedirect) {
               setTimeout(() => {
-                router.push(`/dashboard/class/${classData.id}`);
+                router.push(
+                  `/dashboard/program/${classData.slug || classData.id}`
+                );
               }, 3500); // Wait for dialog to close first
             }
           } else {
@@ -508,7 +510,9 @@ Would you like to refresh the page now?`;
             // Delayed redirect with success message
             if (!disableAutoRedirect) {
               setTimeout(() => {
-                router.push(`/dashboard/class/${classData.id}`);
+                router.push(
+                  `/dashboard/program/${classData.slug || classData.id}`
+                );
               }, 3000); // Increased to 3 seconds to show success message
             }
           } else {

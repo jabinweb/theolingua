@@ -31,6 +31,9 @@ export interface Topic {
   description?: string | null;
   difficulty?: string;
   orderIndex: number;
+  requiresPass?: boolean;
+  masteryScore?: number | null;
+  maxAttempts?: number | null;
   content?: TopicContent;
 }
 
@@ -192,7 +195,7 @@ export function useProgramData(programId?: string) {
 
     const fetchProgress = async () => {
       try {
-        const response = await fetch(`/api/user/progress?userId=${user.id}`);
+        const response = await fetch('/api/user/topic-progress');
         const data = await response.json();
 
         if (!response.ok) {
@@ -200,15 +203,12 @@ export function useProgramData(programId?: string) {
           return;
         }
 
-        // Convert progress object to Map
-        const progressMap = new Map();
-        Object.entries(data.progress || {}).forEach(([topicId, progressData]) => {
-          const progress = progressData as { completed: boolean; completedAt: Date | null; timeSpent: number | null };
-          progressMap.set(topicId, progress.completed);
+        const progressMap = new Map<string, boolean>();
+        Object.entries(data.progress || {}).forEach(([topicId, completed]) => {
+          progressMap.set(topicId, Boolean(completed));
         });
-        
+
         setUserProgress(progressMap);
-        
       } catch (err) {
         console.error('Error fetching progress:', err);
       }
@@ -237,7 +237,7 @@ export function useProgramData(programId?: string) {
 
       if (!response.ok) {
         console.error('Error updating progress:', data.error);
-        return;
+        throw new Error(data.error || 'Failed to update progress');
       }
 
       // Update local state only if API call succeeded
@@ -245,6 +245,7 @@ export function useProgramData(programId?: string) {
       
     } catch (err) {
       console.error('Error updating progress:', err);
+      throw err;
     }
   };
 

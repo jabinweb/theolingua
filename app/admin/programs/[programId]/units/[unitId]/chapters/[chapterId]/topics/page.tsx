@@ -28,6 +28,9 @@ interface Topic {
   difficulty?: string;
   orderIndex: number;
   chapterId: string;
+  requiresPass?: boolean;
+  masteryScore?: number | null;
+  maxAttempts?: number | null;
   created_at: string;
   updated_at: string;
   content?: TopicContentData;
@@ -40,6 +43,9 @@ interface TopicFormData {
   duration: string;
   orderIndex: number;
   chapterId: string;
+  requiresPass?: boolean;
+  masteryScore?: number | null;
+  maxAttempts?: number | null;
   content?: TopicContentData;
 }
 

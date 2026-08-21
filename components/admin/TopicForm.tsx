@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { FileUpload } from '@/components/ui/FileUpload';
+import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 
 interface TopicContentData {
@@ -29,6 +30,9 @@ interface TopicFormData {
   orderIndex: number;
   chapterId: string;
   pdfUrl?: string;
+  requiresPass?: boolean;
+  masteryScore?: number | null;
+  maxAttempts?: number | null;
   content?: TopicContentData;
 }
 
@@ -49,6 +53,9 @@ export function TopicForm({ isOpen, onClose, onSubmit, initialData, mode, chapte
     description: '',
     orderIndex: 0,
     chapterId,
+    requiresPass: false,
+    masteryScore: 80,
+    maxAttempts: null,
     content: {
       contentType: 'external_link',
       url: '',
@@ -103,6 +110,9 @@ export function TopicForm({ isOpen, onClose, onSubmit, initialData, mode, chapte
 
       setFormData({
         ...initialData,
+        requiresPass: Boolean(initialData.requiresPass),
+        masteryScore: initialData.masteryScore ?? 80,
+        maxAttempts: initialData.maxAttempts ?? null,
         content: contentData
       });
     } else if (isOpen && !initialData) {
@@ -114,6 +124,9 @@ export function TopicForm({ isOpen, onClose, onSubmit, initialData, mode, chapte
         description: '',
         orderIndex: 0,
         chapterId,
+        requiresPass: false,
+        masteryScore: 80,
+        maxAttempts: null,
         content: {
           contentType: 'external_link',
           url: '',
@@ -133,7 +146,7 @@ export function TopicForm({ isOpen, onClose, onSubmit, initialData, mode, chapte
     if (formData.content?.contentType === 'iframe') {
       const iframeContent = formData.content?.iframeHtml || '';
       if (iframeContent && !iframeContent.includes('<iframe')) {
-        alert('Please enter valid iframe HTML code starting with <iframe');
+        toast.error('Please enter valid iframe HTML code starting with <iframe');
         return;
       }
     }
@@ -149,7 +162,10 @@ export function TopicForm({ isOpen, onClose, onSubmit, initialData, mode, chapte
     }
   };
 
-  const updateFormData = (field: keyof TopicFormData, value: string | number | object) => {
+  const updateFormData = (
+    field: keyof TopicFormData,
+    value: string | number | boolean | object | null
+  ) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -235,6 +251,72 @@ export function TopicForm({ isOpen, onClose, onSubmit, initialData, mode, chapte
                 className="mt-1.5"
                 required
               />
+            </div>
+          </div>
+
+          <div className="bg-gray-50 p-5 rounded-lg space-y-4">
+            <h3 className="font-semibold text-base">Scoring &amp; Unlock</h3>
+            <p className="text-xs text-gray-500">
+              For iframe/HTML activities, the content should post{' '}
+              <code className="text-[11px] bg-white px-1 rounded">
+                {'{ type: "theo.score", score, maxScore }'}
+              </code>{' '}
+              to the parent window. Learners must reach the mastery score before the next topic unlocks.
+            </p>
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <Label htmlFor="requiresPass" className="text-sm font-medium">
+                  Require passing score
+                </Label>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Hides manual Complete; progress only when the activity reports a pass.
+                </p>
+              </div>
+              <Switch
+                id="requiresPass"
+                checked={Boolean(formData.requiresPass)}
+                onCheckedChange={(checked) => updateFormData('requiresPass', checked)}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="masteryScore" className="text-sm font-medium">
+                  Mastery score (%)
+                </Label>
+                <Input
+                  id="masteryScore"
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={formData.masteryScore ?? 80}
+                  onChange={(e) =>
+                    updateFormData(
+                      'masteryScore',
+                      e.target.value === '' ? 80 : Math.min(100, Math.max(0, parseInt(e.target.value) || 0))
+                    )
+                  }
+                  className="mt-1.5"
+                />
+              </div>
+              <div>
+                <Label htmlFor="maxAttempts" className="text-sm font-medium">
+                  Max attempts (optional)
+                </Label>
+                <Input
+                  id="maxAttempts"
+                  type="number"
+                  min={1}
+                  value={formData.maxAttempts ?? ''}
+                  onChange={(e) =>
+                    updateFormData(
+                      'maxAttempts',
+                      e.target.value === '' ? null : Math.max(1, parseInt(e.target.value) || 1)
+                    )
+                  }
+                  placeholder="Unlimited"
+                  className="mt-1.5"
+                />
+              </div>
             </div>
           </div>
 

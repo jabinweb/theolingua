@@ -84,7 +84,19 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const { name, type, duration, difficulty, orderIndex, chapterId, content, description } = await request.json();
+    const {
+      name,
+      type,
+      duration,
+      difficulty,
+      orderIndex,
+      chapterId,
+      content,
+      description,
+      requiresPass,
+      masteryScore,
+      maxAttempts,
+    } = await request.json();
 
     if (!name || !type || !chapterId) {
       return NextResponse.json({ error: 'Missing required fields: name, type, and chapterId are required' }, { status: 400 });
@@ -101,6 +113,17 @@ export async function POST(request: Request) {
         orderIndex: orderIndex || 0,
         chapterId,
         description: description && description.trim() !== '' ? description : null,
+        requiresPass: Boolean(requiresPass),
+        masteryScore:
+          masteryScore === null || masteryScore === undefined || masteryScore === ''
+            ? requiresPass
+              ? 80
+              : null
+            : Number(masteryScore),
+        maxAttempts:
+          maxAttempts === null || maxAttempts === undefined || maxAttempts === ''
+            ? null
+            : Number(maxAttempts),
         created_at: new Date(),
         updatedAt: new Date(),
       }
@@ -139,7 +162,19 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   try {
-    const { id, name, type, duration, difficulty, orderIndex, content, description } = await request.json();
+    const {
+      id,
+      name,
+      type,
+      duration,
+      difficulty,
+      orderIndex,
+      content,
+      description,
+      requiresPass,
+      masteryScore,
+      maxAttempts,
+    } = await request.json();
     
     if (!id) {
       return NextResponse.json({ error: 'Topic ID is required' }, { status: 400 });
@@ -154,6 +189,19 @@ export async function PUT(request: Request) {
     if (typeof difficulty === 'string') updateData.difficulty = convertDifficultyLevel(difficulty);
     if (typeof orderIndex !== 'undefined') updateData.orderIndex = orderIndex;
     if (typeof description === 'string') updateData.description = description && description.trim() !== '' ? description : null;
+    if (typeof requiresPass === 'boolean') updateData.requiresPass = requiresPass;
+    if (masteryScore !== undefined) {
+      updateData.masteryScore =
+        masteryScore === null || masteryScore === ''
+          ? null
+          : Number(masteryScore);
+    }
+    if (maxAttempts !== undefined) {
+      updateData.maxAttempts =
+        maxAttempts === null || maxAttempts === ''
+          ? null
+          : Number(maxAttempts);
+    }
 
     // Update topic
     await prisma.topic.update({
