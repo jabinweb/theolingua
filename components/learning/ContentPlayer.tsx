@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Play, FileText, Monitor } from 'lucide-react';
+import { ExternalLink, Play, FileText, Monitor, RotateCcw, Check, ArrowRight, X } from 'lucide-react';
 import { type DbTopic } from '@/hooks/useProgramData';
 import { parseIframeHtml } from '@/lib/parse-iframe-html';
 
@@ -161,12 +161,11 @@ export function ContentPlayer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [topic?.id]); // Intentionally only depend on topic ID to avoid resetting on completion changes
 
-  // Handle fullscreen mode on mobile to hide browser address bar
+  // Optional mobile fullscreen — never block UX if unsupported/denied
   useEffect(() => {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     
     if (isOpen && isMobile) {
-      // Request fullscreen on mobile devices
       const enterFullscreen = async () => {
         try {
           const docElement = document.documentElement as HTMLElement & {
@@ -181,32 +180,36 @@ export function ContentPlayer({
           } else if (docElement.msRequestFullscreen) {
             await docElement.msRequestFullscreen();
           }
-        } catch (error) {
-          console.log('Fullscreen request failed:', error);
+        } catch {
+          // Fullscreen is optional; continue without it
         }
       };
 
-      // Small delay to ensure dialog is rendered
-      const timer = setTimeout(enterFullscreen, 300);
+      const timer = setTimeout(() => {
+        void enterFullscreen();
+      }, 300);
       
       return () => {
         clearTimeout(timer);
-        // Exit fullscreen when dialog closes
-        const doc = document as Document & {
-          webkitFullscreenElement?: Element;
-          msFullscreenElement?: Element;
-          webkitExitFullscreen?: () => void;
-          msExitFullscreen?: () => void;
-        };
-        
-        if (doc.fullscreenElement || doc.webkitFullscreenElement || doc.msFullscreenElement) {
-          if (doc.exitFullscreen) {
-            doc.exitFullscreen().catch(() => {});
-          } else if (doc.webkitExitFullscreen) {
-            doc.webkitExitFullscreen();
-          } else if (doc.msExitFullscreen) {
-            doc.msExitFullscreen();
+        try {
+          const doc = document as Document & {
+            webkitFullscreenElement?: Element;
+            msFullscreenElement?: Element;
+            webkitExitFullscreen?: () => void;
+            msExitFullscreen?: () => void;
+          };
+          
+          if (doc.fullscreenElement || doc.webkitFullscreenElement || doc.msFullscreenElement) {
+            if (doc.exitFullscreen) {
+              doc.exitFullscreen().catch(() => {});
+            } else if (doc.webkitExitFullscreen) {
+              doc.webkitExitFullscreen();
+            } else if (doc.msExitFullscreen) {
+              doc.msExitFullscreen();
+            }
           }
+        } catch {
+          // Ignore exit failures
         }
       };
     }
@@ -216,7 +219,6 @@ export function ContentPlayer({
 
   const handleComplete = () => {
     if (!hasCompleted && !isCompleted) {
-      console.log('Completing topic:', topic?.name);
       setHasCompleted(true);
       onComplete();
     }
@@ -224,7 +226,6 @@ export function ContentPlayer({
 
   const handleIncomplete = () => {
     if ((hasCompleted || isCompleted) && onIncomplete) {
-      console.log('Marking topic as incomplete:', topic?.name);
       setHasCompleted(false);
       onIncomplete();
     }
@@ -242,24 +243,13 @@ export function ContentPlayer({
         }
         break;
       case 'video':
-        // Video is embedded inline in the player
-        break;
       case 'pdf':
-        // PDF is embedded inline in the player
-        break;
       case 'text':
-        // Text content is displayed inline
+      case 'iframe':
         break;
       case 'interactive_widget':
-        // Handle interactive widget
-        console.log('Loading widget:', topicContent.widgetConfig);
-        break;
-      case 'iframe':
-        // Iframe content is displayed inline
-        console.log('Iframe content displayed inline');
         break;
       default:
-        console.warn('Unknown content type:', topicContent.contentType);
         break;
     }
     
@@ -297,7 +287,7 @@ export function ContentPlayer({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => {}}>
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
       <DialogContent className="!fixed !inset-0 !w-screen !h-screen !max-w-none !max-h-none !p-0 !m-0 !gap-0 !border-0 !bg-black !translate-x-0 !translate-y-0 !left-0 !top-0 !flex flex-col overflow-hidden !rounded-none [&>button]:hidden">
         {/* Hidden title for accessibility */}
         <DialogTitle className="sr-only">{topic.name}</DialogTitle>
@@ -318,9 +308,10 @@ export function ContentPlayer({
                 onClick={handleIncomplete} 
                 size="sm" 
                 className="gap-1 text-white text-xs sm:text-sm px-3 py-1.5 bg-orange-600 hover:bg-orange-700 h-8"
+                aria-label="Mark Incomplete"
               >
+                <RotateCcw className="h-4 w-4 sm:hidden" aria-hidden="true" />
                 <span className="hidden sm:inline">Mark Incomplete</span>
-                <span className="sm:hidden">↺</span>
               </Button>
             ) : (
               <Button 
@@ -332,9 +323,10 @@ export function ContentPlayer({
                     ? 'bg-gray-600 cursor-not-allowed opacity-50' 
                     : 'bg-green-600 hover:bg-green-700'
                 }`}
+                aria-label={hasCompleted || isCompleted ? 'Completed' : 'Complete'}
               >
+                <Check className="h-4 w-4 sm:hidden" aria-hidden="true" />
                 <span className="hidden sm:inline">{hasCompleted || isCompleted ? 'Completed' : 'Complete'}</span>
-                <span className="sm:hidden">✓</span>
               </Button>
             )}
             {onNext && (
@@ -348,12 +340,11 @@ export function ContentPlayer({
                     : 'bg-blue-600 hover:bg-blue-700'
                 }`}
                 title={isDemo && isDemoLimitReached ? "Upgrade to access more content" : "Play the next game/topic"}
+                aria-label={isDemo && isDemoLimitReached ? 'Upgrade' : 'Play Next'}
               >
+                <ArrowRight className="h-4 w-4 sm:hidden" aria-hidden="true" />
                 <span className="hidden sm:inline">
                   {isDemo && isDemoLimitReached ? 'Upgrade' : 'Play Next'}
-                </span>
-                <span className="sm:hidden">
-                  {isDemo && isDemoLimitReached ? '⬆' : '→'}
                 </span>
               </Button>
             )}
@@ -362,9 +353,10 @@ export function ContentPlayer({
               onClick={onClose} 
               size="sm" 
               className="border-gray-600 bg-gray-800 text-gray-200 hover:bg-gray-700 hover:text-white text-xs sm:text-sm px-3 py-1.5 h-8"
+              aria-label="Close"
             >
+              <X className="h-4 w-4 sm:hidden" aria-hidden="true" />
               <span className="hidden sm:inline">Close</span>
-              <span className="sm:hidden">×</span>
             </Button>
           </div>
         </div>
@@ -372,18 +364,6 @@ export function ContentPlayer({
         {/* Content Area - Takes all remaining space */}
         <div className="flex-1 overflow-hidden relative bg-black">
           <div className="absolute inset-0 w-full h-full bg-black">
-            {(() => {
-              console.log('ContentPlayer: Current state:', {
-                isOpen,
-                isDemo,
-                hasTopicContent: !!topicContent,
-                topicContentType: topicContent?.contentType,
-                hasIframeHtml: !!topicContent?.iframeHtml,
-                contentLoading,
-                topicName: topic?.name
-              });
-              return null;
-            })()}
             {contentLoading ? (
               <div className="flex flex-col items-center justify-center h-full text-center p-4">
                 <div className="mb-4 p-4 bg-gray-800 rounded-full animate-pulse">

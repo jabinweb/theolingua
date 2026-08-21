@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
@@ -26,25 +26,75 @@ import {
   Tag,
   Layers,
   ShieldCheck,
+  FolderOpen,
+  type LucideIcon,
 } from 'lucide-react';
 
-const navigation = [
-  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard, roles: ['ADMIN', 'TEACHER', 'MODERATOR'] },
-  { name: 'Batches', href: '/admin/batches', icon: Layers, roles: ['ADMIN', 'TEACHER', 'MODERATOR'] },
-  { name: 'Colleges', href: '/admin/colleges', icon: School, roles: ['ADMIN'] },
-  { name: 'Users', href: '/admin/users', icon: Users, roles: ['ADMIN', 'MODERATOR'] },
-  { name: 'Programs', href: '/admin/programs', icon: GraduationCap, roles: ['ADMIN', 'MODERATOR', 'TEACHER'] },
-  { name: 'Pricing', href: '/admin/pricing', icon: Tag, roles: ['ADMIN'] },
-  { name: 'Subscriptions', href: '/admin/subscriptions', icon: CreditCard, roles: ['ADMIN'] },
-  { name: 'Payments', href: '/admin/payments', icon: DollarSign, roles: ['ADMIN'] },
-  { name: 'Activities', href: '/admin/activities', icon: Activity, roles: ['ADMIN'] },
-  { name: 'Notifications', href: '/admin/notifications', icon: Bell, roles: ['ADMIN'] },
-  { name: 'Announcements', href: '/admin/announcements', icon: Megaphone, roles: ['ADMIN'] },
-  { name: 'Error Logs', href: '/admin/error-logs', icon: AlertTriangle, roles: ['ADMIN'] },
-  { name: 'Responses', href: '/admin/responses', icon: MessageSquare, roles: ['ADMIN'] },
-  { name: 'Analytics', href: '/admin/analytics', icon: BookOpen, roles: ['ADMIN', 'TEACHER', 'MODERATOR'] },
-  { name: 'Role Management', href: '/admin/roles', icon: ShieldCheck, roles: ['ADMIN'] },
-  { name: 'Settings', href: '/admin/settings', icon: Settings, roles: ['ADMIN'] },
+type NavItem = {
+  name: string;
+  href: string;
+  icon: LucideIcon;
+  roles: string[];
+};
+
+type NavSection = {
+  label: string;
+  items: NavItem[];
+};
+
+const navigation: NavSection[] = [
+  {
+    label: 'Overview',
+    items: [
+      { name: 'Dashboard', href: '/admin', icon: LayoutDashboard, roles: ['ADMIN', 'TEACHER', 'MODERATOR'] },
+      { name: 'Analytics', href: '/admin/analytics', icon: BookOpen, roles: ['ADMIN'] },
+    ],
+  },
+  {
+    label: 'Delivery',
+    items: [
+      { name: 'Batches', href: '/admin/batches', icon: Layers, roles: ['ADMIN', 'TEACHER', 'MODERATOR'] },
+    ],
+  },
+  {
+    label: 'People',
+    items: [
+      { name: 'Users', href: '/admin/users', icon: Users, roles: ['ADMIN'] },
+      { name: 'Colleges', href: '/admin/colleges', icon: School, roles: ['ADMIN'] },
+    ],
+  },
+  {
+    label: 'Content',
+    items: [
+      { name: 'Programs', href: '/admin/programs', icon: GraduationCap, roles: ['ADMIN'] },
+      { name: 'Files', href: '/admin/files', icon: FolderOpen, roles: ['ADMIN'] },
+    ],
+  },
+  {
+    label: 'Commerce',
+    items: [
+      { name: 'Pricing', href: '/admin/pricing', icon: Tag, roles: ['ADMIN'] },
+      { name: 'Subscriptions', href: '/admin/subscriptions', icon: CreditCard, roles: ['ADMIN'] },
+      { name: 'Payments', href: '/admin/payments', icon: DollarSign, roles: ['ADMIN'] },
+    ],
+  },
+  {
+    label: 'Engage',
+    items: [
+      { name: 'Notifications', href: '/admin/notifications', icon: Bell, roles: ['ADMIN'] },
+      { name: 'Announcements', href: '/admin/announcements', icon: Megaphone, roles: ['ADMIN'] },
+      { name: 'Responses', href: '/admin/responses', icon: MessageSquare, roles: ['ADMIN'] },
+    ],
+  },
+  {
+    label: 'System',
+    items: [
+      { name: 'Activities', href: '/admin/activities', icon: Activity, roles: ['ADMIN'] },
+      { name: 'Error Logs', href: '/admin/error-logs', icon: AlertTriangle, roles: ['ADMIN'] },
+      { name: 'Role Management', href: '/admin/roles', icon: ShieldCheck, roles: ['ADMIN'] },
+      { name: 'Settings', href: '/admin/settings', icon: Settings, roles: ['ADMIN'] },
+    ],
+  },
 ];
 
 interface AdminSidebarProps {
@@ -67,9 +117,14 @@ export function AdminSidebar({ isMobile }: AdminSidebarProps) {
       .catch(() => undefined);
   }, []);
 
-  const filteredNavigation = navigation
-    .map((item) => (item.name === 'Programs' ? { ...item, name: programPlural } : item))
-    .filter((item) => item.roles.includes(userRole));
+  const filteredSections = navigation
+    .map((section) => ({
+      ...section,
+      items: section.items
+        .map((item) => (item.name === 'Programs' ? { ...item, name: programPlural } : item))
+        .filter((item) => item.roles.includes(userRole)),
+    }))
+    .filter((section) => section.items.length > 0);
 
   const sidebarContent = (
     <div className="flex h-full flex-col border-r border-gray-200 bg-white">
@@ -78,7 +133,11 @@ export function AdminSidebar({ isMobile }: AdminSidebarProps) {
           <Image src="/logo.png" alt="TheoLingua" fill className="object-contain object-left" />
         </Link>
         <p className="text-xs font-medium text-gray-500">
-          {userRole === 'TEACHER' ? 'Teacher panel' : 'Admin panel'}
+          {userRole === 'TEACHER'
+            ? 'Teacher panel'
+            : userRole === 'MODERATOR'
+              ? 'Moderator panel'
+              : 'Admin panel'}
         </p>
         <Button
           type="button"
@@ -93,26 +152,40 @@ export function AdminSidebar({ isMobile }: AdminSidebarProps) {
       </div>
 
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
-        {filteredNavigation.map((item) => {
-          const isActive =
-            pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
-
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
+        {filteredSections.map((section, sectionIndex) => (
+          <Fragment key={section.label}>
+            <p
               className={cn(
-                'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors',
-                isActive
-                  ? 'bg-theo-yellow/20 text-theo-black'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-theo-black'
+                'px-3 text-[10px] font-bold uppercase tracking-widest text-gray-400',
+                sectionIndex === 0 ? 'mb-2' : 'mb-2 mt-5'
               )}
             >
-              <item.icon className={cn('h-4 w-4 shrink-0', isActive ? 'text-theo-black' : 'text-gray-400')} />
-              {item.name}
-            </Link>
-          );
-        })}
+              {section.label}
+            </p>
+            {section.items.map((item) => {
+              const isActive =
+                pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors',
+                    isActive
+                      ? 'bg-theo-yellow/20 text-theo-black'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-theo-black'
+                  )}
+                >
+                  <item.icon
+                    className={cn('h-4 w-4 shrink-0', isActive ? 'text-theo-black' : 'text-gray-400')}
+                  />
+                  {item.name}
+                </Link>
+              );
+            })}
+          </Fragment>
+        ))}
       </nav>
 
       <div className="border-t border-gray-200 p-3">

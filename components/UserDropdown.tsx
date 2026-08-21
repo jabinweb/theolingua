@@ -20,7 +20,8 @@ import {
   LogOut, 
   School,
   Receipt,
-  Home
+  Home,
+  Bell,
 } from "lucide-react";
 
 export const UserDropdown = () => {
@@ -116,22 +117,22 @@ export const UserDropdown = () => {
           <span>Payment History</span>
         </DropdownMenuItem>
         
-        {/* <DropdownMenuItem 
+        <DropdownMenuItem 
           onClick={() => handleNavigation('/dashboard/notifications')}
           className="cursor-pointer"
         >
           <Bell className="mr-2 h-4 w-4" />
           <span>Notifications</span>
-        </DropdownMenuItem> */}
+        </DropdownMenuItem>
 
         {/* Admin Panel access for admin users only */}
-        {user?.role === 'ADMIN' && (
+        {(user?.role === 'ADMIN' || user?.role === 'TEACHER' || user?.role === 'MODERATOR') && (
           <DropdownMenuItem 
             onClick={() => handleNavigation('/admin')}
             className="cursor-pointer"
           >
             <School className="mr-2 h-4 w-4" />
-            <span>Admin Panel</span>
+            <span>{user?.role === 'ADMIN' ? 'Admin Panel' : 'Staff Panel'}</span>
           </DropdownMenuItem>
         )}
         

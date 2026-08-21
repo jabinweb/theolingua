@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { toast } from 'sonner';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -181,11 +182,11 @@ export default function UsersPage() {
       if (response.ok) {
         setRegisteredUsers(registeredUsers.filter(user => user.uid !== userId));
       } else {
-        alert(await getErrorMessage(response, 'Failed to delete user'));
+        toast.error(await getErrorMessage(response, 'Failed to delete user'));
       }
     } catch (error) {
       console.error('Error deleting user:', error);
-      alert('Failed to delete user');
+      toast.error('Failed to delete user');
     }
   };
 
@@ -194,7 +195,7 @@ export default function UsersPage() {
     if (formSubmitting) return;
 
     if (formData.role === 'TEACHER' && formData.programClassIds.length === 0) {
-      alert('Select at least one program level for teachers');
+      toast.error('Select at least one program level for teachers');
       return;
     }
 
@@ -211,11 +212,11 @@ export default function UsersPage() {
         setFormOpen(false);
         resetForm();
       } else {
-        alert(await getErrorMessage(response, 'Failed to create user'));
+        toast.error(await getErrorMessage(response, 'Failed to create user'));
       }
     } catch (error) {
       console.error('Error creating user:', error);
-      alert('Failed to create user');
+      toast.error('Failed to create user');
     } finally {
       setFormSubmitting(false);
     }
@@ -226,7 +227,7 @@ export default function UsersPage() {
     if (!editingUser || formSubmitting) return;
 
     if (formData.role === 'TEACHER' && formData.programClassIds.length === 0) {
-      alert('Teachers must have at least one program level selected');
+      toast.error('Teachers must have at least one program level selected');
       return;
     }
 
@@ -254,11 +255,11 @@ export default function UsersPage() {
         setEditingUser(null);
         resetForm();
       } else {
-        alert(await getErrorMessage(response, 'Failed to update user'));
+        toast.error(await getErrorMessage(response, 'Failed to update user'));
       }
     } catch (error) {
       console.error('Error updating user:', error);
-      alert('Failed to update user');
+      toast.error('Failed to update user');
     } finally {
       setFormSubmitting(false);
     }
@@ -306,11 +307,11 @@ export default function UsersPage() {
       if (response.ok) {
         refreshData();
       } else {
-        alert(await getErrorMessage(response, 'Failed to update user status'));
+        toast.error(await getErrorMessage(response, 'Failed to update user status'));
       }
     } catch (error) {
       console.error('Error updating user status:', error);
-      alert('Failed to update user status');
+      toast.error('Failed to update user status');
     }
   };
 
@@ -366,13 +367,13 @@ export default function UsersPage() {
       );
       const failed = results.filter((res) => !res.ok).length;
       if (failed > 0) {
-        alert(`${failed} of ${results.length} users could not be deleted`);
+        toast.error(`${failed} of ${results.length} users could not be deleted`);
       }
       setSelectedUsers(new Set());
       refreshData();
     } catch (error) {
       console.error('Error bulk deleting users:', error);
-      alert('Some users could not be deleted');
+      toast.error('Some users could not be deleted');
     } finally {
       setBulkActionLoading(false);
     }
@@ -394,13 +395,13 @@ export default function UsersPage() {
       );
       const failed = results.filter((res) => !res.ok).length;
       if (failed > 0) {
-        alert(`${failed} of ${results.length} users could not be activated`);
+        toast.error(`${failed} of ${results.length} users could not be activated`);
       }
       setSelectedUsers(new Set());
       refreshData();
     } catch (error) {
       console.error('Error bulk activating users:', error);
-      alert('Some users could not be activated');
+      toast.error('Some users could not be activated');
     } finally {
       setBulkActionLoading(false);
     }
@@ -424,13 +425,13 @@ export default function UsersPage() {
       );
       const failed = results.filter((res) => !res.ok).length;
       if (failed > 0) {
-        alert(`${failed} of ${results.length} users could not be deactivated`);
+        toast.error(`${failed} of ${results.length} users could not be deactivated`);
       }
       setSelectedUsers(new Set());
       refreshData();
     } catch (error) {
       console.error('Error bulk deactivating users:', error);
-      alert('Some users could not be deactivated');
+      toast.error('Some users could not be deactivated');
     } finally {
       setBulkActionLoading(false);
     }

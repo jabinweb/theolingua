@@ -124,6 +124,17 @@ export const UnitContent: React.FC<UnitContentProps> = ({
     el?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
   }, [selectedUnit]);
 
+  // Auto-expand chapters when selected unit changes
+  useEffect(() => {
+    if (!selectedUnitData?.chapters?.length) {
+      setExpandedChapters(new Set());
+      return;
+    }
+    setExpandedChapters(new Set(selectedUnitData.chapters.map((ch) => ch.id)));
+    // Only re-expand when switching units, not on every parent re-render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedUnitData?.id]);
+
   const toggleChapter = (chapterId: string) => {
     if (!useAccordion) return;
     
@@ -144,6 +155,20 @@ export const UnitContent: React.FC<UnitContentProps> = ({
     return Math.round((completedCount / chapter.topics.length) * 100);
   };
 
+  const dripLockedSelected =
+    selectedUnitData &&
+    selectedUnitData.isLocked &&
+    (selectedUnitData.daysRemaining ?? 0) > 0
+      ? selectedUnitData
+      : selectedUnit
+        ? units.find(
+            (u) =>
+              u.id === selectedUnit &&
+              u.isLocked &&
+              (u.daysRemaining ?? 0) > 0
+          )
+        : undefined;
+
   return (
     <div className="grid min-w-0 grid-cols-1 gap-4 xl:grid-cols-12 xl:gap-5">
       {/* Mobile / tablet: horizontal unit picker until xl sidebar */}
@@ -162,28 +187,36 @@ export const UnitContent: React.FC<UnitContentProps> = ({
         >
           {units.map((unit) => {
             const daysRemaining = unit.daysRemaining ?? 0;
-            const isDripLocked = unit.isLocked && daysRemaining > 0;
+            const isDripLocked = Boolean(unit.isLocked && daysRemaining > 0);
+            const isPaywallLocked = Boolean(unit.isLocked && daysRemaining === 0);
             const isSelected = selectedUnit === unit.id;
             const progress = getUnitProgress(unit.id);
-            const canSelect = !unit.isLocked;
+            // Drip-locked units remain selectable so countdown UI can show
+            const canSelect = !unit.isLocked || isDripLocked;
             return (
               <button
                 key={unit.id}
                 type="button"
                 role="tab"
                 aria-selected={isSelected}
-                disabled={!canSelect}
+                disabled={false}
                 ref={(el) => {
                   if (el) unitChipRefs.current.set(unit.id, el);
                   else unitChipRefs.current.delete(unit.id);
                 }}
-                onClick={() => canSelect && onUnitSelect(unit.id)}
+                onClick={() => {
+                  if (isPaywallLocked) {
+                    onLockedClick();
+                    return;
+                  }
+                  if (canSelect) onUnitSelect(unit.id);
+                }}
                 className={`flex min-h-[3.25rem] min-w-[8.25rem] max-w-[11rem] shrink-0 snap-start touch-manipulation flex-col items-stretch rounded-lg border px-2.5 py-2 text-left transition-all ${
                   isSelected
                     ? `border-transparent bg-gradient-to-br ${getColorGradient(unit.color)} text-white shadow-md`
                     : canSelect
                       ? 'border-gray-200 bg-gray-50 active:scale-[0.98] hover:border-gray-300 hover:bg-gray-100'
-                      : 'cursor-not-allowed border-gray-100 bg-gray-50/80 opacity-70'
+                      : 'border-gray-100 bg-gray-50/80 opacity-70 hover:border-gray-200 hover:bg-gray-100'
                 }`}
               >
                 <span className="flex items-start gap-1.5">
@@ -245,7 +278,8 @@ export const UnitContent: React.FC<UnitContentProps> = ({
           <CardContent className="space-y-1.5 pb-4">
             {units.map((unit) => {
               const daysRemaining = unit.daysRemaining ?? 0;
-              const isDripLocked = unit.isLocked && daysRemaining > 0;
+              const isDripLocked = Boolean(unit.isLocked && daysRemaining > 0);
+              const isPaywallLocked = Boolean(unit.isLocked && daysRemaining === 0);
               const isSelected = selectedUnit === unit.id;
               return (
               <div
@@ -254,8 +288,14 @@ export const UnitContent: React.FC<UnitContentProps> = ({
                   isSelected
                     ? 'border-theo-black bg-theo-black text-white shadow-sm'
                     : 'border-transparent bg-gray-50 hover:bg-gray-100'
-                } ${unit.isLocked ? 'cursor-not-allowed opacity-60' : ''}`}
-                onClick={() => !unit.isLocked && onUnitSelect(unit.id)}
+                } ${unit.isLocked && !isDripLocked ? 'opacity-60' : ''}`}
+                onClick={() => {
+                  if (isPaywallLocked) {
+                    onLockedClick();
+                    return;
+                  }
+                  onUnitSelect(unit.id);
+                }}
               >
                 <div className="flex items-center gap-2">
                   <div className="h-4 w-4 shrink-0">{getUnitIcon(unit.icon)}</div>
@@ -306,7 +346,25 @@ export const UnitContent: React.FC<UnitContentProps> = ({
 
       {/* Main Content Area */}
       <div className="order-2 min-w-0 xl:col-span-8 2xl:col-span-9">
-        {selectedUnitData ? (
+        {dripLockedSelected ? (
+          <Card className="overflow-hidden">
+            <div className={`bg-gradient-to-r ${getColorGradient(dripLockedSelected.color)} p-12 text-white text-center`}>
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/20 backdrop-blur mb-6">
+                <Lock className="h-10 w-10" />
+              </div>
+              <h2 className="text-3xl font-black mb-3">{dripLockedSelected.name}</h2>
+              <p className="text-white/80 text-lg mb-4 font-medium">This unit unlocks in</p>
+              <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur px-8 py-4 rounded-2xl">
+                <Clock className="h-7 w-7" />
+                <span className="text-4xl font-black">{dripLockedSelected.daysRemaining ?? 0}</span>
+                <span className="text-xl font-bold text-white/80">
+                  {(dripLockedSelected.daysRemaining ?? 0) === 1 ? 'day' : 'days'}
+                </span>
+              </div>
+              <p className="text-white/60 text-sm mt-4 font-medium">Keep learning! This content is part of your scheduled drip curriculum.</p>
+            </div>
+          </Card>
+        ) : selectedUnitData ? (
           <Card className="overflow-hidden py-0 shadow-sm">
             <CardHeader className="border-b border-gray-200 bg-theo-black px-4 py-3 text-white">
               <CardTitle className="flex w-full flex-col gap-2 text-left text-base font-semibold tracking-normal text-white sm:flex-row sm:items-center sm:justify-between">
@@ -382,11 +440,9 @@ export const UnitContent: React.FC<UnitContentProps> = ({
                         <div className="grid grid-cols-1 gap-2 p-2 sm:grid-cols-2">
                           {[...chapter.topics]
                             .sort((a, b) => {
-                              const order = { 'BEGINNER': 0, 'INTERMEDIATE': 1, 'ADVANCED': 2 };
-                              type DiffKey = keyof typeof order;
-                              const aDiff = typeof a.difficulty === 'string' ? a.difficulty.toUpperCase() as DiffKey : undefined;
-                              const bDiff = typeof b.difficulty === 'string' ? b.difficulty.toUpperCase() as DiffKey : undefined;
-                              return (aDiff !== undefined ? order[aDiff] : 99) - (bDiff !== undefined ? order[bDiff] : 99);
+                              const aOrder = typeof a.orderIndex === 'number' ? a.orderIndex : 0;
+                              const bOrder = typeof b.orderIndex === 'number' ? b.orderIndex : 0;
+                              return aOrder - bOrder;
                             })
                             .filter(
                               (topic, index, arr) =>
@@ -429,35 +485,6 @@ export const UnitContent: React.FC<UnitContentProps> = ({
               </div>
             </CardContent>
           </Card>
-        ) : selectedUnit && units.find(u => u.id === selectedUnit)?.isLocked ? (
-          // Drip-locked selected unit — show countdown screen
-          (() => {
-            const lockedUnit = units.find(u => u.id === selectedUnit)!;
-            const daysRemaining = lockedUnit.daysRemaining ?? 0;
-            return (
-              <Card className="overflow-hidden">
-                <div className={`bg-gradient-to-r ${getColorGradient(lockedUnit.color)} p-12 text-white text-center`}>
-                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/20 backdrop-blur mb-6">
-                    <Lock className="h-10 w-10" />
-                  </div>
-                  <h2 className="text-3xl font-black mb-3">{lockedUnit.name}</h2>
-                  {daysRemaining > 0 ? (
-                    <>
-                      <p className="text-white/80 text-lg mb-4 font-medium">This unit unlocks in</p>
-                      <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur px-8 py-4 rounded-2xl">
-                        <Clock className="h-7 w-7" />
-                        <span className="text-4xl font-black">{daysRemaining}</span>
-                        <span className="text-xl font-bold text-white/80">{daysRemaining === 1 ? 'day' : 'days'}</span>
-                      </div>
-                      <p className="text-white/60 text-sm mt-4 font-medium">Keep learning! This content is part of your scheduled drip curriculum.</p>
-                    </>
-                  ) : (
-                    <p className="text-white/80 text-lg font-medium">This unit is locked. Please contact your teacher.</p>
-                  )}
-                </div>
-              </Card>
-            );
-          })()
         ) : (
           <EmptyUnitContent />
         )}
