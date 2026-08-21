@@ -1,11 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ExternalLink, Play, FileText, Monitor, RotateCcw, Check, ArrowRight, X } from 'lucide-react';
 import { type DbTopic } from '@/hooks/useProgramData';
 import { parseIframeHtml } from '@/lib/parse-iframe-html';
+import {
+  THEO_SCORE_MESSAGE_TYPE,
+  defaultMasteryScore,
+  isTheoScoreMessage,
+  normalizeScorePayload,
+} from '@/lib/score-bridge';
+import { toast } from 'sonner';
 
 interface TopicContent {
   contentType: string;
@@ -17,7 +24,24 @@ interface TopicContent {
   widgetConfig?: object;
 }
 
-function IframeHtmlPlayer({ html, title }: { html: string; title: string }) {
+interface TopicMasteryMeta {
+  requiresPass: boolean;
+  masteryScore: number;
+  maxAttempts: number | null;
+  bestScore: number | null;
+  lastScore: number | null;
+  attemptCount: number;
+}
+
+function IframeHtmlPlayer({
+  html,
+  title,
+  reloadKey,
+}: {
+  html: string;
+  title: string;
+  reloadKey: number;
+}) {
   const parsed = parseIframeHtml(html);
 
   if (!parsed.src && !parsed.srcDoc) {
@@ -31,6 +55,7 @@ function IframeHtmlPlayer({ html, title }: { html: string; title: string }) {
   return (
     <div className="absolute inset-0 h-full w-full">
       <iframe
+        key={reloadKey}
         title={title}
         src={parsed.src}
         srcDoc={parsed.srcDoc}
@@ -85,33 +110,46 @@ interface ContentPlayerProps {
   isOpen: boolean;
   onClose: () => void;
   onComplete: () => void;
-  onIncomplete?: () => void; // New prop for marking as incomplete
+  onIncomplete?: () => void;
   onNext?: () => void;
   isCompleted?: boolean;
-  isDemo?: boolean; // Flag to indicate this is demo mode
-  demoContent?: TopicContent; // Pre-loaded demo content
-  isDemoLimitReached?: boolean; // Flag to indicate demo user has reached access limit
+  canGoNext?: boolean;
+  isDemo?: boolean;
+  demoContent?: TopicContent;
+  isDemoLimitReached?: boolean;
 }
 
-export function ContentPlayer({ 
-  topic, 
-  isOpen, 
-  onClose, 
-  onComplete, 
-  onIncomplete, // New prop
-  onNext, 
-  isCompleted = false, 
+export function ContentPlayer({
+  topic,
+  isOpen,
+  onClose,
+  onComplete,
+  onIncomplete,
+  onNext,
+  isCompleted = false,
+  canGoNext = true,
   isDemo = false,
   demoContent,
-  isDemoLimitReached = false
+  isDemoLimitReached = false,
 }: ContentPlayerProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [hasCompleted, setHasCompleted] = useState(false);
   const [topicContent, setTopicContent] = useState<TopicContent | null>(null);
   const [contentLoading, setContentLoading] = useState(false);
   const [contentError, setContentError] = useState<string | null>(null);
+  const [mastery, setMastery] = useState<TopicMasteryMeta | null>(null);
+  const [lastResult, setLastResult] = useState<{
+    percent: number;
+    passed: boolean;
+    canRetry: boolean;
+  } | null>(null);
+  const [scoreSubmitting, setScoreSubmitting] = useState(false);
+  const [iframeReloadKey, setIframeReloadKey] = useState(0);
 
-  // Fetch content from secure endpoint when topic opens
+  const requiresPass = mastery?.requiresPass ?? Boolean(topic?.requiresPass);
+  const masteryScore = mastery?.masteryScore ?? defaultMasteryScore(topic?.masteryScore);
+  const showManualComplete = !requiresPass;
+
   useEffect(() => {
     if (!topic?.id || !isOpen) {
       return;
@@ -120,30 +158,52 @@ export function ContentPlayer({
     if (isDemo && demoContent) {
       setTopicContent(normalizeTopicContent(demoContent));
       setContentError(null);
+      setMastery({
+        requiresPass: Boolean(topic.requiresPass),
+        masteryScore: defaultMasteryScore(topic.masteryScore),
+        maxAttempts: topic.maxAttempts ?? null,
+        bestScore: null,
+        lastScore: null,
+        attemptCount: 0,
+      });
       return;
     }
 
     setTopicContent(null);
     setContentError(null);
     setContentLoading(true);
+    setLastResult(null);
 
     fetch(`/api/content/topic/${topic.id}`)
       .then(async (response) => {
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
           if (response.status === 403) {
-            setContentError('You need access to view this content.');
+            setContentError(errorData.error || 'You need access to view this content.');
             setTopicContent(null);
             setContentLoading(false);
             return null;
           }
-          throw new Error(`Failed to fetch content: ${response.status} - ${errorData.error || response.statusText}`);
+          throw new Error(
+            `Failed to fetch content: ${response.status} - ${errorData.error || response.statusText}`
+          );
         }
         return response.json();
       })
       .then((data) => {
         if (data?.content) {
           setTopicContent(normalizeTopicContent(data.content));
+        }
+        setMastery({
+          requiresPass: Boolean(data?.requiresPass),
+          masteryScore: defaultMasteryScore(data?.masteryScore),
+          maxAttempts: data?.maxAttempts ?? null,
+          bestScore: data?.progress?.bestScore ?? null,
+          lastScore: data?.progress?.lastScore ?? null,
+          attemptCount: data?.progress?.attemptCount ?? 0,
+        });
+        if (data?.progress?.completed) {
+          setHasCompleted(true);
         }
         setContentLoading(false);
       })
@@ -153,18 +213,98 @@ export function ContentPlayer({
         setTopicContent(null);
         setContentLoading(false);
       });
-  }, [topic?.id, isOpen, isDemo, demoContent]);
+  }, [topic?.id, isOpen, isDemo, demoContent, topic?.requiresPass, topic?.masteryScore, topic?.maxAttempts]);
 
-  // Only reset state when topic actually changes (by ID), not when completion status changes
   useEffect(() => {
     setHasCompleted(isCompleted);
+    setLastResult(null);
+    setIframeReloadKey(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [topic?.id]); // Intentionally only depend on topic ID to avoid resetting on completion changes
+  }, [topic?.id]);
 
-  // Optional mobile fullscreen — never block UX if unsupported/denied
+  const submitScore = useCallback(
+    async (payload: Record<string, unknown>) => {
+      if (!topic?.id || isDemo || scoreSubmitting) return;
+
+      setScoreSubmitting(true);
+      try {
+        const response = await fetch('/api/user/topic-score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ topicId: topic.id, ...payload }),
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          toast.error(data.error || 'Failed to save score');
+          return;
+        }
+
+        setLastResult({
+          percent: data.percent,
+          passed: data.passed,
+          canRetry: Boolean(data.canRetry),
+        });
+        setMastery((prev) =>
+          prev
+            ? {
+                ...prev,
+                bestScore: data.progress?.bestScore ?? prev.bestScore,
+                lastScore: data.progress?.lastScore ?? data.percent,
+                attemptCount: data.progress?.attemptCount ?? prev.attemptCount,
+              }
+            : prev
+        );
+
+        if (data.passed || data.completed) {
+          setHasCompleted(true);
+          onComplete();
+          toast.success(
+            data.passed
+              ? `Passed with ${Math.round(data.percent)}% (need ${data.masteryScore}%)`
+              : 'Topic completed'
+          );
+        } else {
+          toast.error(
+            `Score ${Math.round(data.percent)}% — need ${data.masteryScore}% to unlock the next topic`
+          );
+        }
+      } catch (error) {
+        console.error('Score submit failed:', error);
+        toast.error('Failed to save score');
+      } finally {
+        setScoreSubmitting(false);
+      }
+    },
+    [topic?.id, isDemo, scoreSubmitting, onComplete]
+  );
+
   useEffect(() => {
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
+    if (!isOpen || !topic?.id) return;
+
+    const onMessage = (event: MessageEvent) => {
+      if (!isTheoScoreMessage(event.data)) return;
+      const normalized = normalizeScorePayload(event.data, masteryScore);
+      if (!normalized) return;
+
+      void submitScore({
+        type: THEO_SCORE_MESSAGE_TYPE,
+        score: event.data.score,
+        maxScore: event.data.maxScore,
+        percent: event.data.percent,
+        status: event.data.status,
+      });
+    };
+
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [isOpen, topic?.id, masteryScore, submitScore]);
+
+  useEffect(() => {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+
     if (isOpen && isMobile) {
       const enterFullscreen = async () => {
         try {
@@ -172,7 +312,7 @@ export function ContentPlayer({
             webkitRequestFullscreen?: () => Promise<void>;
             msRequestFullscreen?: () => Promise<void>;
           };
-          
+
           if (docElement.requestFullscreen) {
             await docElement.requestFullscreen();
           } else if (docElement.webkitRequestFullscreen) {
@@ -181,14 +321,14 @@ export function ContentPlayer({
             await docElement.msRequestFullscreen();
           }
         } catch {
-          // Fullscreen is optional; continue without it
+          // Fullscreen is optional
         }
       };
 
       const timer = setTimeout(() => {
         void enterFullscreen();
       }, 300);
-      
+
       return () => {
         clearTimeout(timer);
         try {
@@ -198,7 +338,7 @@ export function ContentPlayer({
             webkitExitFullscreen?: () => void;
             msExitFullscreen?: () => void;
           };
-          
+
           if (doc.fullscreenElement || doc.webkitFullscreenElement || doc.msFullscreenElement) {
             if (doc.exitFullscreen) {
               doc.exitFullscreen().catch(() => {});
@@ -215,9 +355,22 @@ export function ContentPlayer({
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
+
   if (!topic) return null;
 
   const handleComplete = () => {
+    if (requiresPass) {
+      toast.message('Complete the activity to pass this topic');
+      return;
+    }
     if (!hasCompleted && !isCompleted) {
       setHasCompleted(true);
       onComplete();
@@ -231,115 +384,174 @@ export function ContentPlayer({
     }
   };
 
+  const handleRetry = () => {
+    setLastResult(null);
+    setIframeReloadKey((k) => k + 1);
+  };
+
   const handleContentAction = () => {
     if (!topicContent) return;
-    
+
     setIsLoading(true);
-    
+
     switch (topicContent.contentType?.toLowerCase()) {
       case 'external_link':
         if (topicContent.url) {
           window.open(topicContent.url, '_blank');
         }
         break;
-      case 'video':
-      case 'pdf':
-      case 'text':
-      case 'iframe':
-        break;
-      case 'interactive_widget':
-        break;
       default:
         break;
     }
-    
+
     setTimeout(() => setIsLoading(false), 1000);
   };
 
   const getContentIcon = () => {
     if (!topicContent) return <Play className="h-5 w-5" />;
-    
+
     const contentType = topicContent.contentType?.toLowerCase();
     switch (contentType) {
-      case 'external_link': return <ExternalLink className="h-5 w-5" />;
-      case 'video': return <Play className="h-5 w-5" />;
-      case 'pdf': return <FileText className="h-5 w-5" />;
-      case 'text': return <FileText className="h-5 w-5" />;
-      case 'interactive_widget': return <Monitor className="h-5 w-5" />;
-      case 'iframe': return <Monitor className="h-5 w-5" />;
-      default: return <Play className="h-5 w-5" />;
+      case 'external_link':
+        return <ExternalLink className="h-5 w-5" />;
+      case 'video':
+        return <Play className="h-5 w-5" />;
+      case 'pdf':
+        return <FileText className="h-5 w-5" />;
+      case 'text':
+        return <FileText className="h-5 w-5" />;
+      case 'interactive_widget':
+        return <Monitor className="h-5 w-5" />;
+      case 'iframe':
+        return <Monitor className="h-5 w-5" />;
+      default:
+        return <Play className="h-5 w-5" />;
     }
   };
 
   const getActionText = () => {
     if (!topicContent) return 'Start Learning';
-    
+
     const contentType = topicContent.contentType?.toLowerCase();
     switch (contentType) {
-      case 'external_link': return 'Open Link';
-      case 'video': return 'Play Video';
-      case 'pdf': return 'View PDF';
-      case 'text': return 'Read Content';
-      case 'interactive_widget': return 'Start Activity';
-      case 'iframe': return 'Start Activity';
-      default: return 'Start Learning';
+      case 'external_link':
+        return 'Open Link';
+      case 'video':
+        return 'Play Video';
+      case 'pdf':
+        return 'View PDF';
+      case 'text':
+        return 'Read Content';
+      case 'interactive_widget':
+        return 'Start Activity';
+      case 'iframe':
+        return 'Start Activity';
+      default:
+        return 'Start Learning';
     }
   };
 
+  const completedNow = hasCompleted || isCompleted;
+  const nextEnabled = Boolean(onNext) && (isDemo ? true : canGoNext && completedNow);
+
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
       <DialogContent className="!fixed !inset-0 !w-screen !h-screen !max-w-none !max-h-none !p-0 !m-0 !gap-0 !border-0 !bg-black !translate-x-0 !translate-y-0 !left-0 !top-0 !flex flex-col overflow-hidden !rounded-none [&>button]:hidden">
-        {/* Hidden title for accessibility */}
         <DialogTitle className="sr-only">{topic.name}</DialogTitle>
-        
-        {/* Header - Compact and clean */}
+
         <div className="flex-shrink-0 px-4 py-2.5 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 flex items-center justify-between gap-3 border-b border-gray-700">
           <div className="flex items-center gap-2 text-white text-sm min-w-0 flex-1">
-            <div className="flex-shrink-0">
-              {getContentIcon()}
+            <div className="flex-shrink-0">{getContentIcon()}</div>
+            <div className="min-w-0">
+              <span className="truncate font-medium block">{topic.name}</span>
+              {requiresPass && (
+                <span className="text-[11px] text-gray-400">
+                  Pass {masteryScore}% to unlock next
+                  {mastery?.attemptCount ? ` · Attempts ${mastery.attemptCount}` : ''}
+                </span>
+              )}
             </div>
-            <span className="truncate font-medium">{topic.name}</span>
           </div>
-          {/* Action Buttons */}
+
           <div className="flex gap-2 flex-shrink-0">
-            {/* Complete/Incomplete Toggle Button */}
-            {(hasCompleted || isCompleted) && onIncomplete ? (
-              <Button 
-                onClick={handleIncomplete} 
-                size="sm" 
-                className="gap-1 text-white text-xs sm:text-sm px-3 py-1.5 bg-orange-600 hover:bg-orange-700 h-8"
-                aria-label="Mark Incomplete"
+            {lastResult && !lastResult.passed && lastResult.canRetry && (
+              <Button
+                onClick={handleRetry}
+                size="sm"
+                className="gap-1 text-white text-xs sm:text-sm px-3 py-1.5 h-8 bg-amber-600 hover:bg-amber-700"
+                aria-label="Retry"
               >
                 <RotateCcw className="h-4 w-4 sm:hidden" aria-hidden="true" />
-                <span className="hidden sm:inline">Mark Incomplete</span>
-              </Button>
-            ) : (
-              <Button 
-                onClick={handleComplete} 
-                size="sm" 
-                disabled={hasCompleted || isCompleted}
-                className={`gap-1 text-white text-xs sm:text-sm px-3 py-1.5 h-8 ${
-                  hasCompleted || isCompleted 
-                    ? 'bg-gray-600 cursor-not-allowed opacity-50' 
-                    : 'bg-green-600 hover:bg-green-700'
-                }`}
-                aria-label={hasCompleted || isCompleted ? 'Completed' : 'Complete'}
-              >
-                <Check className="h-4 w-4 sm:hidden" aria-hidden="true" />
-                <span className="hidden sm:inline">{hasCompleted || isCompleted ? 'Completed' : 'Complete'}</span>
+                <span className="hidden sm:inline">Retry</span>
               </Button>
             )}
+
+            {showManualComplete &&
+              (completedNow && onIncomplete ? (
+                <Button
+                  onClick={handleIncomplete}
+                  size="sm"
+                  className="gap-1 text-white text-xs sm:text-sm px-3 py-1.5 bg-orange-600 hover:bg-orange-700 h-8"
+                  aria-label="Mark Incomplete"
+                >
+                  <RotateCcw className="h-4 w-4 sm:hidden" aria-hidden="true" />
+                  <span className="hidden sm:inline">Mark Incomplete</span>
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleComplete}
+                  size="sm"
+                  disabled={completedNow}
+                  className={`gap-1 text-white text-xs sm:text-sm px-3 py-1.5 h-8 ${
+                    completedNow
+                      ? 'bg-gray-600 cursor-not-allowed opacity-50'
+                      : 'bg-green-600 hover:bg-green-700'
+                  }`}
+                  aria-label={completedNow ? 'Completed' : 'Complete'}
+                >
+                  <Check className="h-4 w-4 sm:hidden" aria-hidden="true" />
+                  <span className="hidden sm:inline">
+                    {completedNow ? 'Completed' : 'Complete'}
+                  </span>
+                </Button>
+              ))}
+
+            {requiresPass && completedNow && (
+              <Button
+                size="sm"
+                disabled
+                className="gap-1 text-white text-xs sm:text-sm px-3 py-1.5 h-8 bg-gray-600 cursor-not-allowed opacity-50"
+                aria-label="Passed"
+              >
+                <Check className="h-4 w-4 sm:hidden" aria-hidden="true" />
+                <span className="hidden sm:inline">Passed</span>
+              </Button>
+            )}
+
             {onNext && (
-              <Button 
-                onClick={onNext} 
-                size="sm" 
-                disabled={false}
+              <Button
+                onClick={onNext}
+                size="sm"
+                disabled={!nextEnabled && !(isDemo && isDemoLimitReached)}
                 className={`gap-1 text-white text-xs sm:text-sm px-3 py-1.5 h-8 ${
-                  isDemo && isDemoLimitReached 
-                    ? 'bg-orange-600 hover:bg-orange-700' 
-                    : 'bg-blue-600 hover:bg-blue-700'
+                  isDemo && isDemoLimitReached
+                    ? 'bg-orange-600 hover:bg-orange-700'
+                    : nextEnabled
+                      ? 'bg-blue-600 hover:bg-blue-700'
+                      : 'bg-gray-600 cursor-not-allowed opacity-50'
                 }`}
-                title={isDemo && isDemoLimitReached ? "Upgrade to access more content" : "Play the next game/topic"}
+                title={
+                  isDemo && isDemoLimitReached
+                    ? 'Upgrade to access more content'
+                    : nextEnabled
+                      ? 'Play the next topic'
+                      : 'Complete this topic to unlock the next one'
+                }
                 aria-label={isDemo && isDemoLimitReached ? 'Upgrade' : 'Play Next'}
               >
                 <ArrowRight className="h-4 w-4 sm:hidden" aria-hidden="true" />
@@ -348,10 +560,11 @@ export function ContentPlayer({
                 </span>
               </Button>
             )}
-            <Button 
-              variant="outline" 
-              onClick={onClose} 
-              size="sm" 
+
+            <Button
+              variant="outline"
+              onClick={onClose}
+              size="sm"
               className="border-gray-600 bg-gray-800 text-gray-200 hover:bg-gray-700 hover:text-white text-xs sm:text-sm px-3 py-1.5 h-8"
               aria-label="Close"
             >
@@ -360,8 +573,21 @@ export function ContentPlayer({
             </Button>
           </div>
         </div>
-        
-        {/* Content Area - Takes all remaining space */}
+
+        {lastResult && (
+          <div
+            className={`flex-shrink-0 px-4 py-2 text-sm ${
+              lastResult.passed
+                ? 'bg-emerald-900/80 text-emerald-100'
+                : 'bg-rose-900/80 text-rose-100'
+            }`}
+          >
+            {lastResult.passed
+              ? `Passed with ${Math.round(lastResult.percent)}%`
+              : `Scored ${Math.round(lastResult.percent)}% — retry to reach ${masteryScore}%`}
+          </div>
+        )}
+
         <div className="flex-1 overflow-hidden relative bg-black">
           <div className="absolute inset-0 w-full h-full bg-black">
             {contentLoading ? (
@@ -378,10 +604,12 @@ export function ContentPlayer({
               </div>
             ) : topicContent?.contentType?.toLowerCase() === 'video' && topicContent.videoUrl ? (
               <div className="w-full h-full absolute inset-0">
-                {/* Handle different video URL formats */}
-                {topicContent.videoUrl.includes('youtube.com') || topicContent.videoUrl.includes('youtu.be') ? (
-                  <iframe 
-                    src={topicContent.videoUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
+                {topicContent.videoUrl.includes('youtube.com') ||
+                topicContent.videoUrl.includes('youtu.be') ? (
+                  <iframe
+                    src={topicContent.videoUrl
+                      .replace('watch?v=', 'embed/')
+                      .replace('youtu.be/', 'youtube.com/embed/')}
                     className="w-full h-full absolute inset-0"
                     style={{ border: 'none', margin: 0, padding: 0 }}
                     allowFullScreen
@@ -389,7 +617,7 @@ export function ContentPlayer({
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   />
                 ) : topicContent.videoUrl.includes('vimeo.com') ? (
-                  <iframe 
+                  <iframe
                     src={topicContent.videoUrl.replace('vimeo.com/', 'player.vimeo.com/video/')}
                     className="w-full h-full absolute inset-0"
                     style={{ border: 'none', margin: 0, padding: 0 }}
@@ -398,7 +626,7 @@ export function ContentPlayer({
                     allow="autoplay; fullscreen; picture-in-picture"
                   />
                 ) : (
-                  <video 
+                  <video
                     controls
                     className="w-full h-full object-contain"
                     title={topic.name}
@@ -428,8 +656,14 @@ export function ContentPlayer({
                   </pre>
                 )}
               </div>
-            ) : (topicContent?.contentType?.toLowerCase() === 'iframe' || topicContent?.contentType === 'IFRAME') && topicContent.iframeHtml ? (
-              <IframeHtmlPlayer html={topicContent.iframeHtml} title={topic?.name || 'Activity'} />
+            ) : (topicContent?.contentType?.toLowerCase() === 'iframe' ||
+                topicContent?.contentType === 'IFRAME') &&
+              topicContent.iframeHtml ? (
+              <IframeHtmlPlayer
+                html={topicContent.iframeHtml}
+                title={topic?.name || 'Activity'}
+                reloadKey={iframeReloadKey}
+              />
             ) : contentError ? (
               <div className="flex flex-col items-center justify-center h-full text-center p-4 sm:p-8">
                 <div className="mb-4 p-3 sm:p-4 bg-gray-800 rounded-full">
@@ -440,14 +674,12 @@ export function ContentPlayer({
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-center p-4 sm:p-8">
-                <div className="mb-4 p-3 sm:p-4 bg-gray-800 rounded-full">
-                  {getContentIcon()}
-                </div>
+                <div className="mb-4 p-3 sm:p-4 bg-gray-800 rounded-full">{getContentIcon()}</div>
                 <h3 className="text-base sm:text-lg font-medium mb-2 text-white">{topic?.name}</h3>
                 <p className="text-sm sm:text-base text-gray-400 mb-4">
                   Duration: {topic?.duration} • Type: {topicContent?.contentType || 'content'}
                 </p>
-                <Button 
+                <Button
                   onClick={handleContentAction}
                   disabled={isLoading || contentLoading}
                   className="gap-2 bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 text-sm sm:text-base px-4 py-2"

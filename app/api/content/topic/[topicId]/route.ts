@@ -3,6 +3,8 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { logTopicStarted } from '@/lib/activity-logger';
 import { hasAllProgramAccess } from '@/lib/user-program-access';
+import { isTopicEnabled, type UnitProgression } from '@/lib/topic-progression';
+import { defaultMasteryScore } from '@/lib/score-bridge';
 
 // Server-side function to verify topic access
 async function verifyTopicAccess(userId: string, topicId: string) {
@@ -16,26 +18,63 @@ async function verifyTopicAccess(userId: string, topicId: string) {
               include: {
                 class: true,
                 chapters: {
-                  orderBy: { orderIndex: 'asc' }
-                }
-              }
-            }
-          }
-        }
-      }
+                  orderBy: { orderIndex: 'asc' },
+                  include: {
+                    topics: {
+                      orderBy: { orderIndex: 'asc' },
+                      select: { id: true, name: true, orderIndex: true },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
-    if (!topic) return { hasAccess: false, topic: null };
+    if (!topic) return { hasAccess: false, topic: null, sequentialLocked: false };
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      include: { school: true, batch: true }
+      include: { school: true, batch: true },
     });
 
-    if (!user) return { hasAccess: false, topic };
+    if (!user) return { hasAccess: false, topic, sequentialLocked: false };
+
+    const unitProgression: UnitProgression = {
+      id: topic.chapter.subject.id,
+      name: topic.chapter.subject.name,
+      chapters: topic.chapter.subject.chapters.map((ch) => ({
+        id: ch.id,
+        name: ch.name,
+        topics: ch.topics.map((t) => ({ id: t.id, name: t.name })),
+      })),
+    };
+
+    const completedRows = await prisma.userTopicProgress.findMany({
+      where: {
+        userId,
+        completed: true,
+        topicId: {
+          in: unitProgression.chapters.flatMap((ch) => ch.topics.map((t) => t.id)),
+        },
+      },
+      select: { topicId: true },
+    });
+    const completedTopics = new Set(completedRows.map((r) => r.topicId));
+    const sequentialLocked = !isTopicEnabled(
+      { id: topic.id, name: topic.name },
+      unitProgression,
+      completedTopics
+    );
 
     if (hasAllProgramAccess(user.role)) {
-      return { hasAccess: true, topic };
+      return { hasAccess: true, topic, sequentialLocked: false };
+    }
+
+    if (sequentialLocked) {
+      return { hasAccess: false, topic, sequentialLocked: true };
     }
 
     const classId = topic.chapter.subject.classId;
@@ -45,11 +84,11 @@ async function verifyTopicAccess(userId: string, topicId: string) {
 
     const isFreeProgram = classPrice === 0 || classPrice === null;
     if (isFreeProgram) {
-      return { hasAccess: true, topic };
+      return { hasAccess: true, topic, sequentialLocked: false };
     }
 
     if (user.batch?.classId === classId) {
-      return { hasAccess: true, topic };
+      return { hasAccess: true, topic, sequentialLocked: false };
     }
 
     const gradeToClassMap: Record<string, number[]> = {
@@ -65,7 +104,7 @@ async function verifyTopicAccess(userId: string, topicId: string) {
       user.grade &&
       (gradeToClassMap[user.grade] || []).includes(classId);
     if (hasSchoolAccess) {
-      return { hasAccess: true, topic };
+      return { hasAccess: true, topic, sequentialLocked: false };
     }
 
     const firstChapter =
@@ -73,7 +112,7 @@ async function verifyTopicAccess(userId: string, topicId: string) {
       topic.chapter.subject.chapters.sort((a, b) => a.orderIndex - b.orderIndex)[0];
 
     if (firstChapter && firstChapter.id === chapterId) {
-      return { hasAccess: true, topic, isFreeTrialAccess: true };
+      return { hasAccess: true, topic, isFreeTrialAccess: true, sequentialLocked: false };
     }
 
     const subscription = await prisma.subscription.findFirst({
@@ -86,13 +125,13 @@ async function verifyTopicAccess(userId: string, topicId: string) {
     });
 
     if (subscription) {
-      return { hasAccess: true, topic };
+      return { hasAccess: true, topic, sequentialLocked: false };
     }
 
-    return { hasAccess: false, topic };
+    return { hasAccess: false, topic, sequentialLocked: false };
   } catch (error) {
     console.error('Error verifying topic access:', error);
-    return { hasAccess: false, topic: null };
+    return { hasAccess: false, topic: null, sequentialLocked: false };
   }
 }
 
@@ -130,42 +169,55 @@ export async function GET(
   const { topicId } = await params;
 
   try {
-    // Check authentication
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Verify access
-    const { hasAccess, topic } = await verifyTopicAccess(session.user.id, topicId);
+    const { hasAccess, topic, sequentialLocked } = await verifyTopicAccess(
+      session.user.id,
+      topicId
+    );
 
     if (!topic) {
       return NextResponse.json({ error: 'Topic not found' }, { status: 404 });
     }
 
-    if (!hasAccess) {
-      return NextResponse.json({ 
-        error: 'Access denied. You need an active subscription to view this content.' 
-      }, { status: 403 });
+    if (sequentialLocked) {
+      return NextResponse.json(
+        { error: 'Complete the previous topic before opening this one.' },
+        { status: 403 }
+      );
     }
 
-    // Get topic content only if user has access
+    if (!hasAccess) {
+      return NextResponse.json(
+        {
+          error: 'Access denied. You need an active subscription to view this content.',
+        },
+        { status: 403 }
+      );
+    }
+
     const topicWithContent = await prisma.topic.findUnique({
       where: { id: topicId },
       include: {
-        content: true
-      }
+        content: true,
+        progress: {
+          where: { userId: session.user.id },
+          take: 1,
+        },
+      },
     });
 
     if (!topicWithContent?.content) {
       return NextResponse.json({ error: 'Content not found' }, { status: 404 });
     }
 
-    // Log topic access activity
     await logTopicStarted(session.user.id, topicId, topic.name);
 
-    // Return only the content data that the ContentPlayer needs
     const content = topicWithContent.content;
+    const userProgress = topicWithContent.progress[0] ?? null;
 
     return NextResponse.json({
       id: topicWithContent.id,
@@ -173,9 +225,19 @@ export async function GET(
       description: topicWithContent.description,
       type: topicWithContent.type,
       duration: topicWithContent.duration,
+      requiresPass: topicWithContent.requiresPass,
+      masteryScore: defaultMasteryScore(topicWithContent.masteryScore),
+      maxAttempts: topicWithContent.maxAttempts,
+      progress: userProgress
+        ? {
+            completed: userProgress.completed,
+            bestScore: userProgress.bestScore,
+            lastScore: userProgress.lastScore,
+            attemptCount: userProgress.attemptCount,
+          }
+        : null,
       content: normalizePlayerContent(content),
     });
-
   } catch (error) {
     console.error('Error fetching topic content:', error);
     return NextResponse.json({ error: 'Failed to fetch topic content' }, { status: 500 });

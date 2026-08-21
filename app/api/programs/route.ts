@@ -36,6 +36,9 @@ export async function GET() {
                     duration: true,
                     orderIndex: true,
                     description: true,
+                    requiresPass: true,
+                    masteryScore: true,
+                    maxAttempts: true,
                     // Exclude content - this is the key change
                   },
                   orderBy: { orderIndex: 'asc' },

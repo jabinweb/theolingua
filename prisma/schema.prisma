@@ -62,19 +62,23 @@ model Chapter {
 }
 
 model Topic {
-  id          String              @id @default(cuid())
-  name        String
-  type        TopicType
-  duration    String?
-  orderIndex  Int
-  chapterId   String
-  difficulty  DifficultyLevel     @default(BEGINNER)
-  created_at  DateTime            @default(now()) @map("created_at")
-  updatedAt   DateTime            @updatedAt @map("updated_at")
-  description String?
-  content     TopicContent?
-  chapter     Chapter             @relation(fields: [chapterId], references: [id], onDelete: Cascade)
-  progress    UserTopicProgress[]
+  id           String              @id @default(cuid())
+  name         String
+  type         TopicType
+  duration     String?
+  orderIndex   Int
+  chapterId    String
+  difficulty   DifficultyLevel     @default(BEGINNER)
+  requiresPass Boolean             @default(false) @map("requires_pass")
+  masteryScore Int?                @map("mastery_score") // 0-100; default 80 when requiresPass
+  maxAttempts  Int?                @map("max_attempts") // null = unlimited
+  created_at   DateTime            @default(now()) @map("created_at")
+  updatedAt    DateTime            @updatedAt @map("updated_at")
+  description  String?
+  content      TopicContent?
+  chapter      Chapter             @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  progress     UserTopicProgress[]
+  attempts     TopicAttempt[]
 
   @@map("topics")
 }
@@ -127,6 +131,7 @@ model User {
   subscriptions     Subscription[]
   activities        UserActivity[]
   progress          UserTopicProgress[]
+  topicAttempts     TopicAttempt[]
   batch             Batch?              @relation("StudentBatch", fields: [batchId], references: [id])
   school            School?             @relation(fields: [schoolId], references: [id])
   teacherBatches    Batch[]             @relation("TeacherBatches")
@@ -173,19 +178,42 @@ model VerificationToken {
 }
 
 model UserTopicProgress {
-  id          String    @id @default(cuid())
-  userId      String
-  topicId     String
-  completed   Boolean   @default(false)
-  completedAt DateTime?
-  timeSpent   Int?
-  created_at  DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  topic       Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String    @id @default(cuid())
+  userId       String
+  topicId      String
+  completed    Boolean   @default(false)
+  completedAt  DateTime?
+  timeSpent    Int?
+  bestScore    Float?    @map("best_score")
+  lastScore    Float?    @map("last_score")
+  attemptCount Int       @default(0) @map("attempt_count")
+  created_at   DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  topic        Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, topicId])
   @@map("user_topic_progress")
+}
+
+model TopicAttempt {
+  id            String   @id @default(cuid())
+  userId        String
+  topicId       String
+  attemptNumber Int      @map("attempt_number")
+  score         Float?
+  maxScore      Float?   @map("max_score")
+  percent       Float?
+  passed        Boolean  @default(false)
+  status        String?
+  rawPayload    Json?    @map("raw_payload")
+  created_at    DateTime @default(now()) @map("created_at")
+  topic         Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, topicId, attemptNumber])
+  @@index([userId, topicId])
+  @@map("topic_attempts")
 }
 
 model Subscription {

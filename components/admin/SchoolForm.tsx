@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { toast } from 'sonner';
 
 interface SchoolFormData {
   id?: string;
@@ -83,7 +84,7 @@ export function SchoolForm({ isOpen, onClose, onSubmit, initialData, mode }: Sch
     } catch (error) {
       console.error('Error submitting school:', error);
       // Show error to user
-      alert(error instanceof Error ? error.message : 'Failed to save school');
+      toast.error(error instanceof Error ? error.message : 'Failed to save school');
     } finally {
       setLoading(false);
     }

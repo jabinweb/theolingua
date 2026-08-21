@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { Upload, Download, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface BulkUploadProps {
   isOpen: boolean;
@@ -58,7 +59,7 @@ Mike Johnson,mike.johnson@example.com,Harvard College,9876543212`;
       setFile(selectedFile);
       setResult(null);
     } else {
-      alert('Please select a valid CSV file');
+      toast.error('Please select a valid CSV file');
     }
   };
 

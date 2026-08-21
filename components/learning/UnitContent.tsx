@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { TopicItem } from '@/components/learning/TopicItem';
 import { type Topic, type TopicContent } from '@/hooks/useProgramData';
+import { isTopicEnabled, type UnitProgression } from '@/lib/topic-progression';
+import { toast } from 'sonner';
 import * as LucideIcons from 'lucide-react';
 import { 
   BookOpen, 
@@ -450,7 +452,30 @@ export const UnitContent: React.FC<UnitContentProps> = ({
                             )
                             .map((topic: BaseTopic) => {
                               const isCompleted = topic.completed || completedTopics.has(topic.id);
-                              const isDisabled = chapter.isLocked || false;
+                              const unitForProgression: UnitProgression | null = selectedUnitData
+                                ? {
+                                    id: selectedUnitData.id,
+                                    name: selectedUnitData.name,
+                                    chapters: selectedUnitData.chapters.map((ch) => ({
+                                      id: ch.id,
+                                      name: ch.name,
+                                      topics: ch.topics.map((t) => ({
+                                        id: t.id,
+                                        name: t.name,
+                                        completed: t.completed || completedTopics.has(t.id),
+                                      })),
+                                    })),
+                                  }
+                                : null;
+                              const progressionLocked = unitForProgression
+                                ? !isTopicEnabled(
+                                    { id: topic.id, name: topic.name },
+                                    unitForProgression,
+                                    completedTopics
+                                  )
+                                : false;
+                              const paywallLocked = chapter.isLocked || false;
+                              const isDisabled = paywallLocked || progressionLocked;
                               // Convert topic for TopicItem - use converter or create default Topic structure
                               const topicForItem: Topic = convertTopicForItem 
                                 ? convertTopicForItem(topic)
@@ -473,7 +498,13 @@ export const UnitContent: React.FC<UnitContentProps> = ({
                                   isDisabled={isDisabled}
                                   accentColor={getColorGradient(selectedUnitData.color)}
                                   onClick={() => onTopicClick(topic, chapterIndex)}
-                                  onLockedClick={onLockedClick}
+                                  onLockedClick={() => {
+                                    if (paywallLocked) {
+                                      onLockedClick();
+                                    } else if (progressionLocked) {
+                                      toast.message('Complete the previous topic to unlock this one');
+                                    }
+                                  }}
                                 />
                               );
                             })}
