@@ -379,7 +379,7 @@ export default function SubscriptionAnalyticsPage() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden bg-white">
-                    <CardHeader className="p-8 pb-0">
+                    <CardHeader className="pb-0">
                       <CardTitle className="flex items-center gap-3 text-2xl font-bold text-theo-black">
                         <div className="h-10 w-10 rounded-2xl bg-theo-yellow/10 flex items-center justify-center">
                           <BarChart3 className="h-5 w-5 text-theo-black" />
@@ -387,7 +387,7 @@ export default function SubscriptionAnalyticsPage() {
                         Growth Velocity
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="p-8">
+                    <CardContent>
                       <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
                           <LineChart data={analyticsData.charts.dailyData}>
@@ -407,7 +407,7 @@ export default function SubscriptionAnalyticsPage() {
                   </Card>
 
                   <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden bg-white">
-                    <CardHeader className="p-8 pb-0">
+                    <CardHeader className="pb-0">
                       <CardTitle className="flex items-center gap-3 text-2xl font-bold text-theo-black">
                         <div className="h-10 w-10 rounded-2xl bg-theo-black/5 flex items-center justify-center">
                           <DollarSign className="h-5 w-5 text-theo-black" />
@@ -415,7 +415,7 @@ export default function SubscriptionAnalyticsPage() {
                         Daily Revenue
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="p-8">
+                    <CardContent>
                       <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
                           <BarChart data={analyticsData.charts.dailyData}>
@@ -565,7 +565,7 @@ export default function SubscriptionAnalyticsPage() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden bg-white">
-                    <CardHeader className="p-8 pb-0">
+                    <CardHeader className="pb-0">
                       <CardTitle className="flex items-center gap-3 text-2xl font-bold text-theo-black">
                         <div className="h-10 w-10 rounded-2xl bg-theo-yellow/10 flex items-center justify-center">
                           <BookOpen className="h-5 w-5 text-theo-black" />
@@ -573,7 +573,7 @@ export default function SubscriptionAnalyticsPage() {
                         Top topics
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="p-8">
+                    <CardContent>
                       <div className="h-80">
                         {learningData.topTopics.length > 0 ? (
                           <ResponsiveContainer width="100%" height="100%">
@@ -614,7 +614,7 @@ export default function SubscriptionAnalyticsPage() {
                   </Card>
 
                   <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden bg-white">
-                    <CardHeader className="p-8 pb-0">
+                    <CardHeader className="pb-0">
                       <CardTitle className="flex items-center gap-3 text-2xl font-bold text-theo-black">
                         <div className="h-10 w-10 rounded-2xl bg-theo-black/5 flex items-center justify-center">
                           <BarChart3 className="h-5 w-5 text-theo-black" />
@@ -622,7 +622,7 @@ export default function SubscriptionAnalyticsPage() {
                         Program completion
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="p-8">
+                    <CardContent>
                       <div className="h-80">
                         {learningData.programCompletion.length > 0 ? (
                           <ResponsiveContainer width="100%" height="100%">

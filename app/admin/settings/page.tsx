@@ -352,7 +352,7 @@ export default function SettingsPage() {
           {/* General Settings */}
           <TabsContent value="general" className="space-y-6">
             <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden bg-white">
-              <CardHeader className="border-b border-gray-200 bg-white p-6 text-theo-black">
+              <CardHeader className="border-b border-gray-200 bg-white text-theo-black">
                 <CardTitle className="flex items-center gap-3 text-3xl font-bold">
                   <Globe className="h-8 w-8" />
                   General Configuration
@@ -438,14 +438,14 @@ export default function SettingsPage() {
           <TabsContent value="payment" className="space-y-6">
             {/* Payment Gateway Selection */}
             <Card className="shadow-xl border border-gray-100 bg-white overflow-hidden">
-              <CardHeader className="border-b border-gray-200 bg-white p-6 text-theo-black">
+              <CardHeader className="border-b border-gray-200 bg-white text-theo-black">
                 <CardTitle className="flex items-center gap-3 text-xl">
                   <CreditCard className="h-6 w-6" />
                   Payment Gateway Configuration
                 </CardTitle>
                 <p className="text-theo-yellow/70 mt-2">Choose and configure your payment gateway</p>
               </CardHeader>
-              <CardContent className="p-8 space-y-6">
+              <CardContent className="space-y-6">
                 {/* Default Gateway Selection */}
                 {/* <div className="border-l-4 border-purple-500 pl-6">
                   <div className="p-4 bg-purple-50 rounded-lg">
@@ -537,7 +537,7 @@ export default function SettingsPage() {
             {/* Razorpay Configuration */}
             {settings.payment_default_gateway === 'RAZORPAY' && (
               <Card className="shadow-xl border border-gray-100 bg-white overflow-hidden">
-                <CardHeader className="border-b border-gray-200 bg-white p-6 text-theo-black">
+                <CardHeader className="border-b border-gray-200 bg-white text-theo-black">
                   <CardTitle className="flex items-center gap-3 text-xl">
                     <CreditCard className="h-6 w-6" />
                     Razorpay Configuration
@@ -545,7 +545,7 @@ export default function SettingsPage() {
                   </CardTitle>
                   <p className="text-theo-yellow/70 mt-2">Configure Razorpay payment gateway settings</p>
                 </CardHeader>
-                <CardContent className="p-8 space-y-8">
+                <CardContent className="space-y-8">
                   {/* Payment Mode Selection */}
                   <div className="border-l-4 border-orange-500 pl-6">
                     <div className="p-4 bg-orange-50 rounded-lg">
@@ -714,7 +714,7 @@ export default function SettingsPage() {
             {/* Cashfree Configuration */}
             {settings.payment_default_gateway === 'CASHFREE' && (
               <Card className="shadow-xl border border-gray-100 bg-white overflow-hidden">
-                <CardHeader className="border-b border-gray-200 bg-white p-6 text-theo-black">
+                <CardHeader className="border-b border-gray-200 bg-white text-theo-black">
                   <CardTitle className="flex items-center gap-3 text-xl">
                     <CreditCard className="h-6 w-6" />
                     Cashfree Configuration
@@ -722,7 +722,7 @@ export default function SettingsPage() {
                   </CardTitle>
                   <p className="text-theo-yellow/70 mt-2">Configure Cashfree payment gateway settings</p>
                 </CardHeader>
-                <CardContent className="p-8 space-y-8">
+                <CardContent className="space-y-8">
                   {/* Environment Selection */}
                   <div className="border-l-4 border-blue-500 pl-6">
                     <div className="p-4 bg-blue-50 rounded-lg">
@@ -854,7 +854,7 @@ export default function SettingsPage() {
           {/* Email Settings */}
           <TabsContent value="email" className="space-y-6">
             <Card className="shadow-xl border border-gray-100 bg-white overflow-hidden">
-              <CardHeader className="border-b border-gray-200 bg-white p-6 text-theo-black">
+              <CardHeader className="border-b border-gray-200 bg-white text-theo-black">
                 <CardTitle className="flex items-center gap-3 text-xl">
                   <Mail className="h-6 w-6" />
                   Email Configuration
@@ -862,7 +862,7 @@ export default function SettingsPage() {
                 </CardTitle>
                 <p className="text-theo-yellow/70 mt-2">Configure email notifications and SMTP settings</p>
               </CardHeader>
-              <CardContent className="p-8 space-y-8">
+              <CardContent className="space-y-8">
                 {/* Email Toggle */}
                 <div className="border-l-4 border-purple-500 pl-6">
                   <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
@@ -991,7 +991,7 @@ export default function SettingsPage() {
           {/* System Settings */}
           <TabsContent value="system" className="space-y-6">
             <Card className="shadow-xl border border-gray-100 bg-white overflow-hidden">
-              <CardHeader className="border-b border-gray-200 bg-white p-6 text-theo-black">
+              <CardHeader className="border-b border-gray-200 bg-white text-theo-black">
                 <CardTitle className="flex items-center gap-3 text-xl">
                   <Server className="h-6 w-6" />
                   System Settings
@@ -999,7 +999,7 @@ export default function SettingsPage() {
                 </CardTitle>
                 <p className="text-theo-yellow/70 mt-2">System-wide configuration and maintenance options</p>
               </CardHeader>
-              <CardContent className="p-8 space-y-8">
+              <CardContent className="space-y-8">
                 {/* Maintenance Mode */}
                 <div className="border-l-4 border-gray-500 pl-6">
                   <div className="p-6 bg-gray-50 rounded-lg">

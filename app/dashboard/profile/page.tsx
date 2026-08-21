@@ -127,7 +127,7 @@ export default function ProfilePage() {
       </div>
 
       <Card className="mb-6 overflow-hidden border border-gray-200 shadow-sm">
-        <CardHeader className="border-b border-gray-200 bg-white pb-6 pt-6">
+        <CardHeader className="border-b border-gray-200 bg-white">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
               <Avatar className="h-20 w-20 border-2 border-gray-200">
@@ -278,11 +278,11 @@ export default function ProfilePage() {
           </Card>
 
           <Card className="overflow-hidden border border-gray-200 shadow-sm">
-            <CardHeader className="border-b border-gray-200 bg-white pb-4 pt-6">
+            <CardHeader className="border-b border-gray-200 bg-white pb-4">
               <h3 className="text-lg font-bold text-theo-black">Security settings</h3>
               <p className="text-sm text-gray-600">Change your password</p>
             </CardHeader>
-            <CardContent className="p-6">
+            <CardContent>
               <ChangePasswordForm />
             </CardContent>
           </Card>

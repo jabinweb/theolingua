@@ -188,7 +188,7 @@ export default function BatchDripConfigPage({ params }: { params: Promise<{ id: 
             Drip Settings
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-6 space-y-6">
+        <CardContent className="space-y-6">
           {/* Enable/Disable Toggle */}
           <div className="flex items-center justify-between p-4 rounded-xl border-2 border-slate-100 bg-white">
             <div className="space-y-1">

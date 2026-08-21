@@ -161,7 +161,7 @@ export function FileUpload({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
         >
-          <CardContent className="flex flex-col items-center justify-center p-8 text-center">
+          <CardContent className="flex flex-col items-center justify-center text-center">
             {uploading ? (
               <>
                 <Loader2 className="w-16 h-16 text-blue-500 animate-spin mb-4" />

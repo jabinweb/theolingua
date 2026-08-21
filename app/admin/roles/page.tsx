@@ -266,7 +266,7 @@ export default function GlobalRBACPage() {
                     )}
                   </div>
                 </CardHeader>
-                <CardContent className="pt-6">
+                <CardContent>
                   <CardDescription className="text-slate-600 mb-6 text-sm leading-relaxed">
                     {def.description}
                   </CardDescription>

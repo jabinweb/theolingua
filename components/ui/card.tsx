@@ -2,12 +2,16 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Padding lives on Header / Content / Footer only — never on the Card root —
+ * so pages don't stack py-* on top of a default Card py-*.
+ */
 function Card({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card"
       className={cn(
-        "bg-card py-6 text-card-foreground flex flex-col rounded-[32px] border border-gray-100 shadow-sm transition-all duration-300",
+        "bg-card text-card-foreground flex flex-col gap-0 rounded-2xl border border-gray-100 shadow-sm transition-all duration-300",
         className
       )}
       {...props}
@@ -20,7 +24,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-header"
       className={cn(
-        "@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6",
+        "@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-5 pt-5 pb-3 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-4",
         className
       )}
       {...props}
@@ -65,7 +69,7 @@ function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-content"
-      className={cn("px-6", className)}
+      className={cn("px-5 pb-5 pt-0", className)}
       {...props}
     />
   )
@@ -75,7 +79,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-footer"
-      className={cn("flex items-center px-6 [.border-t]:pt-6", className)}
+      className={cn("flex items-center px-5 pb-5 pt-0 [.border-t]:pt-4", className)}
       {...props}
     />
   )

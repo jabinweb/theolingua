@@ -228,7 +228,7 @@ export default function PaymentsPage() {
       </div>
 
       <Card className="mb-6 border border-gray-200 shadow-sm">
-            <CardContent className="p-6">
+            <CardContent>
               <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
@@ -291,7 +291,7 @@ export default function PaymentsPage() {
             <div className="space-y-4">
               {payments.map((payment) => (
                 <Card key={payment.id} className="overflow-hidden">
-                  <CardContent className="p-6">
+                  <CardContent>
                     <div className="flex flex-col lg:flex-row lg:items-center gap-4">
                       {/* Payment Info */}
                       <div className="flex-1">
@@ -393,7 +393,7 @@ export default function PaymentsPage() {
               const payment = payments.find(p => p.id === troubleshootPaymentId);
               return payment && payment.status === 'FAILED' ? (
                 <Card className="mt-6">
-                  <CardContent className="p-6">
+                  <CardContent>
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <h3 className="text-lg font-medium text-gray-900">Payment Troubleshooting</h3>

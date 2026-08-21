@@ -200,7 +200,7 @@ export default function TopicsPage() {
       ) : (
         <div className="admin-card-grid">
           {topics.map((topic) => (
-            <Card key={topic.id} className="min-w-0 overflow-hidden border border-gray-200 py-0 shadow-sm">
+            <Card key={topic.id} className="min-w-0 overflow-hidden border border-gray-200 shadow-sm">
               <CardHeader className="gap-2 pb-2">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
