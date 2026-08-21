@@ -25,6 +25,7 @@ interface Topic {
   name: string;
   type: string;
   duration: string;
+  description?: string;
   difficulty?: string;
   orderIndex: number;
   chapterId: string;
@@ -41,6 +42,7 @@ interface TopicFormData {
   name: string;
   type: string;
   duration: string;
+  description?: string;
   orderIndex: number;
   chapterId: string;
   requiresPass?: boolean;
@@ -150,6 +152,12 @@ export default function TopicsPage() {
 
     const topicForEditing = {
       ...topic,
+      type: (topic.type || 'video').toLowerCase(),
+      duration: topic.duration || '',
+      description: topic.description || '',
+      requiresPass: Boolean(topic.requiresPass),
+      masteryScore: topic.masteryScore ?? 80,
+      maxAttempts: topic.maxAttempts ?? null,
       content: parsedContent,
     };
     
