@@ -1,5 +1,7 @@
 'use client';
 
+import { ContentLoader } from '@/components/ui/content-loader';
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
@@ -183,13 +185,6 @@ export default function AdminPage() {
     }
   };
 
-  if (isLoadingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
 
   if (isStaff) {
     const displayName = user?.name || (userRole === 'TEACHER' ? 'Teacher' : 'Moderator');
@@ -264,9 +259,7 @@ export default function AdminPage() {
           </CardHeader>
           <CardContent className="pt-6">
             {staffBatchesLoading ? (
-              <div className="flex justify-center py-10">
-                <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-theo-black" />
-              </div>
+              <ContentLoader variant="table" className="py-4" />
             ) : recentBatches.length === 0 ? (
               <div className="py-10 text-center">
                 <Layers className="mx-auto mb-3 h-12 w-12 text-gray-300" />
@@ -327,12 +320,9 @@ export default function AdminPage() {
     );
   }
 
+
   if (dataLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <ContentLoader variant="page" />;
   }
 
   const activeSubscriptions = Array.isArray(subscriptions)

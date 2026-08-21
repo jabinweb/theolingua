@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2, RefreshCw, ArrowLeft } from 'lucide-react';
 import { UnitForm } from '@/components/admin/UnitForm';
+import { ContentLoader } from '@/components/ui/content-loader';
 import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 interface Unit {
@@ -182,9 +183,7 @@ export default function UnitsPage() {
 
         {/* Unit Cards Grid */}
         {loading ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-          </div>
+          <ContentLoader variant="cards" />
         ) : (
           <div className="admin-card-grid">
             {units.map((subject) => (

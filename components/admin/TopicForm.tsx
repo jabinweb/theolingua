@@ -211,15 +211,15 @@ export function TopicForm({ isOpen, onClose, onSubmit, initialData, mode, chapte
         if (!open) onClose();
       }}
     >
-      <DialogContent className="flex max-h-[90vh] w-[calc(100vw-1.5rem)] max-w-3xl flex-col gap-0 overflow-hidden p-0 sm:w-full">
-        <DialogHeader className="shrink-0 border-b border-gray-100 px-5 py-4 sm:px-6">
+      <DialogContent fullScreen className="flex flex-col">
+        <DialogHeader className="shrink-0 border-b border-gray-100 px-5 py-4 pr-14 sm:px-6">
           <DialogTitle className="text-xl font-bold sm:text-2xl">
             {mode === 'edit' ? 'Edit Topic' : 'Create New Topic'}
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
-          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto overflow-x-hidden px-5 py-4 sm:px-6">
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto overflow-x-hidden overscroll-contain px-5 py-4 sm:px-6">
             <div className="space-y-4 rounded-lg bg-gray-50 p-4 sm:p-5">
               <h3 className="text-base font-semibold">Topic Details</h3>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

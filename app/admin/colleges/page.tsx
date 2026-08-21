@@ -1,5 +1,7 @@
 'use client';
 
+import { ContentLoader } from '@/components/ui/content-loader';
+
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -179,17 +181,10 @@ export default function CollegesPage() {
     fetchColleges(); // Refresh colleges to update student counts
   };
 
-  if (isLoadingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-[40vh] items-center justify-center">
         <div className="text-center">
           <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
@@ -225,9 +220,7 @@ export default function CollegesPage() {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-          </div>
+          <ContentLoader variant="cards" />
         ) : (
           <div className="admin-card-grid">
             {colleges.map((school) => (

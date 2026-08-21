@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ContentLoader } from '@/components/ui/content-loader';
 import { ChevronLeft, Lock, Unlock, Calendar, Zap, Save, RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 interface SubjectConfig {
@@ -134,11 +135,7 @@ export default function BatchDripConfigPage({ params }: { params: Promise<{ id: 
   };
 
   if (loading) {
-    return (
-      <div className="p-10 flex items-center justify-center min-h-screen">
-        <RefreshCw className="h-8 w-8 animate-spin text-indigo-500" />
-      </div>
-    );
+    return <ContentLoader variant="form" />;
   }
 
   if (!config) {

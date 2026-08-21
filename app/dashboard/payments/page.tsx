@@ -1,7 +1,7 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { LoadingScreen } from '@/components/ui/loading-screen';
+import { ContentLoader } from '@/components/ui/content-loader';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -45,9 +45,8 @@ interface PaginationInfo {
 }
 
 export default function PaymentsPage() {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const user = session?.user;
-  const loading = status === 'loading';
   const [payments, setPayments] = useState<Payment[]>([]);
   const [pagination, setPagination] = useState<PaginationInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -100,8 +99,8 @@ export default function PaymentsPage() {
     setCurrentPage(page);
   };
 
-  if (loading || isLoading) {
-    return <LoadingScreen />;
+  if (isLoading) {
+    return <ContentLoader variant="table" message="Loading payments..." />;
   }
 
   const getStatusBadge = (status: string) => {

@@ -32,6 +32,7 @@ import {
 } from '@/components/ui/select';
 import { Tag, Plus, Pencil, Trash2, RefreshCw, AlertCircle, IndianRupee, Star } from 'lucide-react';
 import { toast } from 'sonner';
+import { ContentLoader } from '@/components/ui/content-loader';
 import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 interface PricingPlan {
@@ -280,17 +281,10 @@ export default function PricingPage() {
     }
   });
 
-  if (isLoadingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-[40vh] items-center justify-center">
         <div className="text-center">
           <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
@@ -326,9 +320,7 @@ export default function PricingPage() {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-          </div>
+          <ContentLoader variant="cards" />
         ) : (
           <div className="grid gap-6">
             {Object.values(plansByProgram).map(({ program, plans: programPlans }) => (

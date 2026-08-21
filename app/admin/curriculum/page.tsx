@@ -18,6 +18,7 @@ import {
   ArrowDown,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { ContentLoader } from '@/components/ui/content-loader';
 
 interface CurriculumTopic {
   id: string;
@@ -147,17 +148,10 @@ export default function CurriculumPage() {
     }
   };
 
-  if (isLoadingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary" />
-      </div>
-    );
-  }
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-[40vh] items-center justify-center">
         <div className="text-center">
           <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
@@ -195,9 +189,7 @@ export default function CurriculumPage() {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary" />
-          </div>
+          <ContentLoader variant="page" />
         ) : programs.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center text-muted-foreground">
