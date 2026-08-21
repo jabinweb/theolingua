@@ -86,7 +86,7 @@ export default function SubscriptionsPage() {
   };
 
   if (isLoading) {
-    return <ContentLoader message="Loading subscriptions..." />;
+    return <ContentLoader variant="table" message="Loading subscriptions..." />;
   }
 
   const getStatusBadge = (status: string) => {

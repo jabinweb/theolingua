@@ -100,7 +100,7 @@ export default function PaymentsPage() {
   };
 
   if (isLoading) {
-    return <ContentLoader message="Loading payments..." />;
+    return <ContentLoader variant="table" message="Loading payments..." />;
   }
 
   const getStatusBadge = (status: string) => {

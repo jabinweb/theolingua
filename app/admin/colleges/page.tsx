@@ -1,5 +1,7 @@
 'use client';
 
+import { ContentLoader } from '@/components/ui/content-loader';
+
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -218,9 +220,7 @@ export default function CollegesPage() {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-theo-black border-t-transparent"></div>
-          </div>
+          <ContentLoader variant="cards" />
         ) : (
           <div className="admin-card-grid">
             {colleges.map((school) => (

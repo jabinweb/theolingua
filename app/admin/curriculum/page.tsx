@@ -18,6 +18,7 @@ import {
   ArrowDown,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { ContentLoader } from '@/components/ui/content-loader';
 
 interface CurriculumTopic {
   id: string;
@@ -188,9 +189,7 @@ export default function CurriculumPage() {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary" />
-          </div>
+          <ContentLoader variant="page" />
         ) : programs.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center text-muted-foreground">

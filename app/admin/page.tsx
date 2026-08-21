@@ -1,5 +1,7 @@
 'use client';
 
+import { ContentLoader } from '@/components/ui/content-loader';
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
@@ -257,9 +259,7 @@ export default function AdminPage() {
           </CardHeader>
           <CardContent className="pt-6">
             {staffBatchesLoading ? (
-              <div className="flex justify-center py-10">
-                <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-theo-black" />
-              </div>
+              <ContentLoader variant="table" className="py-4" />
             ) : recentBatches.length === 0 ? (
               <div className="py-10 text-center">
                 <Layers className="mx-auto mb-3 h-12 w-12 text-gray-300" />
@@ -320,12 +320,9 @@ export default function AdminPage() {
     );
   }
 
+
   if (dataLoading) {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-theo-black border-t-transparent"></div>
-      </div>
-    );
+    return <ContentLoader variant="page" />;
   }
 
   const activeSubscriptions = Array.isArray(subscriptions)

@@ -1,5 +1,7 @@
 'use client';
 
+import { ContentLoader } from '@/components/ui/content-loader';
+
 import { useState, useEffect, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -260,12 +262,9 @@ export default function ResponsesPage() {
     );
   }
 
+
   if (loading) {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-theo-black border-t-transparent"></div>
-      </div>
-    );
+    return <ContentLoader variant="page" />;
   }
 
   return (

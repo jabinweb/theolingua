@@ -1,5 +1,7 @@
 'use client';
 
+import { ContentLoader } from '@/components/ui/content-loader';
+
 import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -268,10 +270,7 @@ export default function SubscriptionAnalyticsPage() {
             )}
 
             {isLoading ? (
-              <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                <p className="text-muted-foreground mt-4">Loading analytics...</p>
-              </div>
+              <ContentLoader variant="page" message="Loading analytics..." />
             ) : analyticsData ? (
               <div className="space-y-6">
                 <div className="admin-stats-grid">
@@ -493,10 +492,7 @@ export default function SubscriptionAnalyticsPage() {
             )}
 
             {isLearningLoading ? (
-              <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                <p className="text-muted-foreground mt-4">Loading learning analytics...</p>
-              </div>
+              <ContentLoader variant="page" message="Loading learning analytics..." />
             ) : learningData ? (
               <div className="space-y-6">
                 <div className="admin-stats-grid">

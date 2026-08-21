@@ -32,6 +32,7 @@ import {
 } from '@/components/ui/select';
 import { Tag, Plus, Pencil, Trash2, RefreshCw, AlertCircle, IndianRupee, Star } from 'lucide-react';
 import { toast } from 'sonner';
+import { ContentLoader } from '@/components/ui/content-loader';
 import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 interface PricingPlan {
@@ -319,9 +320,7 @@ export default function PricingPage() {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-theo-black border-t-transparent"></div>
-          </div>
+          <ContentLoader variant="cards" />
         ) : (
           <div className="grid gap-6">
             {Object.values(plansByProgram).map(({ program, plans: programPlans }) => (

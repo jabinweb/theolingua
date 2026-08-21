@@ -10,8 +10,9 @@ import { Plus, Edit, Trash2, RefreshCw, AlertCircle, Layers, Users, BookOpen, Za
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import Link from 'next/link';
 import { useConfirmDialog } from '@/hooks/useConfirmDialog';
+import { ContentLoader } from '@/components/ui/content-loader';
+import Link from 'next/link';
 
 
 interface Class {
@@ -314,9 +315,7 @@ export default function BatchesPage() {
         </div>
 
         {loading ? (
-          <div className="flex justify-center py-12">
-            <RefreshCw className="h-8 w-8 animate-spin text-primary" />
-          </div>
+          <ContentLoader variant="cards" />
         ) : (
           <div className="admin-card-grid">
             {batches.map((batch) => (

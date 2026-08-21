@@ -75,7 +75,7 @@ export default function ProfilePage() {
   }, [user]);
 
   if (!user) {
-    return <ContentLoader />;
+    return <ContentLoader variant="form" />;
   }
 
   const displayName = userProfile?.displayName || userProfile?.name || user.email?.split('@')[0] || 'User';

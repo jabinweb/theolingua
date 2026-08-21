@@ -233,12 +233,18 @@ export function UniversalTopicForm({ isOpen, onClose, onSubmit }: UniversalTopic
     !formData.duration.trim();
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">Create New Topic</DialogTitle>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
+      <DialogContent fullScreen className="flex flex-col">
+        <DialogHeader className="shrink-0 border-b border-gray-100 px-5 py-4 pr-14 sm:px-6">
+          <DialogTitle className="text-xl font-bold sm:text-2xl">Create New Topic</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <div className="min-h-0 flex-1 space-y-6 overflow-y-auto overflow-x-hidden overscroll-contain px-5 py-4 sm:px-6">
           {/* Program Dropdown */}
           <div>
             <Label className="text-sm font-semibold">Program</Label>
@@ -528,7 +534,8 @@ export function UniversalTopicForm({ isOpen, onClose, onSubmit }: UniversalTopic
               </div>
             )}
           </div>
-          <div className="flex justify-end gap-3 pt-4 border-t">
+          </div>
+          <div className="flex shrink-0 justify-end gap-3 border-t border-gray-200 bg-white px-5 py-4 sm:px-6">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>

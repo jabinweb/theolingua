@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { TopicForm } from '@/components/admin/TopicForm';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
+import { ContentLoader } from '@/components/ui/content-loader';
 import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 interface TopicContentData {
@@ -195,9 +196,7 @@ export default function TopicsPage() {
       />
 
       {loading ? (
-        <div className="flex items-center justify-center py-8">
-          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
-        </div>
+        <ContentLoader variant="cards" />
       ) : (
         <div className="admin-card-grid">
           {topics.map((topic) => (

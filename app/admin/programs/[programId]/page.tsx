@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2, Layers, DollarSign } from 'lucide-react';
 import { UnitForm } from '@/components/admin/UnitForm';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
+import { ContentLoader } from '@/components/ui/content-loader';
 import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 interface Unit {
@@ -188,9 +189,7 @@ export default function ProgramDetailPage() {
       />
 
       {loading ? (
-        <div className="flex items-center justify-center py-8">
-          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
-        </div>
+        <ContentLoader variant="cards" />
       ) : (
         <div className="admin-card-grid">
           {subjects.map((subject) => (
