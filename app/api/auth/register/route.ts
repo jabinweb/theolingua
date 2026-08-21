@@ -1,22 +1,23 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { findUserByEmail, normalizeEmail } from '@/lib/normalize-email';
 
 export async function POST(req: Request) {
   try {
-    const { email, password, name } = await req.json();
+    const { email: rawEmail, password, name } = await req.json();
 
-    if (!email || !password) {
+    if (!rawEmail || !password) {
       return NextResponse.json(
         { error: 'Email and password are required' },
         { status: 400 }
       );
     }
 
+    const email = normalizeEmail(rawEmail);
+
     // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
+    const existingUser = await findUserByEmail(email);
 
     if (existingUser) {
       return NextResponse.json(

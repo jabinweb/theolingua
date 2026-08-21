@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
+import { findUserByEmail, normalizeEmail } from '@/lib/normalize-email';
 
 // Helper function to verify admin access
 async function verifyAdminAccess() {
@@ -9,9 +10,7 @@ async function verifyAdminAccess() {
     return { isAuthorized: false, error: 'Not authenticated' };
   }
 
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email }
-  });
+  const user = await findUserByEmail(session.user.email);
 
   if (!user || user.role !== 'ADMIN') {
     return { isAuthorized: false, error: 'Not authorized' };
@@ -67,16 +66,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error }, { status: 401 });
     }
 
-    const { name, email, schoolId, grade, section, rollNumber, phone, parentName, parentEmail } = await request.json();
+    const { name, email: rawEmail, schoolId, grade, section, rollNumber, phone, parentName, parentEmail } = await request.json();
 
-    if (!name || !email) {
+    if (!name || !rawEmail) {
       return NextResponse.json({ error: 'Name and email are required' }, { status: 400 });
     }
 
+    const email = normalizeEmail(rawEmail);
+
     // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
-    });
+    const existingUser = await findUserByEmail(email);
 
     if (existingUser) {
       return NextResponse.json({ error: 'User with this email already exists' }, { status: 400 });
@@ -119,10 +118,19 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error }, { status: 401 });
     }
 
-    const { id, name, email, schoolId, grade, section, rollNumber, phone, parentName, parentEmail, isActive } = await request.json();
+    const { id, name, email: rawEmail, schoolId, grade, section, rollNumber, phone, parentName, parentEmail, isActive } = await request.json();
 
     if (!id) {
       return NextResponse.json({ error: 'Student ID is required' }, { status: 400 });
+    }
+
+    const email = rawEmail ? normalizeEmail(rawEmail) : undefined;
+
+    if (email) {
+      const existing = await findUserByEmail(email);
+      if (existing && existing.id !== id) {
+        return NextResponse.json({ error: 'User with this email already exists' }, { status: 400 });
+      }
     }
 
     // Update student

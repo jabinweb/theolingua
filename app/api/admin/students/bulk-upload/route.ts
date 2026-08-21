@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createUserWithPassword } from '@/lib/auth-helpers';
 import { isAdminOrModerator } from '@/lib/auth-utils';
+import { findUserByEmail, normalizeEmail } from '@/lib/normalize-email';
 
 const DEFAULT_PASSWORD = 'Student@123';
 
@@ -116,7 +117,7 @@ export async function POST(request: Request) {
 
       try {
         const name = getField(studentData, ['name', 'student_name', 'full_name']);
-        const email = getField(studentData, ['email', 'email_address']).toLowerCase();
+        const email = normalizeEmail(getField(studentData, ['email', 'email_address']));
         const collegeName = getField(studentData, [
           'college_name',
           'college',
@@ -157,21 +158,27 @@ export async function POST(request: Request) {
           }
         }
 
-        const existingUser = await prisma.user.findUnique({
-          where: { email },
-          select: { id: true },
-        });
+        const existingUser = await findUserByEmail(email);
 
         let userId: string;
 
         if (existingUser) {
+          if (existingUser.role !== 'STUDENT') {
+            result.errors.push({
+              row: i + 1,
+              error: `Email already belongs to a ${existingUser.role.toLowerCase()} account`,
+              data: studentData,
+            });
+            continue;
+          }
+
           await prisma.user.update({
             where: { id: existingUser.id },
             data: {
+              email,
               name,
               collegeName,
               phone: phone || null,
-              role: 'STUDENT',
               isActive: true,
               ...(batchId ? { batchId } : {}),
             },

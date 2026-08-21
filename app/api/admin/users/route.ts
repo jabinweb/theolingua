@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { isAdminOrModerator } from '@/lib/auth-utils';
 import { syncUserProgramSubscriptions } from '@/lib/user-program-access';
+import { findUserByEmail, normalizeEmail } from '@/lib/normalize-email';
 
 export async function GET() {
   const [authOk, authVal] = await isAdminOrModerator();
@@ -108,12 +109,14 @@ export async function POST(request: Request) {
   if (!authOk) return authVal;
 
   try {
-    const { email, displayName, password, role, isActive, collegeName, phone, batchId, programClassIds } =
+    const { email: rawEmail, displayName, password, role, isActive, collegeName, phone, batchId, programClassIds } =
       await request.json();
 
-    if (!email || !displayName || !password) {
+    if (!rawEmail || !displayName || !password) {
       return NextResponse.json({ error: 'Email, display name, and password are required' }, { status: 400 });
     }
+
+    const email = normalizeEmail(rawEmail);
 
     const userRole = role || 'STUDENT';
     const classIds: number[] = Array.isArray(programClassIds)
@@ -127,7 +130,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    const existingUser = await findUserByEmail(email);
     if (existingUser) {
       return NextResponse.json({ error: 'User with this email already exists' }, { status: 400 });
     }

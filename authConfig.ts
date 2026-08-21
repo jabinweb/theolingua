@@ -2,7 +2,7 @@ import { NextAuthConfig } from "next-auth"
 import Google from "next-auth/providers/google"
 import Credentials from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
-import { prisma } from '@/lib/prisma'
+import { findUserByEmail, normalizeEmail } from '@/lib/normalize-email'
 
 export default {
   providers: [
@@ -15,17 +15,17 @@ export default {
         password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials) {
-        const email = credentials?.email?.toString() || ''
+        const email = normalizeEmail(credentials?.email?.toString() || '')
         const password = credentials?.password?.toString() || ''
 
         if (!email || !password) return null
 
-  const user = await prisma.user.findUnique({ where: { email } })
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const userPassword = (user as any)?.password as string | undefined
-  if (!user || !userPassword) return null
+        const user = await findUserByEmail(email)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const userPassword = (user as any)?.password as string | undefined
+        if (!user || !userPassword) return null
 
-  const valid = await bcrypt.compare(password, userPassword)
+        const valid = await bcrypt.compare(password, userPassword)
         if (!valid) return null
 
         // return a subset of the user object for the session

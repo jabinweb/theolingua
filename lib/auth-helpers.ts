@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 import crypto from 'crypto';
+import { findUserByEmail, normalizeEmail } from '@/lib/normalize-email';
 
 export interface CreateUserInput {
   email: string;
@@ -17,12 +18,11 @@ export interface CreateUserInput {
  * Create a new user with hashed password
  */
 export async function createUserWithPassword(input: CreateUserInput) {
-  const { email, password, name, displayName, role, collegeName, phone, isActive } = input;
+  const { email: rawEmail, password, name, displayName, role, collegeName, phone, isActive } = input;
+  const email = normalizeEmail(rawEmail);
 
   // Check if user already exists
-  const existing = await prisma.user.findUnique({
-    where: { email },
-  });
+  const existing = await findUserByEmail(email);
 
   if (existing) {
     throw new Error('User with this email already exists');
@@ -71,9 +71,7 @@ export async function updateUserPassword(userId: string, newPassword: string) {
  * Verify user password
  */
 export async function verifyUserPassword(email: string, password: string): Promise<boolean> {
-  const user = await prisma.user.findUnique({
-    where: { email },
-  });
+  const user = await findUserByEmail(email);
 
   if (!user) {
     return false;
@@ -93,9 +91,7 @@ export async function verifyUserPassword(email: string, password: string): Promi
  * Generate a password reset token
  */
 export async function generatePasswordResetToken(email: string): Promise<string | null> {
-  const user = await prisma.user.findUnique({
-    where: { email },
-  });
+  const user = await findUserByEmail(email);
 
   if (!user) {
     return null;
