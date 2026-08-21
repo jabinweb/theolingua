@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ExternalLink, Play, FileText, Monitor } from 'lucide-react';
 import { type DbTopic } from '@/hooks/useProgramData';
+import { parseIframeHtml } from '@/lib/parse-iframe-html';
 
 interface TopicContent {
   contentType: string;
@@ -14,6 +15,32 @@ interface TopicContent {
   textContent?: string;
   iframeHtml?: string;
   widgetConfig?: object;
+}
+
+function IframeHtmlPlayer({ html, title }: { html: string; title: string }) {
+  const parsed = parseIframeHtml(html);
+
+  if (!parsed.src && !parsed.srcDoc) {
+    return (
+      <div className="flex h-full items-center justify-center p-6 text-center text-sm text-gray-300">
+        This iframe content could not be parsed. Re-save the topic with a valid embed.
+      </div>
+    );
+  }
+
+  return (
+    <div className="absolute inset-0 h-full w-full">
+      <iframe
+        title={title}
+        src={parsed.src}
+        srcDoc={parsed.srcDoc}
+        sandbox={parsed.sandbox || 'allow-scripts allow-forms allow-popups allow-modals'}
+        allow={parsed.allow}
+        allowFullScreen={parsed.allowFullScreen}
+        className="absolute inset-0 h-full w-full border-0"
+      />
+    </div>
+  );
 }
 
 function normalizeContentType(contentType?: string) {
@@ -422,19 +449,7 @@ export function ContentPlayer({
                 )}
               </div>
             ) : (topicContent?.contentType?.toLowerCase() === 'iframe' || topicContent?.contentType === 'IFRAME') && topicContent.iframeHtml ? (
-              <div className="w-full h-full absolute inset-0">
-                <div 
-                  dangerouslySetInnerHTML={{ 
-                    __html: topicContent.iframeHtml
-                      .replace(/width\s*=\s*["']\d+["']/gi, 'width="100%"')
-                      .replace(/height\s*=\s*["']\d+["']/gi, 'height="100%"')
-                      .replace(/frameborder\s*=\s*["']\d+["']/gi, 'frameborder="0"')
-                      .replace(/style\s*=\s*["'][^"']*["']/gi, '')
-                      .replace(/<iframe/gi, '<iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"')
-                  }}
-                  className="w-full h-full absolute inset-0"
-                />
-              </div>
+              <IframeHtmlPlayer html={topicContent.iframeHtml} title={topic?.name || 'Activity'} />
             ) : contentError ? (
               <div className="flex flex-col items-center justify-center h-full text-center p-4 sm:p-8">
                 <div className="mb-4 p-3 sm:p-4 bg-gray-800 rounded-full">

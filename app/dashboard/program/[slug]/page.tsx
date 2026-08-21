@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback, Suspense } from 'react';
+import { useParams, useRouter, useSearchParams, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Settings } from 'lucide-react';
@@ -34,10 +34,43 @@ interface ChapterData {
   topics: DbTopic[];
 }
 
+function toPlayableTopic(
+  topic: DbTopic,
+  userProgress: Map<string, boolean>
+): DbTopic & { completed: boolean } {
+  return {
+    ...topic,
+    completed: userProgress.get(topic.id) || false,
+    content: topic.content
+      ? {
+          contentType: topic.content.contentType,
+          url: topic.content.url,
+          videoUrl: topic.content.videoUrl,
+          pdfUrl: topic.content.pdfUrl,
+          textContent: topic.content.textContent,
+          iframeHtml: topic.content.iframeHtml,
+          widgetConfig: topic.content.widgetConfig,
+        }
+      : undefined,
+  };
+}
+
 export default function ProgramPage() {
+  return (
+    <Suspense fallback={<ProgramPageSkeleton />}>
+      <ProgramPageContent />
+    </Suspense>
+  );
+}
+
+function ProgramPageContent() {
   const params = useParams();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const slug = params.slug as string;
+  const topicParam = searchParams.get('topic');
+
   const [selectedUnit, setSelectedUnit] = useState<string>('');
   const [selectedTopic, setSelectedTopic] = useState<DbTopic & { completed: boolean } | null>(null);
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
@@ -58,13 +91,86 @@ export default function ProgramPage() {
     error 
   } = useProgramPageData(slug);
 
+  const setTopicInUrl = useCallback(
+    (topicId: string | null, mode: 'push' | 'replace' = 'push') => {
+      const next = new URLSearchParams(searchParams.toString());
+      if (topicId) next.set('topic', topicId);
+      else next.delete('topic');
+      const qs = next.toString();
+      const href = qs ? `${pathname}?${qs}` : pathname;
+      if (mode === 'replace') router.replace(href, { scroll: false });
+      else router.push(href, { scroll: false });
+    },
+    [pathname, router, searchParams]
+  );
+
+  const findTopicInProgram = useCallback(
+    (topicId: string) => {
+      if (!currentProgram) return null;
+      for (const unit of currentProgram.units) {
+        for (const chapter of unit.chapters) {
+          const topic = chapter.topics.find((t) => t.id === topicId);
+          if (topic) {
+            return { unit, chapter, topic };
+          }
+        }
+      }
+      return null;
+    },
+    [currentProgram]
+  );
+
   useEffect(() => {
-    // Auto-select first unlocked unit
-    const firstUnlockedUnit = currentProgram?.units.find(s => !s.isLocked);
+    // Auto-select first unlocked unit when nothing is selected yet
+    if (selectedUnit || topicParam) return;
+    const firstUnlockedUnit = currentProgram?.units.find((s) => !s.isLocked);
     if (firstUnlockedUnit) {
       setSelectedUnit(firstUnlockedUnit.id);
     }
-  }, [currentProgram]);
+  }, [currentProgram, selectedUnit, topicParam]);
+
+  // Open / sync player from ?topic= URL
+  useEffect(() => {
+    if (!currentProgram) return;
+
+    if (!topicParam) {
+      setIsPlayerOpen(false);
+      setSelectedTopic(null);
+      return;
+    }
+
+    const located = findTopicInProgram(topicParam);
+    if (!located) {
+      setTopicInUrl(null, 'replace');
+      return;
+    }
+
+    const { unit, chapter, topic } = located;
+    const hasUnitAccess = unitAccess[unit.id] === true;
+
+    if (!hasUnitAccess && currentProgram.price !== 0) {
+      setShowSubscriptionManager(true);
+      setTopicInUrl(null, 'replace');
+      return;
+    }
+
+    if (chapterAccess[chapter.id] === false) {
+      setTopicInUrl(null, 'replace');
+      return;
+    }
+
+    setSelectedUnit(unit.id);
+    setSelectedTopic(toPlayableTopic(topic, userProgress));
+    setIsPlayerOpen(true);
+  }, [
+    currentProgram,
+    topicParam,
+    unitAccess,
+    chapterAccess,
+    findTopicInProgram,
+    setTopicInUrl,
+    userProgress,
+  ]);
 
   if (loading || !currentProgram) {
     // Use currentProgram data if available, even during loading
@@ -98,22 +204,8 @@ export default function ProgramPage() {
       return;
     }
 
-    // Game-based learning: Allow playing any topic/game without sequential restrictions
-    // Convert DbTopic to the expected format with proper content structure
-    const topicWithCompleted: DbTopic & { completed: boolean } = {
-      ...topic,
-      completed: userProgress.get(topic.id) || false,
-      content: topic.content ? {
-        contentType: topic.content.contentType, // Use contentType for the content type
-        url: topic.content.url,
-        videoUrl: topic.content.videoUrl,
-        pdfUrl: topic.content.pdfUrl,
-        textContent: topic.content.textContent,
-        widgetConfig: topic.content.widgetConfig
-      } : undefined
-    };
-    setSelectedTopic(topicWithCompleted);
-    setIsPlayerOpen(true);
+    // Drive player via URL so any topic is deep-linkable / refreshable
+    setTopicInUrl(topic.id, 'push');
   };
 
   const handleTopicComplete = async () => {
@@ -163,8 +255,7 @@ export default function ProgramPage() {
   };
 
   const handlePlayerClose = () => {
-    setIsPlayerOpen(false);
-    setSelectedTopic(null);
+    setTopicInUrl(null, 'replace');
   };
 
   const handleNextTopic = () => {
@@ -201,26 +292,7 @@ export default function ProgramPage() {
     const nextTopic = getNextTopic(currentTopicForProgression, unitProgress);
     
     if (nextTopic) {
-      // Find the full DbTopic object
-      const allTopics = selectedUnitData.chapters.flatMap((ch: ChapterData) => ch.topics);
-      const fullNextTopic = allTopics.find((topic: DbTopic) => topic.id === nextTopic.id);
-      
-      if (fullNextTopic) {
-        // Convert to the expected format with completed status
-        const nextTopicWithCompleted: DbTopic & { completed: boolean } = {
-          ...fullNextTopic,
-          completed: userProgress.get(fullNextTopic.id) || false,
-          content: fullNextTopic.content ? {
-            contentType: fullNextTopic.content.contentType,
-            url: fullNextTopic.content.url,
-            videoUrl: fullNextTopic.content.videoUrl,
-            pdfUrl: fullNextTopic.content.pdfUrl,
-            textContent: fullNextTopic.content.textContent,
-            widgetConfig: fullNextTopic.content.widgetConfig
-          } : undefined
-        };
-        setSelectedTopic(nextTopicWithCompleted);
-      }
+      setTopicInUrl(nextTopic.id, 'replace');
     } else {
       // If no next topic, close the player
       handlePlayerClose();

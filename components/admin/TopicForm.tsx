@@ -357,7 +357,11 @@ export function TopicForm({ isOpen, onClose, onSubmit, initialData, mode, chapte
                   placeholder='<iframe allow="fullscreen; autoplay" allowfullscreen width="795" height="690" frameborder="0" src="https://example.com/embed"></iframe>'
                   className="mt-1.5"
                 />
-                <p className="text-xs text-gray-500 mt-1">Paste the complete iframe HTML code here</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Paste a full <code>&lt;iframe src=&quot;...&quot;&gt;</code> embed, or wrap HTML in
+                  <code> srcdoc</code> using single quotes around the attribute
+                  (<code>srcdoc=&apos;...&apos;</code>) so inner double quotes do not break the player.
+                </p>
               </div>
             )}
           </div>
