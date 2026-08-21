@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useParams, useRouter, useSearchParams, usePathname } from 'next/navigation';
 import Image from 'next/image';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Settings } from 'lucide-react';
 import { useProgramPageData } from '@/hooks/useProgramPageData';
@@ -236,8 +237,7 @@ function ProgramPageContent() {
         completedTopicsSet.add(selectedTopic.id); // Add the just completed topic
 
         if (isUnitCompleted(unitProgress, completedTopicsSet)) {
-          // Unit completed logic can be added here
-          console.log(`Unit ${selectedUnitData.name} completed!`);
+          toast.success(`Unit complete: ${selectedUnitData.name}`);
         }
       }
       
@@ -387,24 +387,10 @@ function ProgramPageContent() {
             classId={currentProgram.id}
             open={showSubscriptionManager}
             onClose={() => setShowSubscriptionManager(false)}
-            onSubscribe={async (type, options) => {
-              console.log('Subscription request:', type, options);
-              
-              try {
-                // Handle different subscription types
-                if (type === 'class' || type === 'upgrade') {
-                  // Redirect to class payment page for both full class and upgrade
-                  router.push(`/payment/class/${currentProgram.id}`);
-                } else if (type === 'unit' && options?.unitId) {
-                  // Redirect to unit payment page
-                  router.push(`/payment/unit/${options.unitId}`);
-                } else {
-                  // General subscription - could be a modal or redirect
-                  router.push('/dashboard/subscriptions');
-                }
-              } catch (error) {
-                console.error('Subscription handling error:', error);
-              }
+            onSubscribe={async () => {
+              setShowSubscriptionManager(false);
+              toast.success('Access updated — continue learning');
+              window.location.reload();
             }}
           />
         )}
@@ -460,12 +446,9 @@ function ProgramPageContent() {
           useAccordion={true}
           showUpgradeButton={false}
           onUnitSelect={(unitId) => {
-            const unit = currentProgram.units.find(s => s.id === unitId);
-            const hasUnitAccess = unitAccess[unitId] === true;
-            const isAccessible = !unit?.isLocked && hasUnitAccess;
-            if (isAccessible) {
-              setSelectedUnit(unitId);
-            }
+            // Always select so drip-locked units can show countdown UI;
+            // paywall locks are handled via onLockedClick in UnitContent.
+            setSelectedUnit(unitId);
           }}
           onTopicClick={(topic) => {
             const hasUnitAccess = selectedUnitData && unitAccess[selectedUnitData.id] === true;

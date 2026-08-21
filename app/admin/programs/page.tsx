@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2, RefreshCw, AlertCircle, BookOpen, ChevronRight, Users } from 'lucide-react';
 import { ProgramForm } from '@/components/admin/ProgramForm';
 import { useRouter } from 'next/navigation';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 interface Program {
   id: string;
@@ -34,6 +35,7 @@ interface ProgramFormData {
 
 export default function ProgramsPage() {
   const { data: session, status } = useSession();
+  const { confirm, dialog } = useConfirmDialog();
   const user = session?.user;
   const userRole = user?.role; // Get actual role from session
   const authLoading = status === 'loading';
@@ -118,9 +120,13 @@ export default function ProgramsPage() {
   };
 
   const handleDeleteProgram = async (classId: number) => {
-    if (!confirm('Are you sure you want to delete this program? This will also delete all units, lessons, and topics.')) {
-      return;
-    }
+    const ok = await confirm({
+      title: 'Delete program?',
+      description: 'Are you sure you want to delete this program? This will also delete all units, lessons, and topics.',
+      confirmLabel: 'Delete',
+      destructive: true,
+    });
+    if (!ok) return;
 
     try {
       const response = await fetch(`/api/admin/programs?id=${classId}`, {
@@ -176,6 +182,7 @@ export default function ProgramsPage() {
 
   return (
     <div className="p-6">
+      {dialog}
       <div className="max-w-6xl mx-auto">
         <div className="mb-6 page-toolbar">
           <div>

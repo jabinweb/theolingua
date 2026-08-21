@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 
 interface Class {
@@ -48,6 +49,7 @@ interface Batch {
 
 export default function BatchesPage() {
   const { data: session } = useSession();
+  const { confirm, dialog } = useConfirmDialog();
   const userRole = session?.user?.role;
   const isAdmin = userRole === 'ADMIN';
   const isModerator = userRole === 'MODERATOR';
@@ -147,7 +149,13 @@ export default function BatchesPage() {
   };
 
   const deleteBatch = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this batch?')) return;
+    const ok = await confirm({
+      title: 'Delete batch?',
+      description: 'Are you sure you want to delete this batch?',
+      confirmLabel: 'Delete',
+      destructive: true,
+    });
+    if (!ok) return;
     try {
       const res = await fetch(`/api/admin/batches?id=${id}`, { method: 'DELETE' });
       if (res.ok) fetchBatches();
@@ -204,7 +212,13 @@ export default function BatchesPage() {
   };
 
   const removeStudentFromBatch = async (studentId: string) => {
-    if (!confirm('Are you sure you want to remove this student from the batch? They will still remain in the system.')) return;
+    const ok = await confirm({
+      title: 'Remove student?',
+      description: 'Are you sure you want to remove this student from the batch? They will still remain in the system.',
+      confirmLabel: 'Remove',
+      destructive: true,
+    });
+    if (!ok) return;
     try {
       const res = await fetch('/api/admin/users', {
         method: 'PATCH',
@@ -274,6 +288,7 @@ export default function BatchesPage() {
 
   return (
     <div className="p-6">
+      {dialog}
       <div className="max-w-6xl mx-auto">
         <div className="mb-6 page-toolbar">
           <div>

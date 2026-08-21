@@ -3,6 +3,7 @@ import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import DynamicFavicon from "@/components/DynamicFavicon";
 import { SessionProvider } from "@/components/auth/SessionProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -88,6 +89,7 @@ export default function RootLayout({
           <main className="flex-1">
             {children}
           </main>
+          <Toaster />
         </SessionProvider>
       </body>
     </html>

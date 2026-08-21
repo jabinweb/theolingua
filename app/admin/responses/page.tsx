@@ -8,6 +8,7 @@ import { Trash2, RefreshCw, AlertCircle, Download, Search, Mail, Phone, MessageS
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 interface FormResponse {
   id: string;
@@ -39,6 +40,7 @@ const formTypeOptions = [
 
 export default function ResponsesPage() {
   const { data: session, status } = useSession();
+  const { confirm, dialog } = useConfirmDialog();
   const user = session?.user;
   const userRole = user?.role;
   const authLoading = status === 'loading';
@@ -89,7 +91,13 @@ export default function ResponsesPage() {
   }, [isAdmin, isLoadingAuth, dataFetched, user, userRole]);
 
   const deleteResponse = async (responseId: string) => {
-    if (!confirm('Are you sure you want to delete this form response?')) return;
+    const ok = await confirm({
+      title: 'Delete response?',
+      description: 'Are you sure you want to delete this form response?',
+      confirmLabel: 'Delete',
+      destructive: true,
+    });
+    if (!ok) return;
     
     try {
       const response = await fetch(`/api/admin/responses?id=${responseId}`, {
@@ -269,6 +277,7 @@ export default function ResponsesPage() {
 
   return (
     <div className="p-6">
+      {dialog}
       <div className="max-w-6xl mx-auto">
         <div className="mb-6 page-toolbar">
           <div>

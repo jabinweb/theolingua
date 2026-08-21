@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2, Layers, DollarSign } from 'lucide-react';
 import { UnitForm } from '@/components/admin/UnitForm';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 interface Unit {
   id: string;
@@ -42,6 +43,7 @@ interface ProgramItem {
 export default function ProgramDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { confirm, dialog } = useConfirmDialog();
   const programParam = params.programId as string; // Can be either slug or ID
   
   const [programId, setProgramId] = useState<number | null>(null);
@@ -143,7 +145,13 @@ export default function ProgramDetailPage() {
   };
 
   const handleDeleteUnit = async (unitId: string) => {
-    if (!confirm('Delete this unit and all its lessons and topics?')) return;
+    const ok = await confirm({
+      title: 'Delete unit?',
+      description: 'Delete this unit and all its lessons and topics?',
+      confirmLabel: 'Delete',
+      destructive: true,
+    });
+    if (!ok) return;
     const response = await fetch(`/api/admin/units?id=${unitId}`, { method: 'DELETE' });
     if (response.ok) fetchUnits();
   };
@@ -155,6 +163,7 @@ export default function ProgramDetailPage() {
 
   return (
     <div className="min-w-0">
+      {dialog}
       <AdminPageHeader
         title={className}
         badge="Program curriculum"

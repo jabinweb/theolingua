@@ -1,11 +1,10 @@
-
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Button } from "@/components/ui/button";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Play } from "lucide-react";
 import { useProgramData } from '@/hooks/useProgramData';
 import { SubscriptionDialog } from '@/components/dashboard/SubscriptionDialog';
 import { DashboardSkeleton } from '@/components/dashboard/dashboard-skeleton';
@@ -56,10 +55,46 @@ export function DashboardContent() {
   // The userProfile is now fetched via useProgramData hook from the dashboard API
   // No need for a separate effect here since the data comes from the same API call
 
-  const handleProgramClick = (programData: ProgramWithSubjects) => {
-    // Always allow navigation to program page since first unit is free trial
-    // The program page will handle showing which units are locked/unlocked
+  const findFirstIncompleteTopic = (programData: ProgramWithSubjects): string | null => {
+    if (!programData.subjects) return null;
+    for (const subject of programData.subjects) {
+      for (const chapter of subject.chapters || []) {
+        for (const topic of chapter.topics || []) {
+          if (!userProgress.get(topic.id)) {
+            return topic.id;
+          }
+        }
+      }
+    }
+    return null;
+  };
+
+  const globalResume = useMemo(() => {
+    if (!programs?.length) return null;
+    for (const cls of programs) {
+      const program = {
+        ...cls,
+        subjects: cls.subjects || [],
+      } as ProgramWithSubjects;
+      const topicId = findFirstIncompleteTopic(program);
+      if (topicId) {
+        return {
+          topicId,
+          slug: program.slug || String(program.id),
+          programName: program.name,
+        };
+      }
+    }
+    return null;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [programs, userProgress]);
+
+  const handleProgramClick = (programData: ProgramWithSubjects, resumeTopicId?: string | null) => {
     const identifier = programData.slug || programData.id;
+    if (resumeTopicId) {
+      router.push(`/dashboard/program/${identifier}?topic=${resumeTopicId}`);
+      return;
+    }
     router.push(`/dashboard/program/${identifier}`);
   };
 
@@ -161,6 +196,29 @@ export function DashboardContent() {
             </div>
           )}
 
+          {globalResume && (
+            <button
+              type="button"
+              onClick={() =>
+                router.push(`/dashboard/program/${globalResume.slug}?topic=${globalResume.topicId}`)
+              }
+              className="mt-4 flex w-full items-center justify-between gap-3 rounded-2xl border border-theo-black bg-theo-black px-4 py-3.5 text-left text-white transition-opacity hover:opacity-95 sm:px-5"
+            >
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-wide text-theo-yellow">
+                  Continue learning
+                </p>
+                <p className="mt-0.5 truncate text-sm font-medium sm:text-base">
+                  {globalResume.programName}
+                </p>
+              </div>
+              <span className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-theo-yellow px-3 py-1.5 text-sm font-semibold text-theo-black">
+                <Play className="h-3.5 w-3.5" />
+                Resume
+              </span>
+            </button>
+          )}
+
           <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="rounded-2xl border border-gray-200 bg-white p-4">
               <p className="text-xs font-medium text-gray-500">Available programs</p>
@@ -204,6 +262,7 @@ export function DashboardContent() {
             {programs.map((cls) => {
               const safeCls = toProgramWithSubjects(cls);
               const progress = calculateProgramProgress(safeCls);
+              const resumeTopicId = findFirstIncompleteTopic(safeCls);
 
               return (
                 <ProgramCard
@@ -220,7 +279,8 @@ export function DashboardContent() {
                     subjects: safeCls.subjects
                   }}
                   progress={progress}
-                  onClick={() => handleProgramClick(safeCls)}
+                  resumeTopicId={resumeTopicId}
+                  onClick={() => handleProgramClick(safeCls, resumeTopicId)}
                 />
               );
             })}
@@ -283,4 +343,3 @@ export function DashboardContent() {
     </>
   );
 }
-

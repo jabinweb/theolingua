@@ -62,6 +62,7 @@ interface ProgramCardProps {
   onClick: () => void;
   onUpgrade?: (e: React.MouseEvent) => void;
   className?: string;
+  resumeTopicId?: string | null;
 }
 
 const AccessBadge: React.FC<{ programData: DashboardProgramData }> = ({ programData }) => {
@@ -139,7 +140,7 @@ const DashboardActionButton: React.FC<{ programData: DashboardProgramData }> = (
   const getButtonText = () => {
     if ('schoolAccess' in programData && programData.schoolAccess) return 'Access via School';
     if ('subscriptionAccess' in programData && programData.subscriptionAccess) return 'Full Access';
-    if ('hasPartialAccess' in programData && programData.hasPartialAccess) return 'View Subjects';
+    if ('hasPartialAccess' in programData && programData.hasPartialAccess) return 'View Units';
     if (programData.price && programData.price > 0) return `Subscribe for ₹${Math.round(programData.price / 100)}`;
     return 'Start Learning';
   };
@@ -255,7 +256,8 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
   progress,
   onClick,
   onUpgrade,
-  className = ''
+  className = '',
+  resumeTopicId,
 }) => {
   const isDashboard = variant === 'dashboard';
   const isDemo = variant === 'demo';
@@ -334,7 +336,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
               <Users className="h-3.5 w-3.5 text-theo-black" />
             </div>
             <div>
-              <div className="text-xs font-medium text-gray-500">Subjects</div>
+              <div className="text-xs font-medium text-gray-500">Units</div>
               <div className="text-sm font-bold text-gray-900">{subjectCount}</div>
             </div>
           </div>
@@ -363,7 +365,18 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
         </div>
 
         {isDashboard && (
-          <div className="pt-1">
+          <div className="pt-1 space-y-2">
+            {resumeTopicId && progress < 100 && (
+              <div className="flex items-center justify-between rounded-xl border border-theo-yellow/40 bg-theo-yellow/15 px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <div className="rounded-lg bg-theo-yellow/40 p-1.5">
+                    <Play className="h-3.5 w-3.5 text-theo-black" />
+                  </div>
+                  <span className="text-sm font-semibold text-theo-black">Continue</span>
+                </div>
+                <ChevronRight className="h-4 w-4 text-theo-black/50 transition-all group-hover:translate-x-1" />
+              </div>
+            )}
             <DashboardActionButton programData={programData as DashboardProgramData} />
           </div>
         )}

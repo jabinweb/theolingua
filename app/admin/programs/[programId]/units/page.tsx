@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2, RefreshCw, ArrowLeft } from 'lucide-react';
 import { UnitForm } from '@/components/admin/UnitForm';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 interface Unit {
   id: string;
@@ -42,6 +43,7 @@ interface ProgramData {
 export default function UnitsPage() {
   const params = useParams();
   const router = useRouter();
+  const { confirm, dialog } = useConfirmDialog();
   const { data: session, status } = useSession();
   const user = session?.user;
   const userRole = user?.role; // Get actual role from session
@@ -125,9 +127,13 @@ export default function UnitsPage() {
   };
 
   const handleDeleteUnit = async (subjectId: string) => {
-    if (!confirm('Are you sure you want to delete this unit? This will also delete all lessons and topics.')) {
-      return;
-    }
+    const ok = await confirm({
+      title: 'Delete unit?',
+      description: 'Are you sure you want to delete this unit? This will also delete all lessons and topics.',
+      confirmLabel: 'Delete',
+      destructive: true,
+    });
+    if (!ok) return;
 
     try {
       const response = await fetch(`/api/admin/units?id=${subjectId}`, {
@@ -146,6 +152,7 @@ export default function UnitsPage() {
 
   return (
     <div className="p-6">
+      {dialog}
       <div className="max-w-6xl mx-auto">
         <div className="mb-6 page-toolbar">
           <div className="flex items-center gap-4">

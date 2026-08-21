@@ -25,6 +25,7 @@ import {
   Download
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 interface UploadedFile {
   folder: string;
@@ -36,6 +37,7 @@ interface UploadedFile {
 
 export default function FileManagerPage() {
   const { data: session, status } = useSession();
+  const { confirm, dialog } = useConfirmDialog();
   const user = session?.user;
   const userRole = user?.role;
   const [files, setFiles] = useState<UploadedFile[]>([]);
@@ -85,7 +87,13 @@ export default function FileManagerPage() {
   };
 
   const deleteFile = async (folder: string, filename: string) => {
-    if (!confirm(`Delete ${filename}?`)) return;
+    const ok = await confirm({
+      title: 'Delete file?',
+      description: `Delete ${filename}?`,
+      confirmLabel: 'Delete',
+      destructive: true,
+    });
+    if (!ok) return;
 
     setDeleting(`${folder}/${filename}`);
     try {
@@ -146,6 +154,7 @@ export default function FileManagerPage() {
 
   return (
     <div className="min-w-0 w-full">
+      {dialog}
       <div className="min-w-0 w-full space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

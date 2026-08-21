@@ -32,6 +32,7 @@ import {
 } from '@/components/ui/select';
 import { Tag, Plus, Pencil, Trash2, RefreshCw, AlertCircle, IndianRupee, Star } from 'lucide-react';
 import { toast } from 'sonner';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 interface PricingPlan {
   id: string;
@@ -62,6 +63,7 @@ interface Program {
 
 export default function PricingPage() {
   const { data: session, status } = useSession();
+  const { confirm, dialog } = useConfirmDialog();
   const user = session?.user;
   const userRole = user?.role;
   const authLoading = status === 'loading';
@@ -214,7 +216,13 @@ export default function PricingPage() {
   };
 
   const handleDelete = async (planId: string, planName: string) => {
-    if (!confirm(`Are you sure you want to delete "${planName}"?`)) return;
+    const ok = await confirm({
+      title: 'Delete plan?',
+      description: `Are you sure you want to delete "${planName}"?`,
+      confirmLabel: 'Delete',
+      destructive: true,
+    });
+    if (!ok) return;
 
     try {
       const res = await fetch(`/api/admin/pricing/${planId}`, {
@@ -294,6 +302,7 @@ export default function PricingPage() {
 
   return (
     <div className="min-w-0">
+      {dialog}
       <div className="min-w-0 w-full">
         <div className="mb-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
