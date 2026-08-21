@@ -160,17 +160,10 @@ export default function ProgramsPage() {
     router.push(`/admin/programs/${identifier}`);
   };
 
-  if (isLoadingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-[40vh] items-center justify-center">
         <div className="text-center">
           <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
@@ -203,7 +196,7 @@ export default function ProgramsPage() {
 
         {loading ? (
           <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-theo-black border-t-transparent"></div>
           </div>
         ) : (
           <div className="admin-card-grid">

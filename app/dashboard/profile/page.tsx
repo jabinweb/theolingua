@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { LoadingScreen } from '@/components/ui/loading-screen';
+import { ContentLoader } from '@/components/ui/content-loader';
 import { ChangePasswordForm } from '@/components/dashboard/ChangePasswordForm';
 import { 
   Calendar,
@@ -38,9 +38,8 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const user = session?.user;
-  const loading = status === 'loading';
   
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -75,12 +74,8 @@ export default function ProfilePage() {
     fetchUserProfile();
   }, [user]);
 
-  if (loading) {
-    return <LoadingScreen />;
-  }
-
   if (!user) {
-    return null;
+    return <ContentLoader />;
   }
 
   const displayName = userProfile?.displayName || userProfile?.name || user.email?.split('@')[0] || 'User';

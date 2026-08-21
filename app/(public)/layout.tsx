@@ -1,9 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import PublicMain from "@/components/layout/PublicMain";
-
-
+import PublicShell from "@/components/layout/PublicShell";
 
 export const viewport: Viewport = {
   themeColor: "#3b82f6",
@@ -55,11 +51,7 @@ export default function PublicLayout({
 }>) {
   return (
     <div className="flex min-h-screen flex-col overflow-x-hidden">
-      <Header />
-      <PublicMain>
-        {children}
-      </PublicMain>
-      <Footer />
+      <PublicShell>{children}</PublicShell>
     </div>
   );
 }

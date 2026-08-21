@@ -183,13 +183,6 @@ export default function AdminPage() {
     }
   };
 
-  if (isLoadingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
 
   if (isStaff) {
     const displayName = user?.name || (userRole === 'TEACHER' ? 'Teacher' : 'Moderator');
@@ -329,8 +322,8 @@ export default function AdminPage() {
 
   if (dataLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-theo-black border-t-transparent"></div>
       </div>
     );
   }

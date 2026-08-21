@@ -284,13 +284,6 @@ export default function SubscriptionsPage() {
     });
   }, [subscriptions, searchTerm, registeredUsers]);
 
-  if (isLoadingAuth) {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-theo-black border-t-transparent" />
-      </div>
-    );
-  }
 
   if (!user) {
     return (

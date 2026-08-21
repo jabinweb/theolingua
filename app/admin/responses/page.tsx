@@ -236,17 +236,10 @@ export default function ResponsesPage() {
   }, [filteredResponses]);
 
   // Show loading while checking auth and role
-  if (isLoadingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-[40vh] items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-2">Authentication Required</h1>
           <p className="text-muted-foreground">Please sign in to access the admin panel.</p>
@@ -257,7 +250,7 @@ export default function ResponsesPage() {
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-[40vh] items-center justify-center">
         <div className="text-center">
           <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
@@ -269,8 +262,8 @@ export default function ResponsesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-theo-black border-t-transparent"></div>
       </div>
     );
   }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { LoadingScreen } from '@/components/ui/loading-screen';
+import { ContentLoader } from '@/components/ui/content-loader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,9 +21,8 @@ interface Subscription {
 }
 
 export default function SubscriptionsPage() {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const user = session?.user;
-  const loading = status === 'loading';
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -86,8 +85,8 @@ export default function SubscriptionsPage() {
     }
   };
 
-  if (loading || isLoading) {
-    return <LoadingScreen />;
+  if (isLoading) {
+    return <ContentLoader message="Loading subscriptions..." />;
   }
 
   const getStatusBadge = (status: string) => {

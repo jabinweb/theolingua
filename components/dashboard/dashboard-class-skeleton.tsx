@@ -11,7 +11,7 @@ export function ProgramPageSkeleton({ programLogo, programName }: ProgramPageSke
   // If we have a logo, show centered loading screen with logo
   if (programLogo && programLogo !== '') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+      <div className="flex min-h-[40vh] items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-12">
         <div className="text-center">
           <div className="mb-6 flex justify-center">
             <div className="w-32 h-32 rounded-3xl overflow-hidden bg-white border-2 shadow-lg flex items-center justify-center animate-pulse">
@@ -35,7 +35,7 @@ export function ProgramPageSkeleton({ programLogo, programName }: ProgramPageSke
 
   // Fallback to full skeleton if no logo
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-6">
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header Section Skeleton */}
         <div className="mb-8">

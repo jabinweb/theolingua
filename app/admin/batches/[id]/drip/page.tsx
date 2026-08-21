@@ -135,7 +135,7 @@ export default function BatchDripConfigPage({ params }: { params: Promise<{ id: 
 
   if (loading) {
     return (
-      <div className="p-10 flex items-center justify-center min-h-screen">
+      <div className="flex min-h-[40vh] items-center justify-center p-10">
         <RefreshCw className="h-8 w-8 animate-spin text-indigo-500" />
       </div>
     );
