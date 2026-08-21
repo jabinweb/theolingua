@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { TopicForm } from '@/components/admin/TopicForm';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 interface TopicContentData {
   contentType: string;
@@ -45,6 +46,7 @@ interface TopicFormData {
 export default function TopicsPage() {
   const params = useParams();
   const router = useRouter();
+  const { confirm, dialog } = useConfirmDialog();
   const programId = params.programId as string;
   const unitId = params.unitId as string;
   const chapterId = params.chapterId as string;
@@ -151,13 +153,20 @@ export default function TopicsPage() {
   };
 
   const handleDeleteTopic = async (topicId: string) => {
-    if (!confirm('Delete this topic?')) return;
+    const ok = await confirm({
+      title: 'Delete topic?',
+      description: 'Delete this topic?',
+      confirmLabel: 'Delete',
+      destructive: true,
+    });
+    if (!ok) return;
     const response = await fetch(`/api/admin/topics?id=${topicId}`, { method: 'DELETE' });
     if (response.ok) fetchTopics();
   };
 
   return (
     <div className="min-w-0">
+      {dialog}
       <AdminPageHeader
         title="Lesson topics"
         badge="Content management"

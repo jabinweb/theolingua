@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/select';
 import { AVAILABLE_CAPABILITIES, DEFAULT_RBAC_CONFIG } from '@/lib/rbac-config';
 import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 const ROLE_METADATA = {
   ADMIN: {
@@ -48,6 +49,7 @@ const ROLE_METADATA = {
 
 export default function GlobalRBACPage() {
   const { data: session } = useSession();
+  const { confirm, dialog } = useConfirmDialog();
   const isAdmin = session?.user?.role === 'ADMIN';
 
   const [isEditing, setIsEditing] = useState(false);
@@ -127,18 +129,24 @@ export default function GlobalRBACPage() {
     }
   };
 
-  const handleReset = () => {
-    if (confirm('Are you sure you want to reset all roles to their system defaults?')) {
-      const resetConfig = Object.keys(ROLE_METADATA).reduce((acc, role) => {
-        acc[role] = {
-          ...ROLE_METADATA[role as keyof typeof ROLE_METADATA],
-          permissions: DEFAULT_RBAC_CONFIG[role] || []
-        };
-        return acc;
-      }, {} as any);
-      setRolesConfig(resetConfig);
-      toast.info('Roles reset to defaults (click Save to persist)');
-    }
+  const handleReset = async () => {
+    const ok = await confirm({
+      title: 'Reset roles?',
+      description: 'Are you sure you want to reset all roles to their system defaults?',
+      confirmLabel: 'Reset',
+      destructive: true,
+    });
+    if (!ok) return;
+
+    const resetConfig = Object.keys(ROLE_METADATA).reduce((acc, role) => {
+      acc[role] = {
+        ...ROLE_METADATA[role as keyof typeof ROLE_METADATA],
+        permissions: DEFAULT_RBAC_CONFIG[role] || []
+      };
+      return acc;
+    }, {} as any);
+    setRolesConfig(resetConfig);
+    toast.info('Roles reset to defaults (click Save to persist)');
   };
 
   const addCapability = (role: string, capName?: string) => {
@@ -192,6 +200,7 @@ export default function GlobalRBACPage() {
 
   return (
     <div className="p-6">
+      {dialog}
       <div className="max-w-6xl mx-auto">
         <div className="page-toolbar mb-8">
           <div>

@@ -27,6 +27,7 @@ import {
   Layers,
   ShieldCheck,
   FolderOpen,
+  FolderTree,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -67,6 +68,7 @@ const navigation: NavSection[] = [
     label: 'Content',
     items: [
       { name: 'Programs', href: '/admin/programs', icon: GraduationCap, roles: ['ADMIN'] },
+      { name: 'Curriculum', href: '/admin/curriculum', icon: FolderTree, roles: ['ADMIN'] },
       { name: 'Files', href: '/admin/files', icon: FolderOpen, roles: ['ADMIN'] },
     ],
   },

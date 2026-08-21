@@ -26,6 +26,7 @@ import {
   Wrench
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 interface Announcement {
   id: string;
@@ -59,6 +60,7 @@ interface CreateAnnouncementData {
 }
 
 export default function AdminAnnouncementsPage() {
+  const { confirm, dialog } = useConfirmDialog();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [stats, setStats] = useState<AnnouncementStats>({
     totalAnnouncements: 0,
@@ -204,9 +206,13 @@ export default function AdminAnnouncementsPage() {
   };
 
   const deleteAnnouncement = async (announcementId: string) => {
-    if (!confirm('Are you sure you want to delete this announcement?')) {
-      return;
-    }
+    const ok = await confirm({
+      title: 'Delete announcement?',
+      description: 'Are you sure you want to delete this announcement?',
+      confirmLabel: 'Delete',
+      destructive: true,
+    });
+    if (!ok) return;
     
     try {
       const response = await fetch(`/api/admin/announcements/${announcementId}`, {
@@ -302,6 +308,7 @@ export default function AdminAnnouncementsPage() {
 
   return (
     <div className="min-w-0">
+      {dialog}
       <div className="min-w-0 w-full">
         <div className="mb-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">

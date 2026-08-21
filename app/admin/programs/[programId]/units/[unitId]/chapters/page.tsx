@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2, FileText } from 'lucide-react';
 import { ChapterForm } from '@/components/admin/ChapterForm';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 interface Chapter {
   id: string;
@@ -28,6 +29,7 @@ interface ChapterFormData {
 export default function ChaptersPage() {
   const params = useParams();
   const router = useRouter();
+  const { confirm, dialog } = useConfirmDialog();
   const programId = params.programId as string;
   const unitId = params.unitId as string;
 
@@ -75,7 +77,13 @@ export default function ChaptersPage() {
   };
 
   const handleDeleteChapter = async (chapterId: string) => {
-    if (!confirm('Delete this lesson and all its topics?')) return;
+    const ok = await confirm({
+      title: 'Delete lesson?',
+      description: 'Delete this lesson and all its topics?',
+      confirmLabel: 'Delete',
+      destructive: true,
+    });
+    if (!ok) return;
     const response = await fetch(`/api/admin/chapters?id=${chapterId}`, { method: 'DELETE' });
     if (response.ok) fetchChapters();
   };
@@ -86,6 +94,7 @@ export default function ChaptersPage() {
 
   return (
     <div className="min-w-0">
+      {dialog}
       <AdminPageHeader
         title="Unit lessons"
         badge="Content management"

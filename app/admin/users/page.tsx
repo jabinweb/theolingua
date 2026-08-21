@@ -24,6 +24,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 interface Subscription {
   id: string;
@@ -71,6 +72,7 @@ interface UserFormData {
 
 export default function UsersPage() {
   const { data: session, status } = useSession();
+  const { confirm, dialog } = useConfirmDialog();
   const user = session?.user;
   const userRole = user?.role; // Get actual role from session
   const loading = status === 'loading';
@@ -172,7 +174,13 @@ export default function UsersPage() {
   };
 
   const deleteUser = async (userId: string) => {
-    if (!confirm('Are you sure you want to delete this user?')) return;
+    const ok = await confirm({
+      title: 'Delete user?',
+      description: 'Are you sure you want to delete this user?',
+      confirmLabel: 'Delete',
+      destructive: true,
+    });
+    if (!ok) return;
 
     try {
       const response = await fetch(`/api/admin/users?id=${userId}`, {
@@ -356,7 +364,13 @@ export default function UsersPage() {
   const handleBulkDelete = async () => {
     if (selectedUsers.size === 0) return;
 
-    if (!confirm(`Are you sure you want to delete ${selectedUsers.size} user(s)?`)) return;
+    const ok = await confirm({
+      title: 'Delete users?',
+      description: `Are you sure you want to delete ${selectedUsers.size} user(s)?`,
+      confirmLabel: 'Delete',
+      destructive: true,
+    });
+    if (!ok) return;
 
     setBulkActionLoading(true);
     try {
@@ -410,7 +424,13 @@ export default function UsersPage() {
   const handleBulkDeactivate = async () => {
     if (selectedUsers.size === 0) return;
 
-    if (!confirm(`Are you sure you want to deactivate ${selectedUsers.size} user(s)?`)) return;
+    const ok = await confirm({
+      title: 'Deactivate users?',
+      description: `Are you sure you want to deactivate ${selectedUsers.size} user(s)?`,
+      confirmLabel: 'Deactivate',
+      destructive: true,
+    });
+    if (!ok) return;
 
     setBulkActionLoading(true);
     try {
@@ -575,6 +595,7 @@ export default function UsersPage() {
 
   return (
     <div className="min-w-0">
+      {dialog}
       <div className="min-w-0 w-full">
         <div className="mb-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">

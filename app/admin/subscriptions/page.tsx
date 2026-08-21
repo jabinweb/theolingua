@@ -14,6 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 interface Program {
   id: number;
@@ -64,6 +65,7 @@ export default function SubscriptionsPage() {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [batches, setBatches] = useState<Batch[]>([]);
   const { data: session, status } = useSession();
+  const { confirm, dialog } = useConfirmDialog();
   const user = session?.user;
   const userRole = user?.role;
   const loading = status === 'loading';
@@ -180,7 +182,13 @@ export default function SubscriptionsPage() {
   };
 
   const deleteSubscription = async (subscriptionId: string) => {
-    if (!confirm('Are you sure you want to delete this subscription?')) return;
+    const ok = await confirm({
+      title: 'Delete subscription?',
+      description: 'Are you sure you want to delete this subscription?',
+      confirmLabel: 'Delete',
+      destructive: true,
+    });
+    if (!ok) return;
 
     try {
       const response = await fetch(`/api/admin/subscriptions?id=${subscriptionId}`, {
@@ -320,6 +328,7 @@ export default function SubscriptionsPage() {
 
   return (
     <div className="min-w-0">
+      {dialog}
       <AdminPageHeader
         title="Subscription Management"
         description="Grant program access, assign batches, and manage subscriptions."

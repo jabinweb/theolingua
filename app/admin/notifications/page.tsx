@@ -26,6 +26,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 interface Notification {
   id: string;
@@ -63,6 +64,7 @@ interface CreateNotificationData {
 }
 
 export default function AdminNotificationsPage() {
+  const { confirm, dialog } = useConfirmDialog();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [stats, setStats] = useState<NotificationStats>({
     totalNotifications: 0,
@@ -198,9 +200,13 @@ export default function AdminNotificationsPage() {
   };
 
   const deleteNotification = async (notificationId: string) => {
-    if (!confirm('Are you sure you want to delete this notification?')) {
-      return;
-    }
+    const ok = await confirm({
+      title: 'Delete notification?',
+      description: 'Are you sure you want to delete this notification?',
+      confirmLabel: 'Delete',
+      destructive: true,
+    });
+    if (!ok) return;
     
     try {
       const response = await fetch(`/api/admin/notifications/${notificationId}`, {
@@ -258,6 +264,7 @@ export default function AdminNotificationsPage() {
 
   return (
     <div className="min-w-0">
+      {dialog}
       <div className="min-w-0 w-full">
         <div className="mb-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">

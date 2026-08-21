@@ -22,6 +22,7 @@ import {
   Code
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 
 interface ErrorLog {
@@ -45,6 +46,7 @@ interface ErrorStats {
 }
 
 export default function AdminErrorLogsPage() {
+  const { confirm, dialog } = useConfirmDialog();
   const [errorLogs, setErrorLogs] = useState<ErrorLog[]>([]);
   const [stats, setStats] = useState<ErrorStats>({
     totalErrors: 0,
@@ -157,9 +159,13 @@ export default function AdminErrorLogsPage() {
   };
 
   const clearOldLogs = async () => {
-    if (!confirm('Are you sure you want to clear error logs older than 30 days?')) {
-      return;
-    }
+    const ok = await confirm({
+      title: 'Clear old logs?',
+      description: 'Are you sure you want to clear error logs older than 30 days?',
+      confirmLabel: 'Clear',
+      destructive: true,
+    });
+    if (!ok) return;
     
     try {
       const response = await fetch('/api/admin/error-logs/cleanup', {
@@ -176,6 +182,7 @@ export default function AdminErrorLogsPage() {
 
   return (
     <div className="container mx-auto min-w-0 px-4 py-5 sm:px-6">
+      {dialog}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Error Logs</h1>
         <p className="text-gray-600">Monitor and analyze system errors and issues</p>

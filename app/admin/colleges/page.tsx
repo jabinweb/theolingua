@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2, RefreshCw, AlertCircle, School, Users, Mail, Phone, Upload } from 'lucide-react';
 import { SchoolForm } from '@/components/admin/SchoolForm';
 import { BulkStudentUpload } from '@/components/admin/BulkStudentUpload';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
 interface SchoolData {
   id: string;
@@ -39,6 +40,7 @@ interface SchoolFormData {
 
 export default function CollegesPage() {
   const { data: session, status } = useSession();
+  const { confirm, dialog } = useConfirmDialog();
   const user = session?.user;
   // Get actual role from session
   const userRole = user?.role; // Get actual role from session
@@ -121,9 +123,13 @@ export default function CollegesPage() {
   };
 
   const handleDeleteSchool = async (schoolId: string) => {
-    if (!confirm('Are you sure you want to delete this college? This will also affect all associated users.')) {
-      return;
-    }
+    const ok = await confirm({
+      title: 'Delete college?',
+      description: 'Are you sure you want to delete this college? This will also affect all associated users.',
+      confirmLabel: 'Delete',
+      destructive: true,
+    });
+    if (!ok) return;
 
     try {
       const response = await fetch(`/api/admin/colleges?id=${schoolId}`, {
@@ -195,6 +201,7 @@ export default function CollegesPage() {
 
   return (
     <div className="space-y-4">
+      {dialog}
       <div className="min-w-0 w-full">
         <div className="mb-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
