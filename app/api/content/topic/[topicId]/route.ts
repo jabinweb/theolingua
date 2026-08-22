@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { logTopicStarted } from '@/lib/activity-logger';
-import { hasAllProgramAccess } from '@/lib/user-program-access';
+import { hasStaffProgramPreview } from '@/lib/user-program-access';
 import { isTopicEnabled, type UnitProgression } from '@/lib/topic-progression';
 import { defaultMasteryScore } from '@/lib/score-bridge';
 
@@ -42,6 +42,10 @@ async function verifyTopicAccess(userId: string, topicId: string) {
 
     if (!user) return { hasAccess: false, topic, sequentialLocked: false };
 
+    if (hasStaffProgramPreview(user.role)) {
+      return { hasAccess: true, topic, sequentialLocked: false };
+    }
+
     const unitProgression: UnitProgression = {
       id: topic.chapter.subject.id,
       name: topic.chapter.subject.name,
@@ -68,10 +72,6 @@ async function verifyTopicAccess(userId: string, topicId: string) {
       unitProgression,
       completedTopics
     );
-
-    if (hasAllProgramAccess(user.role)) {
-      return { hasAccess: true, topic, sequentialLocked: false };
-    }
 
     if (sequentialLocked) {
       return { hasAccess: false, topic, sequentialLocked: true };

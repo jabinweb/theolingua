@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { buildDripAccessMap } from '@/lib/drip-access';
-import { hasAllProgramAccess } from '@/lib/user-program-access';
+import { hasStaffProgramPreview } from '@/lib/user-program-access';
 
 interface UnitAccess {
   id: string;
@@ -56,7 +56,7 @@ export async function GET(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const hasAdminAccess = hasAllProgramAccess(user.role);
+    const hasStaffPreview = hasStaffProgramPreview(user.role);
 
     const isNumeric = /^\d+$/.test(slug);
 
@@ -121,7 +121,8 @@ export async function GET(
 
     const hasBatchAccess = user.batch?.classId === programData.id;
     const isFreeProgram = programData.price === 0 || programData.price === null;
-    const hasFullAccess = hasAdminAccess || isFreeProgram || hasSchoolAccess || !!classSubscription || hasBatchAccess;
+    const hasFullAccess =
+      hasStaffPreview || isFreeProgram || hasSchoolAccess || !!classSubscription || hasBatchAccess;
 
     let dripAccessMap = new Map<string, { isUnlocked: boolean; daysRemaining: number }>();
     let isDripActive = false;
@@ -156,7 +157,7 @@ export async function GET(
       }
 
       let accessType: UnitAccess['accessType'] = 'none';
-      if (hasAdminAccess) accessType = 'class_subscription';
+      if (hasStaffPreview) accessType = 'class_subscription';
       else if (hasSchoolAccess) accessType = 'school';
       else if (classSubscription || hasBatchAccess) accessType = 'class_subscription';
       else if (hasSubjectSubscription) accessType = 'subject_subscription';
@@ -164,7 +165,7 @@ export async function GET(
         accessType = 'free_trial';
       }
 
-      if (isDripActive && dripAccessMap.size > 0 && !hasAdminAccess) {
+      if (isDripActive && dripAccessMap.size > 0 && !hasStaffPreview) {
         const dripResult = dripAccessMap.get(subject.id);
         if (dripResult && !dripResult.isUnlocked) {
           return {
@@ -203,7 +204,7 @@ export async function GET(
       className: programData.name,
       classPrice: programData.price,
       hasFullAccess,
-      accessType: hasAdminAccess
+      accessType: hasStaffPreview
         ? 'class_subscription'
         : hasSchoolAccess
         ? 'school'

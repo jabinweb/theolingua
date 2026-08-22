@@ -5,6 +5,11 @@ export function hasAllProgramAccess(role?: string | null): boolean {
   return role === 'ADMIN';
 }
 
+/** Admins and teachers preview curriculum without sequential topic locks. */
+export function hasStaffProgramPreview(role?: string | null): boolean {
+  return role === 'ADMIN' || role === 'TEACHER';
+}
+
 export async function syncUserProgramSubscriptions(userId: string, classIds: number[]) {
   const endDate = new Date();
   endDate.setFullYear(endDate.getFullYear() + 1);

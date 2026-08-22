@@ -82,6 +82,7 @@ interface UnitContentProps {
   onUpgradeClick?: () => void;
   getUnitProgress: (unitId: string) => number;
   convertTopicForItem?: (topic: BaseTopic) => Topic;
+  unlockAllTopics?: boolean;
 }
 
 interface EmptyUnitContentProps {
@@ -115,7 +116,8 @@ export const UnitContent: React.FC<UnitContentProps> = ({
   onLockedClick,
   onUpgradeClick,
   getUnitProgress,
-  convertTopicForItem
+  convertTopicForItem,
+  unlockAllTopics = false,
 }) => {
   const [expandedChapters, setExpandedChapters] = useState<Set<string>>(new Set());
   const unitChipRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
@@ -467,13 +469,15 @@ export const UnitContent: React.FC<UnitContentProps> = ({
                                     })),
                                   }
                                 : null;
-                              const progressionLocked = unitForProgression
-                                ? !isTopicEnabled(
-                                    { id: topic.id, name: topic.name },
-                                    unitForProgression,
-                                    completedTopics
-                                  )
-                                : false;
+                              const progressionLocked =
+                                !unlockAllTopics &&
+                                unitForProgression
+                                  ? !isTopicEnabled(
+                                      { id: topic.id, name: topic.name },
+                                      unitForProgression,
+                                      completedTopics
+                                    )
+                                  : false;
                               const paywallLocked = chapter.isLocked || false;
                               const isDisabled = paywallLocked || progressionLocked;
                               // Convert topic for TopicItem - use converter or create default Topic structure
