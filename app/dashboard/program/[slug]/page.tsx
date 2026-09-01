@@ -12,13 +12,9 @@ import { ContentPlayer } from '@/components/learning/ContentPlayer';
 import { ProgramSubscriptionManager } from '@/components/dashboard/ProgramSubscriptionManager';
 import { ProgramPageSkeleton } from '@/components/dashboard/dashboard-class-skeleton';
 import { UnitContent } from '@/components/learning/UnitContent';
-import { useSession } from 'next-auth/react';
-import { hasStaffProgramPreview } from '@/lib/user-program-access';
 import {
   getNextTopic,
   isUnitCompleted,
-  isTopicEnabled,
-  canNavigateToNext,
   type UnitProgression,
 } from '@/lib/topic-progression';
 
@@ -73,8 +69,6 @@ function ProgramPageContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { data: session } = useSession();
-  const unlockAllTopics = hasStaffProgramPreview(session?.user?.role);
   const slug = params.slug as string;
   const topicParam = searchParams.get('topic');
 
@@ -211,34 +205,6 @@ function ProgramPageContent() {
       return;
     }
 
-    if (selectedUnitData) {
-      const unitProgress: UnitProgression = {
-        id: selectedUnitData.id,
-        name: selectedUnitData.name,
-        chapters: selectedUnitData.chapters.map((ch) => ({
-          id: ch.id,
-          name: ch.name,
-          topics: ch.topics.map((t) => ({
-            id: t.id,
-            name: t.name,
-            completed: userProgress.get(t.id) || false,
-          })),
-        })),
-      };
-      const completedTopicsSet = new Set<string>();
-      userProgress.forEach((completed, topicId) => {
-        if (completed) completedTopicsSet.add(topicId);
-      });
-
-      if (
-        !unlockAllTopics &&
-        !isTopicEnabled({ id: topic.id, name: topic.name }, unitProgress, completedTopicsSet)
-      ) {
-        toast.message('Complete the previous topic to unlock this one');
-        return;
-      }
-    }
-
     // Drive player via URL so any topic is deep-linkable / refreshable
     setTopicInUrl(topic.id, 'push');
   };
@@ -316,24 +282,6 @@ function ProgramPageContent() {
       name: selectedTopic.name,
       completed: userProgress.get(selectedTopic.id) || false
     };
-
-    // Create a Set from userProgress for compatibility with shared functions
-    const completedTopicsSet = new Set<string>();
-    userProgress.forEach((completed, topicId) => {
-      if (completed) completedTopicsSet.add(topicId);
-    });
-
-    if (
-      !unlockAllTopics &&
-      !canNavigateToNext(currentTopicForProgression, unitProgress, completedTopicsSet)
-    ) {
-      toast.message(
-        selectedTopic.requiresPass
-          ? 'Pass this activity to unlock the next topic'
-          : 'Complete this topic before moving on'
-      );
-      return;
-    }
 
     const nextTopic = getNextTopic(currentTopicForProgression, unitProgress);
     
@@ -516,7 +464,6 @@ function ProgramPageContent() {
             const unit = currentProgram.units.find(s => s.id === unitId);
             return unit ? getUnitProgress(unit) : 0;
           }}
-          unlockAllTopics={unlockAllTopics}
         />
 
       <ContentPlayer
@@ -528,7 +475,7 @@ function ProgramPageContent() {
         onNext={handleNextTopic}
         isCompleted={selectedTopic ? (userProgress.get(selectedTopic.id) || false) : false}
         canGoNext={
-          unlockAllTopics && selectedTopic && selectedUnitData
+          selectedTopic && selectedUnitData
             ? Boolean(
                 getNextTopic(
                   {
@@ -551,33 +498,7 @@ function ProgramPageContent() {
                   }
                 )
               )
-            : selectedTopic && selectedUnitData
-              ? canNavigateToNext(
-                  {
-                    id: selectedTopic.id,
-                    name: selectedTopic.name,
-                    completed: userProgress.get(selectedTopic.id) || false,
-                  },
-                  {
-                    id: selectedUnitData.id,
-                    name: selectedUnitData.name,
-                    chapters: selectedUnitData.chapters.map((ch) => ({
-                      id: ch.id,
-                      name: ch.name,
-                      topics: ch.topics.map((t) => ({
-                        id: t.id,
-                        name: t.name,
-                        completed: userProgress.get(t.id) || false,
-                      })),
-                    })),
-                  },
-                  new Set(
-                    Array.from(userProgress.entries())
-                      .filter(([, completed]) => completed)
-                      .map(([topicId]) => topicId)
-                  )
-                )
-              : false
+            : false
         }
       />
     </div>
