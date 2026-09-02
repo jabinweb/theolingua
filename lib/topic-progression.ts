@@ -27,29 +27,16 @@ export function getOrderedTopics(unitData: UnitProgression): TopicProgression[] 
 }
 
 /**
- * Check if a topic should be enabled based on sequential unlock logic
+ * Check if a topic should be enabled based on sequential unlock logic.
+ * Sequential locking is disabled — all topics in an accessible unit are open.
  */
 export function isTopicEnabled(
   topic: TopicProgression,
   unitData: UnitProgression,
-  completedTopics: Set<string>
+  _completedTopics: Set<string>
 ): boolean {
   if (!unitData) return false;
-
-  const allTopics = getOrderedTopics(unitData);
-  const topicIndex = allTopics.findIndex((t) => t.id === topic.id);
-
-  if (topicIndex < 0) return false;
-  if (topicIndex === 0) return true;
-
-  for (let i = 0; i < topicIndex; i++) {
-    const previousTopic = allTopics[i];
-    if (!completedTopics.has(previousTopic.id) && !previousTopic.completed) {
-      return false;
-    }
-  }
-
-  return true;
+  return getOrderedTopics(unitData).some((t) => t.id === topic.id);
 }
 
 export function isTopicCompleted(
@@ -87,20 +74,14 @@ export function getNextTopic(
 }
 
 /**
- * Next is allowed only when the current topic is completed (passed).
+ * Next is allowed whenever another topic follows (completion not required).
  */
 export function canNavigateToNext(
   currentTopic: TopicProgression,
   unitData: UnitProgression,
-  completedTopics: Set<string>
+  _completedTopics: Set<string>
 ): boolean {
   if (!unitData || !currentTopic) return false;
-
-  const isCurrentCompleted =
-    completedTopics.has(currentTopic.id) || Boolean(currentTopic.completed);
-
-  if (!isCurrentCompleted) return false;
-
   return getNextTopic(currentTopic, unitData) !== null;
 }
 

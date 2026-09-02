@@ -266,7 +266,7 @@ export function ContentPlayer({
           );
         } else {
           toast.error(
-            `Score ${Math.round(data.percent)}% — need ${data.masteryScore}% to unlock the next topic`
+            `Score ${Math.round(data.percent)}% — need ${data.masteryScore}% to pass this topic`
           );
         }
       } catch (error) {
@@ -452,7 +452,7 @@ export function ContentPlayer({
   };
 
   const completedNow = hasCompleted || isCompleted;
-  const nextEnabled = Boolean(onNext) && (isDemo ? true : canGoNext && completedNow);
+  const nextEnabled = Boolean(onNext) && (isDemo ? true : canGoNext);
 
   return (
     <Dialog
@@ -471,7 +471,7 @@ export function ContentPlayer({
               <span className="truncate font-medium block">{topic.name}</span>
               {requiresPass && (
                 <span className="text-[11px] text-gray-400">
-                  Pass {masteryScore}% to unlock next
+                  Pass {masteryScore}% to complete this topic
                   {mastery?.attemptCount ? ` · Attempts ${mastery.attemptCount}` : ''}
                 </span>
               )}
@@ -550,7 +550,7 @@ export function ContentPlayer({
                     ? 'Upgrade to access more content'
                     : nextEnabled
                       ? 'Play the next topic'
-                      : 'Complete this topic to unlock the next one'
+                      : 'No more topics in this unit'
                 }
                 aria-label={isDemo && isDemoLimitReached ? 'Upgrade' : 'Play Next'}
               >

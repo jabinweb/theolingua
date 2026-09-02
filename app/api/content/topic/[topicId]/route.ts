@@ -3,7 +3,6 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { logTopicStarted } from '@/lib/activity-logger';
 import { hasStaffProgramPreview } from '@/lib/user-program-access';
-import { isTopicEnabled, type UnitProgression } from '@/lib/topic-progression';
 import { defaultMasteryScore } from '@/lib/score-bridge';
 
 // Server-side function to verify topic access
@@ -44,37 +43,6 @@ async function verifyTopicAccess(userId: string, topicId: string) {
 
     if (hasStaffProgramPreview(user.role)) {
       return { hasAccess: true, topic, sequentialLocked: false };
-    }
-
-    const unitProgression: UnitProgression = {
-      id: topic.chapter.subject.id,
-      name: topic.chapter.subject.name,
-      chapters: topic.chapter.subject.chapters.map((ch) => ({
-        id: ch.id,
-        name: ch.name,
-        topics: ch.topics.map((t) => ({ id: t.id, name: t.name })),
-      })),
-    };
-
-    const completedRows = await prisma.userTopicProgress.findMany({
-      where: {
-        userId,
-        completed: true,
-        topicId: {
-          in: unitProgression.chapters.flatMap((ch) => ch.topics.map((t) => t.id)),
-        },
-      },
-      select: { topicId: true },
-    });
-    const completedTopics = new Set(completedRows.map((r) => r.topicId));
-    const sequentialLocked = !isTopicEnabled(
-      { id: topic.id, name: topic.name },
-      unitProgression,
-      completedTopics
-    );
-
-    if (sequentialLocked) {
-      return { hasAccess: false, topic, sequentialLocked: true };
     }
 
     const classId = topic.chapter.subject.classId;
