@@ -130,9 +130,9 @@ function ProgramPageContent() {
     }
   }, [currentProgram, selectedUnit, topicParam]);
 
-  // Open / sync player from ?topic= URL
+  // Open / sync player from ?topic= URL (wait for access data — avoids false paywall modal)
   useEffect(() => {
-    if (!currentProgram) return;
+    if (!currentProgram || loading) return;
 
     if (!topicParam) {
       setIsPlayerOpen(false);
@@ -150,8 +150,11 @@ function ProgramPageContent() {
     const hasUnitAccess = unitAccess[unit.id] === true;
 
     if (!hasUnitAccess && currentProgram.price !== 0) {
-      setShowSubscriptionManager(true);
-      setTopicInUrl(null, 'replace');
+      // Only prompt when access API explicitly denied — not while data is still empty
+      if (unitAccess[unit.id] === false) {
+        setShowSubscriptionManager(true);
+        setTopicInUrl(null, 'replace');
+      }
       return;
     }
 
@@ -171,6 +174,7 @@ function ProgramPageContent() {
     findTopicInProgram,
     setTopicInUrl,
     userProgress,
+    loading,
   ]);
 
   if (loading || !currentProgram) {
